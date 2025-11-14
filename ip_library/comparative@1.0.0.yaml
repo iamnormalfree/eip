@@ -1,0 +1,24 @@
+id: comparative
+version: 1.0.0
+purpose: "Help people choose between options by comparing criteria and trade-offs"
+operators:
+  - name: CRITERIA_MATRIX
+    spec: "Define evaluation criteria and create comparison matrix"
+  - name: TRADE_OFF_ANALYSIS
+    spec: "Analyze pros/cons and trade-offs for each option"
+  - name: RECOMMENDATION
+    spec: "Provide recommendation based on use case and priorities"
+invariants:
+  - "Must include at least two options to compare"
+  - "Must include a Criteria section"
+  - "Must include a Comparison section"
+  - "Must include a Recommendation section"
+  - "Criteria must be objective and measurable"
+sections:
+  - Overview
+  - Options
+  - Criteria
+  - Comparison
+  - Trade-offs
+  - Recommendation
+  - CTA

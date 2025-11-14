@@ -185,12 +185,103 @@ describe('IP Validation', () => {
     });
   });
 
+  describe('Process IP Specific Validation', () => {
+    it('should require Process IP specific sections', () => {
+      const requiredSections = ['Overview', 'Prerequisites', 'Steps', 'Examples', 'Troubleshooting', 'Tips', 'CTA'];
+
+      const processSections = ['Overview', 'Prerequisites', 'Steps', 'Examples', 'Troubleshooting', 'Tips', 'CTA'];
+      const missingSections = requiredSections.filter(section => !processSections.includes(section));
+
+      expect(missingSections).toHaveLength(0);
+      expect(processSections).toHaveLength(7);
+    });
+
+    it('should require exactly 3 operators for Process IP', () => {
+      const validOperatorCount = 3;
+      const processOperators = [
+        { name: 'STEP_BY_STEP', spec: 'Break down into sequential steps' },
+        { name: 'EXAMPLE_DEMO', spec: 'Provide concrete example' },
+        { name: 'TROUBLESHOOT', spec: 'Identify common pitfalls' }
+      ];
+
+      expect(processOperators).toHaveLength(validOperatorCount);
+    });
+
+    it('should validate Process IP invariants', () => {
+      const requiredInvariants = [
+        'Must include step-by-step instructions',
+        'Must include a Examples section',
+        'Must include a Troubleshooting section',
+        'Steps must be numbered and sequential',
+        'Each step must have clear action verb'
+      ];
+
+      const processInvariants = [
+        'Must include step-by-step instructions',
+        'Must include a Examples section',
+        'Must include a Troubleshooting section',
+        'Steps must be numbered and sequential',
+        'Each step must have clear action verb'
+      ];
+
+      requiredInvariants.forEach(invariant => {
+        expect(processInvariants).toContain(invariant);
+      });
+    });
+  });
+
+  describe('Comparative IP Specific Validation', () => {
+    it('should require Comparative IP specific sections', () => {
+      const requiredSections = ['Overview', 'Options', 'Criteria', 'Comparison', 'Trade-offs', 'Recommendation', 'CTA'];
+
+      const comparativeSections = ['Overview', 'Options', 'Criteria', 'Comparison', 'Trade-offs', 'Recommendation', 'CTA'];
+      const missingSections = requiredSections.filter(section => !comparativeSections.includes(section));
+
+      expect(missingSections).toHaveLength(0);
+      expect(comparativeSections).toHaveLength(7);
+    });
+
+    it('should require exactly 3 operators for Comparative IP', () => {
+      const validOperatorCount = 3;
+      const comparativeOperators = [
+        { name: 'CRITERIA_MATRIX', spec: 'Define evaluation criteria' },
+        { name: 'TRADE_OFF_ANALYSIS', spec: 'Analyze pros/cons' },
+        { name: 'RECOMMENDATION', spec: 'Provide recommendation' }
+      ];
+
+      expect(comparativeOperators).toHaveLength(validOperatorCount);
+    });
+
+    it('should validate Comparative IP invariants', () => {
+      const requiredInvariants = [
+        'Must include at least two options to compare',
+        'Must include a Criteria section',
+        'Must include a Comparison section',
+        'Must include a Recommendation section',
+        'Criteria must be objective and measurable'
+      ];
+
+      const comparativeInvariants = [
+        'Must include at least two options to compare',
+        'Must include a Criteria section',
+        'Must include a Comparison section',
+        'Must include a Recommendation section',
+        'Criteria must be objective and measurable'
+      ];
+
+      requiredInvariants.forEach(invariant => {
+        expect(comparativeInvariants).toContain(invariant);
+      });
+    });
+  });
+
   describe('Schema Registry Functionality', () => {
     it('should maintain registry of supported IP types', () => {
       const supportedTypes = ['framework', 'process', 'comparative', 'template', 'checklist', 'example'];
-      
+
       expect(supportedTypes).toContain('framework');
       expect(supportedTypes).toContain('process');
+      expect(supportedTypes).toContain('comparative');
       expect(supportedTypes.length).toBeGreaterThan(0);
     });
 

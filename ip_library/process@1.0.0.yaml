@@ -1,0 +1,24 @@
+id: process
+version: 1.0.0
+purpose: "Walk through how to do something step by step with clear guidance and examples"
+operators:
+  - name: STEP_BY_STEP
+    spec: "Break down into sequential steps with clear actions and expected outcomes"
+  - name: EXAMPLE_DEMO
+    spec: "Provide concrete example demonstrating the process in action"
+  - name: TROUBLESHOOT
+    spec: "Identify common pitfalls and how to resolve them"
+invariants:
+  - "Must include step-by-step instructions"
+  - "Must include a Examples section"
+  - "Must include a Troubleshooting section"
+  - "Steps must be numbered and sequential"
+  - "Each step must have clear action verb"
+sections:
+  - Overview
+  - Prerequisites
+  - Steps
+  - Examples
+  - Troubleshooting
+  - Tips
+  - CTA

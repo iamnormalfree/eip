@@ -70,6 +70,11 @@ async function processEIPContentGenerationJob(job: Job<EIPContentGenerationJob>)
     let jobId = data.job_id || `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     if (db) {
       const { job: dbJob, error: createError } = await db.createJob({
+        brief: data.brief,
+        persona: data.persona,
+        funnel: data.funnel,
+        tier: data.tier || 'MEDIUM',
+        status: 'processing',
         stage: 'queue_processing',
         inputs: {
           brief: data.brief,

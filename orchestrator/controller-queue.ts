@@ -138,6 +138,11 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
   if (db) {
     try {
       const jobRecord = await db.createJob({
+        brief: input.brief,
+        persona: input.persona,
+        funnel: input.funnel,
+        tier: input.tier || 'MEDIUM',
+        status: 'queued',
         stage: 'started',
         inputs: input,
         correlation_id: input.correlation_id
