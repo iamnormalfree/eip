@@ -1,0 +1,70 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/question-suppression-detector.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/assumption-detector.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/question-suppression-detector.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/assumption-detector.py"
+          }
+        ]
+      },
+      {
+        "matcher": "NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/question-suppression-detector.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/assumption-detector.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/question-suppression-detector.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/assumption-detector.py"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+// ABOUTME: IP validator (skeleton)
+// ABOUTME: Accepts empty library gracefully; validates basic fields if present.
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { parse } from 'yaml';
+
+function validateIP(obj: any, file: string) {
+  const required = ['id', 'version', 'purpose', 'sections'];
+  for (const key of required) {
+    if (!(key in obj)) {
+      throw new Error(`IP ${file} missing required field: ${key}`);
+    }
+  }
+}
+
+function main() {
+  const dir = path.join(process.cwd(), 'ip_library');
+  if (!fs.existsSync(dir)) {
+    console.log('ip_library directory not found; nothing to validate');
+    process.exit(0);
+  }
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.yaml'));
+  if (files.length === 0) {
+    console.log('No IP YAML files found; nothing to validate');
+    process.exit(0);
+  }
+  for (const f of files) {
+    const raw = fs.readFileSync(path.join(dir, f), 'utf8');
+    const obj = parse(raw);
+    validateIP(obj, f);
+  }
+  console.log(`Validated ${files.length} IP file(s)`);
+}
+
+main();
+

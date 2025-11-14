@@ -1,0 +1,24 @@
+budgets:
+  LIGHT:
+    retrieval: 200
+    planner: 400
+    generator: 1400
+    auditor: 300
+    repairer: 200
+    review: 100
+    wallclock_s: 20
+  MEDIUM:
+    retrieval: 400
+    planner: 1000
+    generator: 2400
+    auditor: 700
+    repairer: 600
+    wallclock_s: 45
+  HEAVY:
+    retrieval: 600
+    planner: 1400
+    generator: 4000
+    auditor: 1100
+    repairer: 1000
+    review: 300
+    wallclock_s: 90

@@ -1,0 +1,62 @@
+--- a/lib/calculations/instant-profile.ts
++++ b/lib/calculations/instant-profile.ts
+@@ -4,6 +4,7 @@
+ import {
+   DR_ELENA_ABSD_RATES,
+   DR_ELENA_CPF_USAGE_RULES,
++  DR_ELENA_INCOME_RECOGNITION,
+   DR_ELENA_LTV_LIMITS,
+   DR_ELENA_POLICY_REFERENCES,
+   DR_ELENA_STRESS_TEST_FLOORS
+@@ -67,6 +68,7 @@ export interface ComplianceSnapshotResult {
+   isMSRCompliant?: boolean;
+   limitingFactor?: 'TDSR' | 'MSR' | 'LTV';
+   reasonCodes: string[];
+   policyRefs: string[];
++  stressRateApplied: number;
+ }
+ 
+ export interface RefinanceOutlookInput {
+@@ -351,12 +353,28 @@ export function calculateComplianceSnapshot(
+   // Use stress test rate (4% for residential, 5% for commercial) as per MAS requirements
+   // Source: dr-elena-mortgage-expert-v2.json -> computational_modules.core_formulas.tdsr_available
+-  const stressTestRate = property_type === 'Commercial' ? 0.05 : 0.04; // 5% for commercial, 4% for residential
++  const stressFloor = property_type === 'Commercial' 
++    ? DR_ELENA_STRESS_TEST_FLOORS.nonResidential
++    : DR_ELENA_STRESS_TEST_FLOORS.residential;
++  
++  // Apply Math.max(quoted_rate, stress_floor) logic
++  const quotedRate = rate / 100;
++  const stressRateApplied = Math.max(quotedRate, stressFloor);
+   const monthlyStressRate = stressTestRate / 12;
+   
+   // Recalculate monthly payment with stress test rate for compliance checking
+   const stressTestMonthlyPayment = roundMonthlyPayment(
+@@ -383,9 +401,15 @@ export function calculateComplianceSnapshot(
+   const reasonCodes: string[] = [];
+   const policyRefs: string[] = [];
+ 
+-  // Add relevant policy references - both TDSR and MSR are general MAS regulations
++  // Policy references conditional on property type:
++  // - HDB/EC: Include BOTH MAS 645 (TDSR) AND MAS 632 (MSR)
++  // - Private/Commercial: Include ONLY MAS 645 (TDSR)
+   policyRefs.push('MAS Notice 645'); // TDSR applies to all
+-  policyRefs.push('MAS Notice 632'); // MSR reference for completeness
++  
++  // Only add MSR policy reference for HDB/EC properties
++  if (property_type === 'HDB' || property_type === 'EC') {
++    policyRefs.push('MAS Notice 632'); // MSR applies to HDB/EC
++  }
+   
+   // Add specific MSR flag for HDB/EC where MSR actively applies
+   if (property_type === 'HDB' || property_type === 'EC') {
+@@ -422,7 +446,8 @@ export function calculateComplianceSnapshot(
+     isMSRCompliant,
+     limitingFactor,
+     reasonCodes,
+-    policyRefs
++    policyRefs,
++    stressRateApplied
+   };
+ }
+ 

@@ -1,0 +1,116 @@
+{
+  "_comment": "Example integration of new metacognitive hooks into settings.json",
+  "_comment2": "Copy desired hook configurations to your actual .claude/settings.json",
+  "_OLD_FORMAT_INCORRECT": {
+    "_comment": "INCORRECT FORMAT - Used before_tool_use object format (do not use this)",
+    "_problem": "This was the OLD incorrect way to configure hooks",
+    "hooks": {
+      "before_tool_use": {
+        "Edit": {
+          "enabled": true,
+          "hook": {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          }
+        },
+        "Write": {
+          "enabled": true,
+          "hook": {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          }
+        }
+      }
+    }
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "_comment": "Existing hook - add orchestration reminder",
+        "matcher": "^/response-awareness",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"$input = $input | ConvertFrom-Json; $input.prompt += '`n`nOrchestrate only, do not implement. Follow the response awareness framework exactly step by step.'; Write-Output ($input | ConvertTo-Json -Compress)\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "_comment": "Orchestrator firewall - prevents orchestrators from implementing",
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          }
+        ]
+      },
+      {
+        "matcher": "NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          }
+        ]
+      },
+      {
+        "_comment": "NEW: Assumption detector - catches unverified assumptions (DISABLED by default)",
+        "matcher": "Read",
+        "hooks": [],
+        "_activation_note": "Add hook object to activate assumption detection"
+      },
+      {
+        "_comment": "NEW: Assumption detector on Grep (DISABLED by default)",
+        "matcher": "Grep",
+        "hooks": [],
+        "_activation_note": "Add hook object to activate"
+      },
+      {
+        "_comment": "NEW: Question suppression detector - enforces Phase 1 clarification (DISABLED by default)",
+        "matcher": "Task",
+        "hooks": [],
+        "_activation_note": "Add hook object to enforce question enumeration in Phase 1"
+      }
+    ]
+  },
+  "_integration_instructions": {
+    "_step1": "Copy the 'PreToolUse' configurations you want",
+    "_step2": "Paste into your actual .claude/settings.json",
+    "_step3": "To enable a hook, add the hook object to the hooks array",
+    "_step4": "Test with debug mode: DEBUG_ASSUMPTION_DETECTOR=1 or DEBUG_QUESTION_DETECTOR=1"
+  },
+  "_recommended_activation_order": {
+    "phase1": "orchestrator-firewall.py (already active)",
+    "phase2": "assumption-detector.py (add to Read/Edit/Write hooks arrays)",
+    "phase3": "question-suppression-detector.py (add to Task hooks array)",
+    "note": "Start with one new hook at a time to verify behavior"
+  },
+  "_hook_behavior_notes": {
+    "orchestrator-firewall": "Blocks Edit/Write/NotebookEdit for orchestrators (exit 2)",
+    "assumption-detector": "Blocks orchestrators on unverified assumptions (exit 2), warns agents to tag",
+    "question-suppression": "Blocks Phase 1 orchestrators on ambiguous requirements (exit 2), warns agents to tag"
+  },
+  "_exit_code_semantics": {
+    "exit_0": "Allow - tool executes normally",
+    "exit_1": "Warn - show message but allow execution (non-blocking)",
+    "exit_2": "Block - prevent tool execution (blocking)",
+    "_OLD_INCORRECT_exit_1": "Exit 1 used to be documented as block (WRONG - exit 1 is non-blocking warn)"
+  },
+  "_debug_modes": {
+    "orchestrator-firewall": "Set DEBUG_FIREWALL=1",
+    "assumption-detector": "Set DEBUG_ASSUMPTION_DETECTOR=1",
+    "question-suppression": "Set DEBUG_QUESTION_DETECTOR=1"
+  }
+}

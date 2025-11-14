@@ -1,0 +1,335 @@
+// ABOUTME: Comprehensive BM25 retrieval smoke tests for EIP Steel Thread
+// ABOUTME: Validates BM25 functionality, performance, and integration contracts
+// ABOUTME: Dual-Execution Architecture - Works as Jest test AND standalone runner
+
+import { parallelRetrieve, retrieveByDomain, retrieveRelated } from '../orchestrator/retrieval';
+import { BudgetEnforcer } from '../orchestrator/budget';
+
+// Test data for BM25 validation
+const TEST_QUERIES = [
+  {
+    query: 'Singapore property refinancing process',
+    expected_domain: 'finance',
+    min_candidates: 2,
+    max_time_ms: 1000
+  },
+  {
+    query: 'HDB loan eligibility criteria',
+    expected_domain: 'housing',
+    min_candidates: 1,
+    max_time_ms: 1000
+  },
+  {
+    query: 'Bank loan interest rates comparison',
+    expected_domain: 'banking',
+    min_candidates: 1,
+    max_time_ms: 1000
+  }
+];
+
+// Dual-execution test exports
+export const retrievalTests = {
+  testBasicRetrieval: async () => {
+    console.log('Testing basic BM25 retrieval...');
+    const query = 'Singapore property refinancing';
+    
+    const result = await parallelRetrieve({ query });
+    
+    if (!result.candidates || result.candidates.length === 0) {
+      throw new Error('No candidates retrieved');
+    }
+    
+    if (!result.flags?.bm25_used) {
+      throw new Error('BM25 was not used for retrieval');
+    }
+    
+    console.log(`✓ Retrieved ${result.candidates.length} candidates using BM25`);
+    console.log(`✓ Domain: ${result.query_analysis.domain}`);
+    return result;
+  },
+
+  testPerformance: async () => {
+    console.log('Testing retrieval performance...');
+    const query = 'property refinancing';
+    
+    const startTime = Date.now();
+    const result = await parallelRetrieve({ query });
+    const duration = Date.now() - startTime;
+    
+    if (duration > 1000) {
+      throw new Error(`Retrieval took too long: ${duration}ms`);
+    }
+    
+    if (result.flags?.retrieval_time_ms && result.flags.retrieval_time_ms > 1000) {
+      throw new Error(`Retrieval time exceeds budget: ${result.flags.retrieval_time_ms}ms`);
+    }
+    
+    console.log(`✓ Retrieval completed in ${duration}ms`);
+    return result;
+  },
+
+  testDomainFiltering: async () => {
+    console.log('Testing domain-specific retrieval...');
+    const financeResults = await retrieveByDomain('finance', 3);
+    
+    if (!financeResults || financeResults.length === 0) {
+      throw new Error('No finance domain results retrieved');
+    }
+    
+    financeResults.forEach(result => {
+      if (result.metadata.domain !== 'finance') {
+        throw new Error(`Expected finance domain, got: ${result.metadata.domain}`);
+      }
+    });
+    
+    console.log(`✓ Retrieved ${financeResults.length} finance domain results`);
+    return financeResults;
+  },
+
+  testConcurrentQueries: async () => {
+    console.log('Testing concurrent query performance...');
+    const queries = TEST_QUERIES.map(tq => tq.query);
+    
+    const startTime = Date.now();
+    const results = await Promise.all(
+      queries.map(query => parallelRetrieve({ query }))
+    );
+    const totalTime = Date.now() - startTime;
+    
+    if (totalTime > 2000) {
+      throw new Error(`Concurrent queries took too long: ${totalTime}ms`);
+    }
+    
+    console.log(`✓ Processed ${queries.length} queries in ${totalTime}ms`);
+    return results;
+  }
+};
+
+// Standalone execution function
+async function runStandaloneTests() {
+  console.log('🚀 Running BM25 Retrieval Smoke Tests (Standalone Mode)');
+  console.log('='.repeat(60));
+  
+  const testEntries = Object.entries(retrievalTests);
+  let passed = 0;
+  let failed = 0;
+  
+  for (const [testName, testFn] of testEntries) {
+    try {
+      console.log(`\n📋 ${testName}`);
+      await testFn();
+      passed++;
+      console.log(`✅ ${testName} PASSED`);
+    } catch (error: any) {
+      failed++;
+      console.error(`❌ ${testName} FAILED:`, error.message);
+    }
+  }
+  
+  console.log('\n' + '='.repeat(60));
+  console.log(`📊 Test Results: ${passed} passed, ${failed} failed`);
+  
+  if (failed > 0) {
+    console.log('🚨 Some tests failed!');
+    process.exit(1);
+  } else {
+    console.log('🎉 All tests passed!');
+    process.exit(0);
+  }
+}
+
+// Jest test suite (preserved for integration with test framework)
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+
+describe('BM25 Retrieval Smoke Tests', () => {
+  let budgetEnforcer: any;
+
+  beforeEach(() => {
+    budgetEnforcer = new BudgetEnforcer('MEDIUM');
+    budgetEnforcer.startStage('planner'); // Retrieval happens during planning
+  });
+
+  afterEach(() => {
+    budgetEnforcer.endStage('planner');
+  });
+
+  describe('Core BM25 Functionality', () => {
+    it('should retrieve relevant candidates for financial queries', async () => {
+      const result = await retrievalTests.testBasicRetrieval();
+      
+      expect(result.candidates).toBeDefined();
+      expect(result.candidates.length).toBeGreaterThan(0);
+      expect(result.flags?.bm25_used).toBe(true);
+      expect(result.query_analysis.domain).toBe('finance');
+      
+      // Verify candidate structure
+      result.candidates.forEach(candidate => {
+        expect(candidate).toHaveProperty('id');
+        expect(candidate).toHaveProperty('content');
+        expect(candidate).toHaveProperty('source');
+        expect(candidate).toHaveProperty('score');
+        expect(candidate).toHaveProperty('metadata');
+        expect(candidate.score).toBeGreaterThan(0);
+      });
+    });
+
+    it('should analyze query complexity correctly', async () => {
+      const simpleQuery = 'refinance';
+      const complexQuery = 'comprehensive guide to Singapore property refinancing with bank loan eligibility criteria and HDB regulations';
+      
+      const simpleResult = await parallelRetrieve({ query: simpleQuery });
+      const complexResult = await parallelRetrieve({ query: complexQuery });
+      
+      expect(simpleResult.query_analysis.complexity).toBe('low');
+      expect(complexResult.query_analysis.complexity).toBe('high');
+    });
+
+    it('should extract query terms accurately', async () => {
+      const query = 'Singapore property refinancing process';
+      
+      const result = await parallelRetrieve({ query });
+      
+      expect(result.query_analysis.terms).toContain('singapore');
+      expect(result.query_analysis.terms).toContain('property');
+      expect(result.query_analysis.terms).toContain('refinancing');
+      expect(result.query_analysis.terms).toContain('process');
+    });
+  });
+
+  describe('Performance Validation', () => {
+    it('should complete retrieval within performance budget', async () => {
+      const result = await retrievalTests.testPerformance();
+      
+      expect(result.flags?.retrieval_time_ms).toBeLessThan(1000);
+      
+      // Check budget compliance
+      budgetEnforcer.addTokens('planner', Math.floor((result.flags?.retrieval_time_ms || 0) / 10)); // Estimate tokens
+      const budgetCheck = budgetEnforcer.checkStageBudget('planner');
+      expect(budgetCheck.ok).toBe(true);
+    });
+
+    it('should handle multiple concurrent queries efficiently', async () => {
+      const results = await retrievalTests.testConcurrentQueries();
+      
+      expect(results).toHaveLength(TEST_QUERIES.length);
+      
+      // Verify all results are valid
+      results.forEach(result => {
+        expect(result.candidates).toBeDefined();
+        expect(result.flags?.bm25_used).toBe(true);
+      });
+    });
+  });
+
+  describe('Domain-Specific Retrieval', () => {
+    it('should retrieve content by domain filter', async () => {
+      const financeResults = await retrievalTests.testDomainFiltering();
+      
+      expect(financeResults).toBeDefined();
+      expect(financeResults.length).toBeGreaterThan(0);
+      
+      financeResults.forEach(result => {
+        expect(result.metadata.domain).toBe('finance');
+        expect(result.score).toBe(1.0); // Perfect match for domain filter
+      });
+    });
+
+    it('should handle domain queries correctly', async () => {
+      for (const testCase of TEST_QUERIES) {
+        const result = await parallelRetrieve({ query: testCase.query });
+        
+        expect(result.query_analysis.domain).toBeDefined();
+        expect(result.candidates.length).toBeGreaterThanOrEqual(testCase.min_candidates);
+        expect(result.flags?.retrieval_time_ms).toBeLessThan(testCase.max_time_ms);
+      }
+    });
+  });
+
+  describe('Integration Contracts', () => {
+    it('should satisfy BM25 auditor smoke test contract', async () => {
+      const testCases = [
+        {
+          name: 'Basic retrieval',
+          input: { query: 'property refinancing' },
+          validations: [
+            (result: any) => result.candidates.length > 0,
+            (result: any) => result.flags?.bm25_used === true,
+            (result: any) => (result.flags?.retrieval_time_ms || 0) < 1000
+          ]
+        },
+        {
+          name: 'Domain-specific retrieval',
+          input: { query: 'HDB loan eligibility' },
+          validations: [
+            (result: any) => result.query_analysis.domain === 'housing',
+            (result: any) => result.candidates.some((c: any) => c.content.toLowerCase().includes('hdb'))
+          ]
+        }
+      ];
+
+      for (const testCase of testCases) {
+        const result = await parallelRetrieve(testCase.input);
+        
+        for (const validation of testCase.validations) {
+          expect(validation(result)).toBe(true);
+        }
+      }
+    });
+
+    it('should integrate with performance budget validation', async () => {
+      const query = 'comprehensive financial planning guide';
+      
+      // Simulate budget tracking
+      budgetEnforcer.addTokens('planner', 800); // Estimated token usage
+      const result = await parallelRetrieve({ query });
+      
+      // Validate performance budget compliance
+      const budgetCheck = budgetEnforcer.checkStageBudget('planner');
+      expect(budgetCheck.ok).toBe(true);
+      
+      // Verify result quality despite budget constraints
+      expect(result.candidates.length).toBeGreaterThan(0);
+    });
+  });
+});
+
+// Performance benchmarks for regression testing
+describe('BM25 Performance Benchmarks', () => {
+  it('should meet performance regression benchmarks', async () => {
+    const benchmarkQueries = [
+      'refinancing',
+      'property loan',
+      'bank rates',
+      'HDB eligibility'
+    ];
+
+    const performanceMetrics = [];
+
+    for (const query of benchmarkQueries) {
+      const iterations = 5;
+      const times = [];
+
+      for (let i = 0; i < iterations; i++) {
+        const start = Date.now();
+        await parallelRetrieve({ query });
+        times.push(Date.now() - start);
+      }
+
+      const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
+      performanceMetrics.push({ query, avgTime, times });
+    }
+
+    // Verify performance stays within acceptable bounds
+    performanceMetrics.forEach(metric => {
+      expect(metric.avgTime).toBeLessThan(500); // Average should be under 500ms
+      expect(Math.max(...metric.times)).toBeLessThan(1000); // Max should be under 1s
+    });
+
+    console.log('BM25 Performance Metrics:', performanceMetrics);
+  });
+});
+
+// Standalone execution check
+if (require.main === module) {
+  runStandaloneTests().catch(console.error);
+}

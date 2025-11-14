@@ -1,0 +1,117 @@
+{
+  "custom_agents": {
+    "worktree-helper": {
+      "description": "Manages git worktree creation and isolation for parallel work",
+      "tools": ["Bash", "Read", "Write", "Grep", "Glob"],
+      "model": "claude-3-5-haiku-20241022",
+      "prompt_path": ".claude/agents/worktree-helper.md",
+      "when_to_use": [
+        "Uncommitted changes detected and new task is unrelated",
+        "User explicitly requests worktree creation",
+        "Parallel development streams needed"
+      ]
+    }
+  },
+
+  "agent_overrides": {
+    "complexity-scout": {
+      "thoroughness": "very thorough",
+      "check_worktrees": true,
+      "check_canonical_references": true,
+      "use_component_placement_tree": true,
+      "model": "claude-3-5-haiku-20241022"
+    },
+    "plan-synthesis-agent": {
+      "use_preserving_tensions": true,
+      "max_plan_length": 200,
+      "enforce_tdd": true,
+      "check_claude_md_compliance": true,
+      "model": "claude-sonnet-4-5-20250929"
+    },
+    "test-automation-expert": {
+      "enforce_tdd": true,
+      "no_mocks_in_e2e": true,
+      "pristine_output_required": true,
+      "model": "claude-sonnet-4-5-20250929"
+    },
+    "metacognitive-tag-verifier": {
+      "verify_all_tags": true,
+      "check_false_completions": true,
+      "track_tag_lifecycle": true,
+      "model": "claude-sonnet-4-5-20250929"
+    }
+  },
+
+  "default_model_tier": {
+    "assessment": "haiku",
+    "implementation_light": "haiku",
+    "implementation_medium": "haiku",
+    "implementation_heavy": "sonnet",
+    "orchestration": "sonnet",
+    "verification": "sonnet"
+  },
+
+  "agent_deployment_rules": {
+    "light_tier": {
+      "max_agents": 1,
+      "orchestration_required": false,
+      "allowed_agents": ["general-purpose"]
+    },
+    "medium_tier": {
+      "max_agents": 3,
+      "orchestration_required_if_task_used": true,
+      "allowed_agents": ["general-purpose", "test-automation-expert", "worktree-helper"]
+    },
+    "heavy_tier": {
+      "max_agents": 10,
+      "orchestration_required": true,
+      "allowed_agents": "all",
+      "mandatory_agents": ["plan-synthesis-agent", "metacognitive-tag-verifier"]
+    },
+    "full_tier": {
+      "max_agents": "unlimited",
+      "orchestration_required": true,
+      "allowed_agents": "all",
+      "mandatory_agents": [
+        "plan-synthesis-agent",
+        "metacognitive-tag-verifier",
+        "complexity-scout"
+      ]
+    }
+  },
+
+  "orchestration_firewall": {
+    "enabled_tiers": ["medium", "heavy", "full"],
+    "enforce_delegation": true,
+    "block_direct_implementation": true,
+    "allowed_tools_for_orchestrator": [
+      "Task",
+      "TodoWrite",
+      "Bash(git)",
+      "Read(config files only)",
+      "Grep(assessment only)",
+      "Glob(assessment only)"
+    ],
+    "blocked_tools_for_orchestrator": [
+      "Edit",
+      "Write",
+      "NotebookEdit"
+    ],
+    "violation_message": "⚠️ ORCHESTRATOR FIREWALL: You've used Task() to delegate, so you are now an orchestrator. Orchestrators cannot implement directly. Deploy a sub-agent for implementation."
+  },
+
+  "nextnest_specific_agents": {
+    "canonical-references-checker": {
+      "description": "Checks if files being modified are in CANONICAL_REFERENCES.md and enforces change rules",
+      "enabled": true,
+      "auto_deploy_before": ["Edit", "Write"],
+      "model": "claude-3-5-haiku-20241022"
+    },
+    "component-placement-advisor": {
+      "description": "Uses Component Placement Decision Tree from CLAUDE.md to advise file locations",
+      "enabled": true,
+      "auto_deploy_before": ["Write(new files)"],
+      "model": "claude-3-5-haiku-20241022"
+    }
+  }
+}

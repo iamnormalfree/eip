@@ -1,0 +1,89 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.tgz
+*.tar.gz
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local tooling state
+/.beads
+
+# Local env files
+.env*.local
+.env
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+nul
+
+# Deployment setup files with secrets
+*_SETUP.md
+
+# Playwright MCP screenshots (AI debugging artifacts)
+.playwright-mcp/
+
+# Build caches
+.swc/
+
+# Keep .codex and .factory per user request (alternative Claude configs)
+
+# Audit logs (environment-specific storage for PDPA compliance)
+/logs/
+*.jsonl
+
+# Temporary files (QA findings, test artifacts)
+/temp/
+
+# Upstream reference no longer needed with git subtree
+.claude/upstream-reference/*
+!.claude/upstream-reference/README.md
+
+# Git worktrees (managed via git worktree command)
+.worktrees/
+
+# Skill symlinks to subtree (junctions managed locally, not committed)
+.claude/skills/response-awareness-light
+.claude/skills/response-awareness-medium
+.claude/skills/response-awareness-heavy
+.claude/skills/response-awareness-full
+.claude/skills/brainstorming
+.npm/
+.env.local.backup
+auth.json
+docs/RAILWAY_ENVIRONMENT_CONFIGURATION.md
+
+# Sentry Config File
+.env.sentry-build-plugin
+# MAF Credentials - never commit API keys
+.maf/credentials/*.env
+!maf/credentials/README.md
+!maf/credentials/example-*.env

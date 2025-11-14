@@ -1,0 +1,105 @@
+{
+  "default_level": "verbose",
+  "retention_days": 90,
+
+  "log_locations": {
+    "phase_transitions": "docs/completion_drive_logs/{date}_{task}/phase_transitions.log",
+    "tag_operations": "docs/completion_drive_logs/{date}_{task}/tag_operations.log",
+    "lcl_exports": "docs/completion_drive_logs/{date}_{task}/lcl_exports.log",
+    "final_metrics": "docs/completion_drive_logs/{date}_{task}/final_metrics.md",
+    "detailed_report": "docs/completion_drive_logs/{date}_{task}/detailed_report.md"
+  },
+
+  "log_formats": {
+    "timestamp_format": "DD-MM-YYYY HH:mm:ss",
+    "date_folder_format": "DD-MM-YYYY",
+    "task_slug_max_length": 50
+  },
+
+  "logging_levels": {
+    "none": {
+      "enabled": false,
+      "logs": []
+    },
+    "light": {
+      "enabled": true,
+      "logs": [
+        "phase_transitions",
+        "final_metrics"
+      ],
+      "overhead_estimate_seconds": 10,
+      "overhead_estimate_tokens": 500
+    },
+    "verbose": {
+      "enabled": true,
+      "logs": [
+        "phase_transitions",
+        "tag_operations",
+        "lcl_exports",
+        "final_metrics",
+        "detailed_report"
+      ],
+      "overhead_estimate_seconds": 60,
+      "overhead_estimate_tokens": 2500
+    }
+  },
+
+  "learning_mode": {
+    "enabled": true,
+    "save_plans_after_completion": true,
+    "generate_learning_summaries": true,
+    "learning_summary_path": "docs/completion_drive_logs/{date}_{task}/LEARNING_SUMMARY.md",
+    "include_sections": [
+      "what_worked",
+      "what_didnt_work",
+      "patterns_discovered",
+      "tag_insights",
+      "complexity_accuracy"
+    ]
+  },
+
+  "tag_logging": {
+    "log_insertions": true,
+    "log_resolutions": true,
+    "log_lifecycle": true,
+    "track_false_positives": true,
+    "track_missed_tags": true
+  },
+
+  "lcl_logging": {
+    "log_exports": true,
+    "log_imports": true,
+    "track_context_efficiency": true
+  },
+
+  "phase_logging": {
+    "log_transitions": true,
+    "log_agent_deployments": true,
+    "log_escalations": true,
+    "track_phase_duration": true
+  },
+
+  "metrics": {
+    "track_complexity_score_accuracy": true,
+    "track_tier_routing_accuracy": true,
+    "track_tag_effectiveness": true,
+    "track_time_per_phase": true,
+    "track_agent_usage": true
+  },
+
+  "output_formats": {
+    "phase_transitions": "plaintext",
+    "tag_operations": "json",
+    "lcl_exports": "json",
+    "final_metrics": "markdown",
+    "detailed_report": "markdown",
+    "learning_summary": "markdown"
+  },
+
+  "auto_cleanup": {
+    "enabled": true,
+    "delete_after_days": 90,
+    "archive_before_delete": true,
+    "archive_location": "docs/completion_drive_logs/archive"
+  }
+}

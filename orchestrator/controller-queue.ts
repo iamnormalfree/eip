@@ -1,0 +1,492 @@
+// ABOUTME: EIP orchestrator controller with queue-first architecture integration
+// ABOUTME: Pipeline orchestrator pattern with circuit breakers, DLQ handling, and queue submission
+
+import { BudgetEnforcer, Tier } from './budget';
+import { OrchestratorDB } from './database';
+import { routeIP } from './router';
+import { parallelRetrieve } from './retrieval';
+import { microAudit } from './auditor';
+import { repairDraft } from './repairer';
+import { publishArtifact } from './publisher';
+import { isLegacyCompat } from '../lib_supabase/utils/compat';
+import { submitContentGenerationJob } from '../lib_supabase/queue/eip-queue-fixed';
+
+type Brief = {
+  brief: string;
+  persona?: string;
+  funnel?: string;
+  tier?: Tier;
+  correlation_id?: string;
+  queue_mode?: boolean; // New: force queue processing
+};
+
+/**
+ * Queue-First Architecture Integration
+ * 
+ * Following unified blueprint decisions:
+ * - queue_first_pattern: Route all work through queues
+ * - sequential_integration: Maintain existing direct execution for compatibility
+ * - contract::final::queue_system_to_all_domains
+ */
+async function runOnce(input: Brief): Promise<{ success: boolean; artifact?: any; error?: string; queue_job_id?: string }> {
+  // Check if queue mode is enabled or forced
+  const queueMode = input.queue_mode || process.env.EIP_QUEUE_MODE === 'enabled';
+  
+  if (queueMode) {
+    console.log('🚀 Queue-first mode: Submitting job to EIP queue system');
+    return await runViaQueue(input);
+  } else {
+    console.log('🔄 Direct execution mode: Processing job directly (legacy compatibility)');
+    return await runDirectly(input);
+  }
+}
+
+/**
+ * Queue-First Processing: Submit job to EIP queue system
+ * 
+ * Integration contract: Expose EIP job processing interface with budget checkpoints
+ */
+async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?: any; error?: string; queue_job_id?: string }> {
+  try {
+    // Validate required inputs
+    if (!input.brief) {
+      return { success: false, error: 'Brief is required for content generation' };
+    }
+
+    const tier = input.tier || 'MEDIUM';
+    
+    console.log('📋 Submitting to EIP Queue System:', {
+      brief: input.brief.substring(0, 100) + (input.brief.length > 100 ? '...' : ''),
+      tier: tier,
+      persona: input.persona,
+      funnel: input.funnel,
+      correlation_id: input.correlation_id,
+    });
+
+    // Submit job to queue
+    const queueResult = await submitContentGenerationJob({
+      brief: input.brief,
+      persona: input.persona,
+      funnel: input.funnel,
+      tier: tier,
+      correlation_id: input.correlation_id,
+      priority: tier === 'HEAVY' ? 1 : tier === 'MEDIUM' ? 3 : 5,
+      metadata: {
+        submission_source: 'orchestrator_controller',
+        queue_mode: true,
+        timestamp: new Date().toISOString()
+      }
+    });
+
+    if (queueResult.success) {
+      console.log('✅ Job successfully submitted to EIP queue: ' + queueResult.jobId);
+      
+      return {
+        success: true,
+        queue_job_id: queueResult.jobId,
+        artifact: {
+          queue_submission: {
+            job_id: queueResult.jobId,
+            tier: tier,
+            status: 'queued',
+            submitted_at: new Date().toISOString(),
+            processing_mode: 'queue_first'
+          }
+        }
+      };
+    } else {
+      console.error('❌ Failed to submit job to EIP queue:', queueResult.error);
+      
+      // Fallback to direct execution if queue submission fails
+      console.log('🔄 Queue submission failed, falling back to direct execution...');
+      return await runDirectly(input);
+    }
+
+  } catch (error) {
+    console.error('❌ Queue processing failed:', error);
+    
+    // Fallback to direct execution on error
+    console.log('🔄 Queue processing failed, falling back to direct execution...');
+    return await runDirectly(input);
+  }
+}
+
+/**
+ * Direct Execution: Original orchestrator logic for compatibility
+ * 
+ * Preserves existing functionality for:
+ * - Legacy compatibility mode
+ * - Fallback when queue system is unavailable
+ * - Local development and testing
+ */
+async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?: any; error?: string }> {
+  // Initialize budget enforcement and database (optional)
+  const tier = input.tier || 'MEDIUM';
+  const budget = new BudgetEnforcer(tier);
+  let db: OrchestratorDB | null = null;
+  
+  try {
+    db = new OrchestratorDB();
+    console.log('Database connection initialized');
+  } catch (dbError) {
+    console.warn('Database not available, running without persistence:', dbError instanceof Error ? dbError.message : 'Unknown error');
+    db = null;
+  }
+
+  // Create initial job record (if database available)
+  let jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  if (db) {
+    try {
+      const jobRecord = await db.createJob({
+        stage: 'started',
+        inputs: input,
+        correlation_id: input.correlation_id
+      });
+      
+      if (jobRecord.job && !jobRecord.error) {
+        jobId = jobRecord.job.id;
+      }
+    } catch (createError) {
+      console.warn('Failed to create job record:', createError);
+    }
+  }
+
+  console.log('Started job:', jobId, 'with tier:', tier);
+
+  try {
+    // Stage 1: IP Routing (minimal budget impact)
+    budget.startStage('planner');
+    const ip = routeIP({ persona: input.persona, funnel: input.funnel });
+    budget.addTokens('planner', 10); // Small token cost for routing
+    budget.endStage('planner');
+
+    const budgetCheck = budget.checkStageBudget('planner');
+    if (!budgetCheck.ok) {
+      throw new Error(budgetCheck.reason);
+    }
+
+    // Update job with IP selection (if database available)
+    if (db) {
+      try {
+        await db.updateJob(jobId, { stage: 'ip_selected', outputs: { ip_selected: ip } });
+      } catch (updateError) {
+        console.warn('Failed to update job:', updateError);
+      }
+    }
+
+    // Stage 2: Retrieval (BM25/graph/vector)
+    budget.startStage('retrieval');
+    const retrieval = await parallelRetrieve({ query: input.brief });
+    budget.addTokens('retrieval', 50); // Estimated token cost for retrieval
+    budget.endStage('retrieval');
+
+    // Stage 3: Generation (main content creation)
+    budget.startStage('generator');
+    const draft = await generateDraft(input.brief, ip, retrieval);
+    const estimatedTokens = draft.length / 4; // Rough token estimation
+    budget.addTokens('generator', estimatedTokens);
+    budget.endStage('generator');
+
+    const genBudgetCheck = budget.checkStageBudget('generator');
+    if (!genBudgetCheck.ok) {
+      throw new Error(genBudgetCheck.reason);
+    }
+
+    // Update job with draft (if database available)
+    if (db) {
+      try {
+        await db.updateJob(jobId, { 
+          stage: 'generated', 
+          outputs: { draft, ip, retrieval_flags: retrieval.flags },
+          tokens: budget.getTracker().tokens_used 
+        });
+      } catch (updateError) {
+        console.warn('Failed to update job:', updateError);
+      }
+    }
+
+    // Stage 4: Audit (quality checks)
+    budget.startStage('auditor');
+    const audit = await microAudit({ draft, ip });
+    budget.addTokens('auditor', 30); // Estimated token cost for audit
+    budget.endStage('auditor');
+
+    const auditBudgetCheck = budget.checkStageBudget('auditor');
+    if (!auditBudgetCheck.ok) {
+      throw new Error(auditBudgetCheck.reason);
+    }
+
+    // Update job with audit results (if database available)
+    if (db) {
+      try {
+        await db.updateJob(jobId, { 
+          stage: 'audited',
+          outputs: { draft, ip, retrieval_flags: retrieval.flags, audit_tags: audit.tags }
+        });
+      } catch (updateError) {
+        console.warn('Failed to update job:', updateError);
+      }
+    }
+
+    // Stage 5: Repair (if needed)
+    budget.startStage('repairer');
+    const repaired = await repairDraft({ draft, audit });
+    budget.addTokens('repairer', 20); // Estimated token cost for repairs
+    budget.endStage('repairer');
+
+    const repairBudgetCheck = budget.checkStageBudget('repairer');
+    if (!repairBudgetCheck.ok) {
+      throw new Error(repairBudgetCheck.reason);
+    }
+
+    // Stage 6: Re-audit after repair
+    const finalAudit = await microAudit({ draft: repaired, ip });
+    
+    // Stage 7: Publishing
+    const artifact = await publishArtifact({ 
+      draft: repaired, 
+      ip, 
+      audit: finalAudit, 
+      retrieval,
+      metadata: {
+        brief: input.brief,
+        persona: input.persona,
+        funnel: input.funnel,
+        tier: tier,
+        correlation_id: input.correlation_id,
+        processing_mode: 'direct_execution'
+      }
+    });
+
+    // Create artifact record (if database available)
+    let savedArtifact = null;
+    if (db) {
+      try {
+        const artifactResult = await db.createArtifact({
+          job_id: jobId,
+          brief: input.brief,
+          ip_used: ip,
+          persona: input.persona,
+          funnel: input.funnel,
+          tier: tier,
+          content: artifact.mdx,
+          frontmatter: artifact.frontmatter,
+          jsonld: artifact.jsonld,
+          ledger: artifact.ledger
+        });
+
+        if (!artifactResult.error && artifactResult.artifact) {
+          savedArtifact = artifactResult.artifact;
+          console.log('💾 Artifact saved: ' + savedArtifact.id);
+        }
+      } catch (artifactError) {
+        console.warn('Failed to save artifact:', artifactError);
+      }
+    }
+
+    // Final budget check and job completion
+    const tracker = budget.getTracker();
+    const duration = Date.now() - tracker.start_time;
+    
+    if (db) {
+      try {
+        await db.updateJob(jobId, {
+          stage: 'completed',
+          outputs: { 
+            artifact_id: savedArtifact?.id,
+            ip: ip, 
+            tags: finalAudit.tags,
+            jsonld_type: artifact.jsonld['@type'] || 'Article'
+          },
+          tokens: tracker.tokens_used,
+          duration_ms: duration,
+          cost_cents: calculateCostCents(tracker.tokens_used, tier)
+        });
+      } catch (updateError) {
+        console.warn('Failed to update job:', updateError);
+      }
+    }
+
+    console.log('✅ Job completed:', jobId, {
+      ip: ip,
+      tokens: tracker.tokens_used,
+      duration_ms: duration,
+      tags: finalAudit.tags.length,
+      breaches: budget.hasBreaches() ? budget.getBreaches().length : 0,
+      db_persisted: !!db,
+      processing_mode: 'direct_execution'
+    });
+
+    return { 
+      success: true, 
+      artifact: {
+        ...savedArtifact,
+        metadata: {
+          budget_tier: tier,
+          tokens_used: tracker.tokens_used,
+          duration_ms: duration,
+          breaches: budget.getBreaches(),
+          db_persisted: !!db,
+          processing_mode: 'direct_execution'
+        }
+      }
+    };
+
+  } catch (error) {
+    console.error('❌ Job failed:', jobId, error);
+
+    // Check if this is a budget breach
+    if (budget.shouldFailToDLQ()) {
+      const dlqRecord = budget.createDLQRecord();
+      if (db) {
+        try {
+          await db.failJobToDLQ(jobId, dlqRecord);
+        } catch (dlqError) {
+          console.warn('Failed to send to DLQ:', dlqError);
+        }
+      }
+      
+      console.error('Job sent to DLQ due to budget breach:', dlqRecord);
+      return { 
+        success: false, 
+        error: 'Budget breach: ' + dlqRecord.fail_reason,
+        dlq: dlqRecord
+      };
+    }
+
+    // Regular failure
+    if (db) {
+      try {
+        await db.updateJob(jobId, {
+          stage: 'failed',
+          fail_reason: error instanceof Error ? error.message : 'Unknown error'
+        });
+      } catch (updateError) {
+        console.warn('Failed to update job:', updateError);
+      }
+    }
+
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    };
+  }
+}
+
+// Helper function for draft generation (stub implementation)
+async function generateDraft(brief: string, ip: string, retrieval: any): Promise<string> {
+  // This would normally call the AI generation service
+  // For now, return a structured stub
+  return `# ${brief}
+
+**IP Pattern:** ${ip}
+
+## Overview
+This is a generated draft using the ${ip} pattern.
+
+## Key Points
+- Brief: ${brief}
+- Retrieved ${retrieval.candidates?.length || 0} candidate sources
+- Graph connectivity: ${retrieval.flags?.graph_sparse ? 'Sparse' : 'Dense'}
+
+## Analysis
+Based on the educational IP structure, this content should provide:
+1. Clear learning objectives
+2. Structured progression
+3. Practical examples
+
+## How It Works
+This process operates through the following key mechanisms:
+
+1. **Initial Assessment** - Evaluation of current conditions
+2. **Processing** - Application of specific procedures
+3. **Outcome** - Expected results and next steps
+
+## Examples
+
+*Example 1:* [Specific example would be inserted here based on content context]
+
+*Example 2:* [Another practical application]
+
+## Summary
+This draft will undergo quality audit and repair processes.
+
+---
+
+*This content is for informational purposes only. Please consult with relevant regulatory authorities such as MAS (Monetary Authority of Singapore) for specific guidance.*
+`;
+}
+
+// Helper function to calculate cost in cents
+function calculateCostCents(tokens: number, tier: Tier): number {
+  const costPerMillionTokens = tier === 'HEAVY' ? 30 : tier === 'MEDIUM' ? 15 : 10;
+  return Math.ceil((tokens / 1000000) * costPerMillionTokens * 100);
+}
+
+async function main() {
+  const legacyCompat = isLegacyCompat();
+  console.log('🚀 EIP Orchestrator starting...');
+  console.log('🔧 Legacy compatibility mode:', legacyCompat ? 'ENABLED' : 'DISABLED');
+  console.log('📋 Queue mode:', process.env.EIP_QUEUE_MODE || 'disabled');
+
+  if (legacyCompat) {
+    console.log('ℹ️  Note: Legacy compatibility is enabled for development and backward compatibility');
+    console.log('⚠️  Production: After 2 weeks of stable operation, consider disabling via EIP_LEGACY_COMPAT=false');
+  }
+
+  // Parse command line arguments
+  const args = process.argv.slice(2);
+  const queueModeFlag = args.includes('--queue') || args.includes('-q');
+  
+  const brief = process.env.EIP_BRIEF || 'Explain refinancing mechanism in SG';
+  const persona = process.env.EIP_PERSONA || 'default_persona';
+  const funnel = process.env.EIP_FUNNEL || 'MOFU';
+  const tier = (process.env.EIP_TIER as Tier) || 'MEDIUM';
+  const correlationId = process.env.EIP_CORRELATION_ID || 'cli-' + Date.now();
+  
+  const input: Brief = {
+    brief,
+    persona,
+    funnel,
+    tier,
+    correlation_id: correlationId,
+    queue_mode: queueModeFlag || process.env.EIP_QUEUE_MODE === 'enabled'
+  };
+
+  console.log('📋 Processing parameters:', {
+    brief: brief.substring(0, 100) + (brief.length > 100 ? '...' : ''),
+    persona,
+    funnel,
+    tier,
+    correlation_id: correlationId,
+    queue_mode: input.queue_mode
+  });
+  
+  const result = await runOnce(input);
+  
+  if (result.success) {
+    console.log('✅ Processing completed successfully');
+    
+    if (result.queue_job_id) {
+      console.log('📋 Job submitted to queue: ' + result.queue_job_id);
+      console.log('💡 Use queue monitoring tools to track progress');
+    }
+    
+    console.log('📊 Artifact metadata:', result.artifact?.metadata);
+  } else {
+    console.error('❌ Processing failed:', result.error);
+    if ('dlq' in result) {
+      console.error('📭 Sent to DLQ:', result.dlq);
+    }
+    process.exit(1);
+  }
+}
+
+if (require.main === module) {
+  main().catch((err) => {
+    console.error('Orchestrator error:', err);
+    process.exit(1);
+  });
+}
+
+export { runOnce };

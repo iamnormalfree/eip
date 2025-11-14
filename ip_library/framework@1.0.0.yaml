@@ -1,0 +1,21 @@
+id: framework
+version: 1.0.0
+purpose: "Explain mechanisms: parts → interactions → outcome"
+operators:
+  - name: REDUCE_TO_MECHANISM
+    spec: "Explain as parts → interactions → outcome. Use causal verbs."
+  - name: COUNTEREXAMPLE
+    spec: "Construct a failure case; state which interaction flips."
+  - name: TRANSFER
+    spec: "Map mechanism into two contexts; change one constraint."
+invariants:
+  - "Must include a Mechanism section"
+  - "Must include a Counterexample section"
+  - "Must include a Transfer section"
+sections:
+  - Overview
+  - Mechanism
+  - Counterexample
+  - Transfer
+  - CTA
+

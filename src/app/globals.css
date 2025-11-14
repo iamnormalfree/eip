@@ -1,0 +1,15 @@
+/* ABOUTME: Global CSS styles for EIP app */
+/* ABOUTME: Tailwind CSS base styles and custom utilities */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for EIP components */
+.artifact-card {
+  @apply border border-gray-200 rounded-lg shadow-sm;
+}
+
+.quality-gate-indicator {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}

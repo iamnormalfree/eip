@@ -1,0 +1,290 @@
+// ABOUTME: Enhanced retrieval with BM25 implementation
+// ABOUTME: Multi-channel retrieval with performance tracking
+
+type RetrieveInput = { 
+  query: string;
+  ip?: string; // Optional IP context
+  max_results?: number;
+};
+
+interface RetrievalResult {
+  id: string;
+  content: string;
+  source: string;
+  score: number;
+  metadata: any;
+}
+
+interface GraphEdge {
+  from: string;
+  to: string;
+  weight: number;
+  type: string;
+}
+
+interface RetrievalFlags {
+  graph_sparse: boolean;
+  bm25_used: boolean;
+  vector_used: boolean;
+  cache_hit: boolean;
+  retrieval_time_ms: number;
+}
+
+interface RetrievalOutput {
+  candidates: RetrievalResult[];
+  graph_edges: GraphEdge[];
+  flags: RetrievalFlags;
+  query_analysis: {
+    terms: string[];
+    complexity: 'low' | 'medium' | 'high';
+    domain: string;
+  };
+}
+
+// Simple BM25 implementation
+class SimpleBM25 {
+  private docs: Array<{ id: string; content: string; terms: string[] }>;
+  private docCount: number;
+  private avgDocLength: number;
+  private k1: number = 1.2;
+  private b: number = 0.75;
+
+  constructor(documents: Array<{ id: string; content: string }>) {
+    this.docCount = documents.length;
+    this.docs = documents.map(doc => ({
+      ...doc,
+      terms: this.tokenize(doc.content.toLowerCase())
+    }));
+    
+    const totalLength = this.docs.reduce((sum, doc) => sum + doc.terms.length, 0);
+    this.avgDocLength = totalLength / this.docCount;
+  }
+
+  private tokenize(text: string): string[] {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s]/g, ' ')
+      .split(/\s+/)
+      .filter(term => term.length > 2);
+  }
+
+  private idf(term: string): number {
+    const df = this.docs.filter(doc => doc.terms.includes(term)).length;
+    if (df === 0) return 0;
+    return Math.log((this.docCount - df + 0.5) / (df + 0.5));
+  }
+
+  search(query: string, limit: number = 5): Array<{ id: string; score: number }> {
+    const queryTerms = this.tokenize(query.toLowerCase());
+    const scores: { [docId: string]: number } = {};
+
+    for (const doc of this.docs) {
+      let score = 0;
+      const docLength = doc.terms.length;
+
+      for (const term of queryTerms) {
+        if (!doc.terms.includes(term)) continue;
+
+        const tf = doc.terms.filter(t => t === term).length;
+        const idf = this.idf(term);
+        const numerator = tf * (this.k1 + 1);
+        const denominator = tf + this.k1 * (1 - this.b + this.b * (docLength / this.avgDocLength));
+        
+        score += idf * (numerator / denominator);
+      }
+
+      if (score > 0) {
+        scores[doc.id] = score;
+      }
+    }
+
+    return Object.entries(scores)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, limit)
+      .map(([id, score]) => ({ id, score }));
+  }
+}
+
+// Mock document store (would be replaced with real database)
+const mockDocuments = [
+  {
+    id: 'sg_refinance_001',
+    content: 'Singapore property refinancing allows homeowners to access equity by replacing existing mortgage with new loan terms.',
+    source: 'financial_guide',
+    metadata: { type: 'guide', domain: 'finance', last_updated: '2024-01-15' }
+  },
+  {
+    id: 'sg_refinance_002',
+    content: 'The refinancing process involves property valuation, loan application, and legal documentation typically taking 6-8 weeks.',
+    source: 'process_guide',
+    metadata: { type: 'process', domain: 'finance', last_updated: '2024-02-01' }
+  },
+  {
+    id: 'sg_hdb_loan_003',
+    content: 'HDB loan refinancing has specific eligibility criteria including minimum occupation period and income requirements.',
+    source: 'hdb_guidelines',
+    metadata: { type: 'policy', domain: 'housing', last_updated: '2024-01-20' }
+  },
+  {
+    id: 'sg_bank_loan_004',
+    content: 'Bank loan refinancing offers competitive interest rates but requires credit assessment and debt-to-ratio evaluation.',
+    source: 'bank_guide',
+    metadata: { type: 'product', domain: 'banking', last_updated: '2024-02-10' }
+  },
+  {
+    id: 'sg_financial_planning_005',
+    content: 'Financial planning considerations for refinancing include total cost savings, break-even point calculation, and long-term goals.',
+    source: 'planning_guide',
+    metadata: { type: 'advice', domain: 'finance', last_updated: '2024-01-25' }
+  }
+];
+
+// Mock graph connections
+const mockGraphEdges: GraphEdge[] = [
+  { from: 'sg_refinance_001', to: 'sg_bank_loan_004', weight: 0.8, type: 'alternative' },
+  { from: 'sg_refinance_002', to: 'sg_hdb_loan_003', weight: 0.6, type: 'related_process' },
+  { from: 'sg_refinance_001', to: 'sg_financial_planning_005', weight: 0.9, type: 'consideration' },
+  { from: 'sg_bank_loan_004', to: 'sg_financial_planning_005', weight: 0.7, type: 'planning' }
+];
+
+let bm25Index: SimpleBM25 | null = null;
+
+function initializeBM25(): void {
+  if (!bm25Index) {
+    bm25Index = new SimpleBM25(mockDocuments);
+  }
+}
+
+function analyzeQuery(query: string): RetrievalOutput['query_analysis'] {
+  const terms = query.toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(term => term.length > 2);
+
+  const complexity = terms.length > 10 ? 'high' : terms.length > 5 ? 'medium' : 'low';
+  
+  const domainKeywords = {
+    finance: ['loan', 'refinance', 'mortgage', 'interest', 'bank', 'rate'],
+    property: ['property', 'hdb', 'home', 'house', 'real', 'estate'],
+    legal: ['legal', 'document', 'contract', 'law', 'regulation'],
+    process: ['process', 'step', 'application', 'procedure', 'timeline']
+  };
+
+  let domain = 'general';
+  for (const [domainName, keywords] of Object.entries(domainKeywords)) {
+    if (keywords.some(keyword => query.toLowerCase().includes(keyword))) {
+      domain = domainName;
+      break;
+    }
+  }
+
+  return { terms, complexity, domain };
+}
+
+export async function parallelRetrieve(input: RetrieveInput): Promise<RetrievalOutput> {
+  const startTime = Date.now();
+  const maxResults = input.max_results || 5;
+  
+  console.log('Retrieval: Processing query:', input.query.substring(0, 100));
+  
+  // Initialize BM25 index
+  initializeBM25();
+  
+  // Analyze query
+  const queryAnalysis = analyzeQuery(input.query);
+  
+  // Perform BM25 search
+  const bm25Results = bm25Index ? bm25Index.search(input.query, maxResults) : [];
+  
+  // Convert to retrieval results
+  const candidates: RetrievalResult[] = bm25Results.map(result => {
+    const doc = mockDocuments.find(d => d.id === result.id);
+    if (!doc) return null;
+    
+    return {
+      id: doc.id,
+      content: doc.content,
+      source: doc.source,
+      score: result.score,
+      metadata: {
+        ...doc.metadata,
+        retrieval_score: result.score,
+        retrieval_method: 'bm25'
+      }
+    };
+  }).filter(Boolean) as RetrievalResult[];
+  
+  // Mock graph density analysis
+  const graphEdges = mockGraphEdges.filter(edge => 
+    candidates.some(c => c.id === edge.from || c.id === edge.to)
+  );
+  
+  const retrievalTime = Date.now() - startTime;
+  const graphSparse = graphEdges.length < candidates.length; // Simple sparsity heuristic
+  
+  const flags: RetrievalFlags = {
+    graph_sparse: graphSparse,
+    bm25_used: bm25Results.length > 0,
+    vector_used: false, // Not implemented yet
+    cache_hit: false, // Not implemented yet
+    retrieval_time_ms: retrievalTime
+  };
+  
+  console.log('Retrieval: Completed', {
+    candidates_found: candidates.length,
+    graph_edges: graphEdges.length,
+    flags,
+    query_domain: queryAnalysis.domain
+  });
+  
+  return {
+    candidates,
+    graph_edges: graphEdges,
+    flags,
+    query_analysis: queryAnalysis
+  };
+}
+
+// Additional functions for advanced retrieval patterns
+export async function retrieveByDomain(domain: string, limit: number = 5): Promise<RetrievalResult[]> {
+  const filtered = mockDocuments
+    .filter(doc => doc.metadata.domain === domain)
+    .slice(0, limit)
+    .map(doc => ({
+      id: doc.id,
+      content: doc.content,
+      source: doc.source,
+      score: 1.0, // Perfect match for domain filter
+      metadata: {
+        ...doc.metadata,
+        retrieval_method: 'domain_filter'
+      }
+    }));
+  
+  return filtered;
+}
+
+export async function retrieveRelated(docId: string, limit: number = 3): Promise<RetrievalResult[]> {
+  const relatedEdges = mockGraphEdges.filter(edge => edge.from === docId || edge.to === docId);
+  const relatedIds = relatedEdges.flatMap(edge => [edge.from, edge.to]).filter(id => id !== docId);
+  
+  return relatedIds
+    .slice(0, limit)
+    .map(id => {
+      const doc = mockDocuments.find(d => d.id === id);
+      if (!doc) return null;
+      
+      return {
+        id: doc.id,
+        content: doc.content,
+        source: doc.source,
+        score: 0.8, // High score for related documents
+        metadata: {
+          ...doc.metadata,
+          retrieval_method: 'graph_relation',
+          relation_type: relatedEdges.find(e => e.from === id || e.to === id)?.type
+        }
+      };
+    })
+    .filter(Boolean) as RetrievalResult[];
+}

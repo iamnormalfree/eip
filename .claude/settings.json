@@ -1,0 +1,78 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/question-suppression-detector.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/assumption-detector.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/question-suppression-detector.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/assumption-detector.py"
+          }
+        ]
+      },
+      {
+        "matcher": "NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/question-suppression-detector.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/assumption-detector.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/question-suppression-detector.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/assumption-detector.py"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "15267ec2640844bb82f29e0b1be881aa.TPV6V17gFDjquEfC",
+    "API_TIMEOUT_MS": "3000000",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.5-air",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.6",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-4.6"
+  }
+}

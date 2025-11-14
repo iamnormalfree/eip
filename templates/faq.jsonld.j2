@@ -1,0 +1,257 @@
+{# ABOUTME: Nunjucks template for JSON-LD FAQPage schema with metadata injection #}
+{# Template contract: structured FAQ content with frontmatter following schema.org FAQPage type #}
+
+{
+  "@context": "https://schema.org",
+  "@type": ["FAQPage", "EducationalContent"],
+  "headline": "{{ frontmatter.title | default('Generated FAQ') }}",
+  "description": "{{ frontmatter.description | default('Frequently asked questions about educational topics using EIP framework') }}",
+  "dateCreated": "{{ frontmatter.created_at | default('' | now) | isoformat }}",
+  "dateModified": "{{ frontmatter.updated_at | default(frontmatter.created_at | default('' | now) | isoformat) }}",
+  "author": {
+    "@type": "Organization",
+    "name": "EIP Content Runtime"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EIP Content Runtime"
+  },
+  "inLanguage": "{{ frontmatter.language | default('en') }}",
+  "isPartOf": {
+    "@type": "CreativeWorkSeries",
+    "name": "EIP Educational FAQ Content"
+  },
+
+  {# Educational-specific properties for FAQ content #}
+  "educationalLevel": {% if frontmatter.tier == 'LIGHT' %}"Beginner"{% elif frontmatter.tier == 'MEDIUM' %}"Intermediate"{% elif frontmatter.tier == 'HEAVY' %}"Advanced"{% else %}"Intermediate"{% endif %},
+  "learningResourceType": "{{ frontmatter.learning_type | default('faq') }}",
+  "teaches": [
+    {% for objective in frontmatter.learning_objectives | default(['Find answers to common questions', 'Understand key concepts through Q&A']) %}
+      "{{ objective }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+
+  {# Main FAQ content - question-answer pairs #}
+  "mainEntity": [
+    {% for faq_item in faq_data %}
+      {
+        "@type": "Question",
+        "name": "{{ faq_item.question | trim | escape }}",
+        "text": "{{ faq_item.question | trim | escape }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ faq_item.answer | trim | escape }}",
+          "dateCreated": "{{ frontmatter.created_at | default('' | now) | isoformat }}",
+          "author": {
+            "@type": "Organization",
+            "name": "EIP Content Runtime"
+          },
+          "upvoteCount": 0,
+          "url": "#answer-{{ loop.index0 }}"
+        },
+
+        {# Add evidence sources if available for this FAQ item #}
+        {% if faq_item.sources and faq_item.sources | length > 0 %}
+        "suggestedAnswer": [
+          {% for source in faq_item.sources %}
+            {
+              "@type": "Answer",
+              "text": "Reference: {{ source.title | default(source.description) }}",
+              "url": "{{ source.url | default('#') }}",
+              "author": {
+                "@type": "Organization",
+                "name": "{{ source.author | default('External Source') }}"
+              }
+            }{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ],
+        {% endif %}
+
+        {# Difficulty level for individual questions #}
+        {% if faq_item.difficulty %}
+        "learningLevel": "{{ faq_item.difficulty }}"{% if faq_item.topic or faq_item.related_concepts or faq_item.learning_objectives %},{% endif %}
+        {% endif %}
+
+        {# Topic categorization #}
+        {% if faq_item.topic %}
+        "about": {
+          "@type": "Thing",
+          "name": "{{ faq_item.topic }}",
+          "description": "Topic categorization for this FAQ item"
+        }{% if faq_item.related_concepts or faq_item.learning_objectives %},{% endif %}
+        {% endif %}
+
+        {# Related concepts #}
+        {% if faq_item.related_concepts %}
+        "mentions": [
+          {% for concept in faq_item.related_concepts %}
+            {
+              "@type": "Thing",
+              "name": "{{ concept }}"
+            }{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ]{% if faq_item.learning_objectives %},{% endif %}
+        {% endif %}
+
+        {# Learning objectives specific to this question #}
+        {% if faq_item.learning_objectives %}
+        "teaches": [
+          {% for objective in faq_item.learning_objectives %}
+            "{{ objective }}"{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ]
+        {% endif %}
+      }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+
+  {# Quality metrics and compliance #}
+  "qualityAssurance": {
+    "@type": "PropertyValue",
+    "name": "FAQ Quality Score",
+    "value": {{ frontmatter.content_score | default(75) }},
+    "measurementTechnique": "EIP Quality Audit",
+    "valueReference": {
+      "@type": "PropertyValue",
+      "name": "Number of Questions",
+      "value": {{ faq_data | length | default(0) }}
+    }
+  },
+
+  {% if frontmatter.compliance_level and frontmatter.compliance_level != 'low' %}
+  "compliesWith": {
+    "@type": "CreativeWork",
+    "name": "EIP Content Standards",
+    "description": "Educational-IP FAQ content generation quality standards"
+  },
+  {% endif %}
+
+  {# Provenance and generation metadata #}
+  "provenance": {
+    "@type": "ProvenanceStatement",
+    "wasGeneratedBy": {
+      "@type": "SoftwareApplication",
+      "name": "EIP Orchestrator",
+      "version": "1.0.0"
+    },
+    "usedIP": "{{ frontmatter.ip_pattern }}",
+    "generationProcess": [
+      "FAQ Topic Analysis",
+      "Question Generation",
+      "Answer Formulation",
+      "Evidence Retrieval",
+      "Quality Audit",
+      "FAQ Structure Validation",
+      "Metadata Enhancement"
+    ],
+    "qualityScore": {{ frontmatter.quality_score | default(frontmatter.content_score | default(75)) }}
+  },
+
+  {# Audience and targeting metadata #}
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "{{ frontmatter.persona | default('student') }}"
+  },
+
+  {% if frontmatter.funnel %}
+  "about": {
+    "@type": "Thing",
+    "name": "{{ frontmatter.funnel }} FAQ",
+    "description": "FAQ content targeting specific conversion funnel"
+  },
+  {% endif %}
+
+  {# Content metrics specific to FAQ #}
+  "wordCount": {{ frontmatter.word_count | default(800) }},
+  "timeRequired": "PT{{ frontmatter.reading_time | default(5) }}M",
+  "questionCount": {{ faq_data | length | default(0) }},
+
+  {# FAQ-specific metadata #}
+  "hasPart": [
+    {% for faq_item in faq_data %}
+      {
+        "@type": "WebPageElement",
+        "name": "FAQ Question {{ loop.index }}",
+        "text": "{{ faq_item.question | trim | escape }}",
+        "isAccessibleForFree": true
+      }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+
+  {# Source references if available #}
+  {% if frontmatter.has_evidence and frontmatter.sources_count > 0 %}
+  "citation": [
+    {% for i in range(frontmatter.sources_count | default(0)) %}
+      {
+        "@type": "CreativeWork",
+        "name": "FAQ Source {{ i + 1 }}",
+        "identifier": "faq_source_{{ i + 1 }}"
+      }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+  {% endif %}
+
+  {# Additional metadata #}
+  "identifier": "{{ frontmatter.correlation_id | default('faq_' + (frontmatter.created_at | default('' | now) | isoformat) | replace(':', '') | replace('.', '') | replace('-', '')) }}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "#faq-content"
+  },
+
+  {% if frontmatter.quality_tags %}
+  "genre": [
+    {% for tag in frontmatter.quality_tags %}
+      "{{ tag.tag | lower | replace('_', ' ') }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+  {% endif %}
+
+  {# Domain and complexity information #}
+  {% if frontmatter.content_domain %}
+  "about": {
+    "@type": "Thing",
+    "name": "{{ frontmatter.content_domain }} FAQ",
+    "description": "FAQ domain classification"
+  },
+  {% endif %}
+
+  {% if frontmatter.query_complexity %}
+  "learningOutcome": "FAQ complexity level: {{ frontmatter.query_complexity }}",
+  {% endif %}
+
+  {# Engagement metrics #}
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "https://schema.org/ViewAction",
+      "userInteractionCount": 0
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "https://schema.org/AskAction",
+      "userInteractionCount": 0
+    }
+  ],
+
+  {# Accessibility information #}
+  "accessibilityFeature": [
+    "structuredNavigation",
+    "tableOfContents",
+    "readingOrder"
+  ],
+  "accessMode": "textual",
+  "accessModeSufficient": {
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@type": "DefinedTerm",
+          "name": "text",
+          "description": "Textual content"
+        }
+      }
+    ]
+  }
+}

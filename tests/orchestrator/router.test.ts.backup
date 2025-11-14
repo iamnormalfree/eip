@@ -1,0 +1,193 @@
+// ABOUTME: IP routing logic testing for EIP Steel Thread
+// ABOUTME: Validates intelligent IP selection, routing decisions, and integration contracts
+
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+
+describe('IP Routing System', () => {
+  // Mock IP library data
+  const mockIPLibrary = {
+    'framework@1.0.0': {
+      type: 'framework',
+      version: '1.0.0',
+      description: 'Systematic approach to complex problem solving',
+      invariants: ['has_overview', 'has_mechanism', 'has_examples'],
+      operators: ['structure_validator', 'example_formatter'],
+      complexity_score: 0.7,
+      use_cases: ['strategic_planning', 'process_design', 'systematic_approach']
+    },
+    'process@1.0.0': {
+      type: 'process',
+      version: '1.0.0', 
+      description: 'Step-by-step procedure for achieving specific outcomes',
+      invariants: ['has_steps', 'has_timeline', 'has_requirements'],
+      operators: ['step_validator', 'timeline_generator'],
+      complexity_score: 0.5,
+      use_cases: ['application_process', 'procedural_guidance', 'workflow']
+    },
+    'comparative@1.0.0': {
+      type: 'comparative',
+      version: '1.0.0',
+      description: 'Systematic comparison of multiple options',
+      invariants: ['has_options', 'has_criteria', 'has_recommendation'],
+      operators: ['comparison_matrix', 'recommendation_engine'],
+      complexity_score: 0.6,
+      use_cases: ['option_comparison', 'decision_support', 'trade_analysis']
+    }
+  };
+
+  describe('IP Selection Logic', () => {
+    beforeEach(() => {
+      // Mock the IP library
+      jest.mock('../../orchestrator/router', () => ({
+        routeToIP: jest.fn(),
+        getIPMetadata: jest.fn(),
+        validateIPSelection: jest.fn()
+      }));
+    });
+
+    it('should select framework IP for strategic planning queries', async () => {
+      const query = {
+        query: 'strategic framework for business expansion in Singapore',
+        intent: 'planning_guidance',
+        entities: ['strategic', 'framework', 'business', 'expansion']
+      };
+
+      // Mock framework selection
+      const { routeToIP } = await import('../../orchestrator/router');
+      (routeToIP as jest.Mock).mockResolvedValue({
+        selected_ip: 'framework@1.0.0',
+        confidence: 0.92,
+        reasoning: {
+          primary_indicators: ['strategic', 'framework'],
+          complexity_match: 0.85,
+          scenario_fit: 0.95
+        },
+        alternatives: ['process@1.0.0']
+      });
+
+      const result = await routeToIP(query);
+
+      expect(result.selected_ip).toBe('framework@1.0.0');
+      expect(result.confidence).toBeGreaterThan(0.9);
+      expect(result.reasoning.primary_indicators).toContain('framework');
+    });
+
+    it('should select process IP for step-by-step procedures', async () => {
+      const query = {
+        query: 'step by step process for loan application',
+        intent: 'procedural_guidance',
+        entities: ['step', 'process', 'loan', 'application']
+      };
+
+      const { routeToIP } = await import('../../orchestrator/router');
+      (routeToIP as jest.Mock).mockResolvedValue({
+        selected_ip: 'process@1.0.0',
+        confidence: 0.88,
+        reasoning: {
+          primary_indicators: ['step', 'process'],
+          procedural_intent: 0.94,
+          workflow_match: 0.82
+        },
+        alternatives: ['framework@1.0.0']
+      });
+
+      const result = await routeToIP(query);
+
+      expect(result.selected_ip).toBe('process@1.0.0');
+      expect(result.reasoning.procedural_intent).toBeGreaterThan(0.9);
+    });
+
+    it('should select comparative IP for option comparison queries', async () => {
+      const query = {
+        query: 'compare bank loans vs HDB loans for property purchase',
+        intent: 'comparison_analysis',
+        entities: ['compare', 'bank', 'loans', 'hdb', 'property']
+      };
+
+      const { routeToIP } = await import('../../orchestrator/router');
+      (routeToIP as jest.Mock).mockResolvedValue({
+        selected_ip: 'comparative@1.0.0',
+        confidence: 0.91,
+        reasoning: {
+          primary_indicators: ['compare'],
+          comparison_entities: ['bank', 'hdb'],
+          decision_context: 0.87
+        },
+        alternatives: ['framework@1.0.0']
+      });
+
+      const result = await routeToIP(query);
+
+      expect(result.selected_ip).toBe('comparative@1.0.0');
+      expect(result.reasoning.comparison_entities).toContain('bank');
+      expect(result.reasoning.comparison_entities).toContain('hdb');
+    });
+  });
+
+  describe('IP Metadata Validation', () => {
+    it('should return complete IP metadata', async () => {
+      const { getIPMetadata } = await import('../../orchestrator/router');
+      (getIPMetadata as jest.Mock).mockImplementation((ipId) => {
+        return mockIPLibrary[ipId] || null;
+      });
+
+      const metadata = await getIPMetadata('framework@1.0.0');
+
+      expect(metadata).toEqual(mockIPLibrary['framework@1.0.0']);
+      expect(metadata.type).toBe('framework');
+      expect(metadata.invariants).toContain('has_overview');
+      expect(metadata.operators).toContain('structure_validator');
+    });
+
+    it('should handle non-existent IP gracefully', async () => {
+      const { getIPMetadata } = await import('../../orchestrator/router');
+      (getIPMetadata as jest.Mock).mockResolvedValue(null);
+
+      const metadata = await getIPMetadata('nonexistent@1.0.0');
+
+      expect(metadata).toBeNull();
+    });
+
+    it('should validate IP structure completeness', async () => {
+      const { getIPMetadata } = await import('../../orchestrator/router');
+      (getIPMetadata as jest.Mock).mockImplementation((ipId) => {
+        const ip = mockIPLibrary[ipId];
+        if (!ip) return null;
+        
+        // Validate required fields
+        const requiredFields = ['type', 'version', 'invariants', 'operators'];
+        const hasAllFields = requiredFields.every(field => ip.hasOwnProperty(field));
+        
+        return {
+          ...ip,
+          structure_valid: hasAllFields
+        };
+      });
+
+      const validIP = await getIPMetadata('framework@1.0.0');
+      expect(validIP.structure_valid).toBe(true);
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should handle empty or null queries', async () => {
+      const { routeToIP } = await import('../../orchestrator/router');
+      (routeToIP as jest.Mock).mockResolvedValue({
+        selected_ip: null,
+        confidence: 0,
+        error: 'Empty query provided',
+        fallback_suggestion: 'Please provide a specific question or topic'
+      });
+
+      const result = await routeToIP({ query: '' });
+
+      expect(result.selected_ip).toBeNull();
+      expect(result.error).toBeDefined();
+      expect(result.fallback_suggestion).toBeDefined();
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+});

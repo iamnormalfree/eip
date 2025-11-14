@@ -1,0 +1,72 @@
+================================================================================
+OLD SECTIONS ADDED TO DOCUMENTATION - FINAL REPORT
+================================================================================
+
+Date: 2025-10-05
+Task: Add OLD commented versions showing what was incorrect before the fix
+Status: COMPLETE
+
+================================================================================
+SUMMARY
+================================================================================
+
+Files Updated: 5
+Total OLD Sections: 8
+  - README.md: 1 section
+  - ORCHESTRATOR_FIREWALL_GUIDE.md: 1 section  
+  - VISUAL_GUIDE.md: 2 sections
+  - hook-config-example.json: 2 sections
+  - settings-integration-example.json: 2 sections
+
+================================================================================
+KEY ISSUES DOCUMENTED
+================================================================================
+
+Issue 1: Exit Code Confusion
+-----------------------------
+OLD (WRONG):  Exit 1 = block
+NEW (RIGHT):  Exit 2 = block, Exit 1 = warn (non-blocking)
+
+Files showing this:
+- VISUAL_GUIDE.md (2 locations)
+- hook-config-example.json (1 location)
+- settings-integration-example.json (1 location)
+
+Issue 2: Settings Format
+-------------------------
+OLD (WRONG):  Object-based with "before_tool_use" and "enabled" field
+NEW (RIGHT):  Array-based with "PreToolUse" and "matcher" field
+
+Files showing this:
+- README.md (1 location)
+- ORCHESTRATOR_FIREWALL_GUIDE.md (1 location)
+- hook-config-example.json (1 location)
+- settings-integration-example.json (1 location)
+
+================================================================================
+VERIFICATION
+================================================================================
+
+All files verified to contain OLD sections:
+[OK] README.md                          - 1 section
+[OK] ORCHESTRATOR_FIREWALL_GUIDE.md     - 1 section
+[OK] VISUAL_GUIDE.md                    - 2 sections
+[OK] hook-config-example.json           - 2 sections
+[OK] settings-integration-example.json  - 2 sections
+
+Total: 8 OLD sections across 5 files
+
+================================================================================
+COMPLETION STATUS
+================================================================================
+
+[SUCCESS] Task completed successfully
+
+All 5 files updated with 8 OLD sections showing:
+- What was incorrect (exit code 1, before_tool_use format)
+- Why it was wrong (doesn't block, doesn't work)  
+- What is correct now (exit 2, PreToolUse arrays)
+
+Ready for user review.
+
+================================================================================

@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": ["dom", "dom.iterable", "es2015"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strict": false,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "db/sql-executor.ts", "db/setup.ts", "db/seed.ts", "db/schema.sql", "db/seed_registries.sql", "lib_supabase/db/types/database.types.ts", "lib_supabase/db/supabase-client.ts", "ip-validation/schemas.ts", ".next/types/**/*.ts", "types/global.d.ts"],
+  "exclude": ["node_modules", "scripts/**/*.ts", "scripts/**/*.mjs", "test-*.ts", "*.test.ts", "**/*.test.tsx", "**/__tests__/**/*", "tests/**/*", "components/forms/archive/**/*", "plugins.disabled/**/*", "components/archive/**/*", "lib_supabase/integrations/**/*"]
+}

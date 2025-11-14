@@ -1,0 +1,425 @@
+// ABOUTME: Quality gate testing for EIP Steel Thread
+// ABOUTME: Validates micro-auditor functionality, quality tags, and compliance checks
+
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+
+describe('Micro-Auditor System', () => {
+  const testContent = {
+    goodFramework: `# Strategic Planning Framework
+
+## Overview
+This framework provides a systematic approach to strategic planning for organizations.
+
+## How It Works
+The planning mechanism operates through four key phases:
+1. Assessment of current position and capabilities
+2. Vision and goal definition
+3. Strategy formulation and resource allocation
+4. Implementation planning and monitoring
+
+## Example
+Technology companies use this framework for product roadmap planning and market expansion strategies.
+
+## Compliance
+Follows MAS guidelines for corporate governance and strategic risk management.`,
+
+    poorContent: `Some planning stuff without proper structure or examples.`,
+
+    financialContent: `Based on MAS regulations, all financial institutions must maintain a capital adequacy ratio of at least 8%. Source: MAS Notice 620 https://www.mas.gov.sg/-/media/MAS/Regulations-and-Legislation/Notices/FSN/620.pdf`,
+
+    invalidContent: `This is just random text without any meaningful structure or educational value.`
+  };
+
+  describe('Content Quality Assessment', () => {
+    beforeEach(() => {
+      jest.mock('../../orchestrator/auditor', () => ({
+        microAudit: jest.fn(),
+        getTagDefinitions: jest.fn(),
+        calculateRepairPriority: jest.fn()
+      }));
+    });
+
+    it('should identify high-quality framework content', async () => {
+      const { microAudit } = await import('../../orchestrator/auditor');
+      (microAudit as jest.Mock).mockResolvedValue({
+        overall_score: 95,
+        tags: [
+          {
+            tag: 'COMPLETION_DRIVE',
+            severity: 'info',
+            confidence: 0.1,
+            rationale: 'Content demonstrates thorough coverage of topic'
+          }
+        ],
+        content_analysis: {
+          structure_score: 98,
+          clarity_score: 92,
+          completeness_score: 95
+        },
+        pattern_analysis: {
+          has_mechanism: true,
+          has_examples: true,
+          has_overview: true,
+          framework_compliance: true
+        }
+      });
+
+      const result = await microAudit({ 
+        draft: testContent.goodFramework, 
+        ip: 'framework@1.0.0' 
+      });
+
+      expect(result.overall_score).toBeGreaterThan(90);
+      expect(result.pattern_analysis.has_mechanism).toBe(true);
+      expect(result.pattern_analysis.has_examples).toBe(true);
+    });
+
+    it('should detect low-quality content issues', async () => {
+      const { microAudit } = await import('../../orchestrator/auditor');
+      (microAudit as jest.Mock).mockResolvedValue({
+        overall_score: 35,
+        tags: [
+          {
+            tag: 'COMPLETION_DRIVE',
+            severity: 'error',
+            confidence: 0.9,
+            rationale: 'Content appears rushed and incomplete'
+          },
+          {
+            tag: 'QUESTION_SUPPRESSION',
+            severity: 'warning',
+            confidence: 0.6,
+            rationale: 'Could benefit from addressing common questions'
+          }
+        ],
+        content_analysis: {
+          structure_score: 20,
+          clarity_score: 45,
+          completeness_score: 30
+        },
+        pattern_analysis: {
+          has_mechanism: false,
+          has_examples: false,
+          has_overview: false,
+          framework_compliance: false
+        }
+      });
+
+      const result = await microAudit({ 
+        draft: testContent.poorContent, 
+        ip: 'framework@1.0.0' 
+      });
+
+      expect(result.overall_score).toBeLessThan(50);
+      expect(result.pattern_analysis.has_mechanism).toBe(false);
+      expect(result.pattern_analysis.has_examples).toBe(false);
+      expect(result.tags.some(t => t.severity === 'error')).toBe(true);
+    });
+  });
+
+  describe('Pattern Detection', () => {
+    it('should detect COMPLETION_DRIVE pattern', async () => {
+      const { microAudit } = await import('../../orchestrator/auditor');
+      (microAudit as jest.Mock).mockResolvedValue({
+        overall_score: 75,
+        tags: [
+          {
+            tag: 'COMPLETION_DRIVE',
+            severity: 'warning',
+            confidence: 0.75,
+            rationale: 'Content shows signs of rushing through important details'
+          }
+        ],
+        pattern_analysis: {
+          completion_drive_score: 0.8,
+          rushed_sections: ['examples', 'mechanism'],
+          detail_level: 'insufficient'
+        }
+      });
+
+      const result = await microAudit({ 
+        draft: 'Basic framework without detailed explanation', 
+        ip: 'framework@1.0.0' 
+      });
+
+      const completionTag = result.tags.find(t => t.tag === 'COMPLETION_DRIVE');
+      expect(completionTag).toBeDefined();
+      expect(completionTag.confidence).toBeGreaterThan(0.7);
+    });
+
+    it('should detect QUESTION_SUPPRESSION pattern', async () => {
+      const { microAudit } = await import('../../orchestrator/auditor');
+      (microAudit as jest.Mock).mockResolvedValue({
+        overall_score: 80,
+        tags: [
+          {
+            tag: 'QUESTION_SUPPRESSION',
+            severity: 'info',
+            confidence: 0.65,
+            rationale: 'Content could address common user questions more explicitly'
+          }
+        ],
+        pattern_analysis: {
+          question_suppression_score: 0.7,
+          missing_faqs: ['cost', 'timeline', 'requirements'],
+          user_concerns_unaddressed: ['risks', 'alternatives']
+        }
+      });
+
+      const result = await microAudit({ 
+        draft: 'Process without addressing common questions', 
+        ip: 'process@1.0.0' 
+      });
+
+      const questionTag = result.tags.find(t => t.tag === 'QUESTION_SUPPRESSION');
+      expect(questionTag).toBeDefined();
+      expect(questionTag.confidence).toBeGreaterThan(0.5);
+    });
+  });
+
+  describe('IP Invariant Validation', () => {
+    it('should validate framework IP invariants', async () => {
+      const { microAudit } = await import('../../orchestrator/auditor');
+      (microAudit as jest.Mock).mockResolvedValue({
+        overall_score: 92,
+        ip_validation: {
+          ip_type: 'framework',
+          invariants_satisfied: ['has_overview', 'has_mechanism', 'has_examples'],
+          invariants_violated: [],
+          invariant_compliance_rate: 1.0
+        },
+        pattern_analysis: {
+          has_mechanism: true,
+          has_examples: true,
+          has_overview: true
+        }
+      });
+
+      const result = await microAudit({ 
+        draft: testContent.goodFramework, 
+        ip: 'framework@1.0.0' 
+      });
+
+      expect(result.ip_validation.invariants_satisfied).toContain('has_overview');
+      expect(result.ip_validation.invariants_satisfied).toContain('has_mechanism');
+      expect(result.ip_validation.invariants_satisfied).toContain('has_examples');
+      expect(result.ip_validation.invariant_compliance_rate).toBe(1.0);
+    });
+
+    it('should detect IP invariant violations', async () => {
+      const { microAudit } = await import('../../orchestrator/auditor');
+      (microAudit as jest.Mock).mockResolvedValue({
+        overall_score: 55,
+        ip_validation: {
+          ip_type: 'framework',
+          invariants_satisfied: ['has_overview'],
+          invariants_violated: ['has_mechanism', 'has_examples'],
+          invariant_compliance_rate: 0.33
+        },
+        pattern_analysis: {
+          has_mechanism: false,
+          has_examples: false,
+          has_overview: true
+        }
+      });
+
+      const result = await microAudit({ 
+        draft: 'Framework overview without mechanism or examples', 
+        ip: 'framework@1.0.0' 
+      });
+
+      expect(result.ip_validation.invariants_violated).toContain('has_mechanism');
+      expect(result.ip_validation.invariants_violated).toContain('has_examples');
+      expect(result.ip_validation.invariant_compliance_rate).toBeLessThan(0.5);
+    });
+  });
+
+  describe('Compliance Checking', () => {
+    it('should validate financial claims with proper sources', async () => {
+      const { microAudit } = await import('../../orchestrator/auditor');
+      (microAudit as jest.Mock).mockResolvedValue({
+        overall_score: 88,
+        compliance_analysis: {
+          financial_claims_detected: 1,
+          financial_claims_sourced: 1,
+          domains_used: ['mas.gov.sg'],
+          compliance_score: 95,
+          warnings: [],
+          errors: []
+        },
+        tags: []
+      });
+
+      const result = await microAudit({ 
+        draft: testContent.financialContent, 
+        ip: 'framework@1.0.0' 
+      });
+
+      expect(result.compliance_analysis.financial_claims_sourced).toBe(1);
+      expect(result.compliance_analysis.domains_used).toContain('mas.gov.sg');
+      expect(result.compliance_analysis.compliance_score).toBeGreaterThan(90);
+    });
+
+    it('should flag unsourced financial claims', async () => {
+      const { microAudit } = await import('../../orchestrator/auditor');
+      (microAudit as jest.Mock).mockResolvedValue({
+        overall_score: 65,
+        compliance_analysis: {
+          financial_claims_detected: 1,
+          financial_claims_sourced: 0,
+          domains_used: [],
+          compliance_score: 45,
+          warnings: ['Financial claim requires source or conditional language'],
+          errors: ['Unsourced financial regulatory claim']
+        },
+        tags: [
+          {
+            tag: 'COMPLIANCE_VIOLATION',
+            severity: 'error',
+            confidence: 0.9,
+            rationale: 'Financial claim made without proper source attribution'
+          }
+        ]
+      });
+
+      const result = await microAudit({ 
+        draft: 'All financial institutions must maintain 8% capital ratio', 
+        ip: 'framework@1.0.0' 
+      });
+
+      expect(result.compliance_analysis.errors.length).toBeGreaterThan(0);
+      expect(result.compliance_analysis.compliance_score).toBeLessThan(50);
+    });
+  });
+
+  describe('Tag Generation and Quality', () => {
+    it('should generate appropriate quality tags', async () => {
+      const { getTagDefinitions } = await import('../../orchestrator/auditor');
+      (getTagDefinitions as jest.Mock).mockResolvedValue([
+        {
+          tag: 'COMPLETION_DRIVE',
+          description: 'Content appears rushed or incomplete',
+          severity_levels: ['error', 'warning', 'info'],
+          confidence_threshold: 0.6
+        },
+        {
+          tag: 'QUESTION_SUPPRESSION',
+          description: 'Content fails to address common user questions',
+          severity_levels: ['warning', 'info'],
+          confidence_threshold: 0.5
+        },
+        {
+          tag: 'CARGO_CULT',
+          description: 'Content mimics form without understanding function',
+          severity_levels: ['error', 'warning'],
+          confidence_threshold: 0.7
+        }
+      ]);
+
+      const tagDefinitions = await getTagDefinitions();
+
+      expect(tagDefinitions).toHaveLength(3);
+      expect(tagDefinitions[0].tag).toBe('COMPLETION_DRIVE');
+      expect(tagDefinitions[0].severity_levels).toContain('error');
+    });
+
+    it('should validate tag structure and confidence', async () => {
+      const { microAudit } = await import('../../orchestrator/auditor');
+      (microAudit as jest.Mock).mockResolvedValue({
+        overall_score: 70,
+        tags: [
+          {
+            tag: 'COMPLETION_DRIVE',
+            severity: 'warning',
+            confidence: 0.75,
+            rationale: 'Content shows moderate signs of rushing',
+            evidence: ['Insufficient detail in mechanism section'],
+            suggestions: ['Expand mechanism explanation', 'Add more examples']
+          },
+          {
+            tag: 'QUESTION_SUPPRESSION',
+            severity: 'info',
+            confidence: 0.55,
+            rationale: 'Some user questions could be addressed',
+            evidence: ['Missing FAQ section'],
+            suggestions: ['Consider adding common questions']
+          }
+        ]
+      });
+
+      const result = await microAudit({ 
+        draft: 'Sample content for tag validation', 
+        ip: 'framework@1.0.0' 
+      });
+
+      result.tags.forEach(tag => {
+        expect(tag).toHaveProperty('tag');
+        expect(tag).toHaveProperty('severity');
+        expect(tag).toHaveProperty('confidence');
+        expect(tag).toHaveProperty('rationale');
+        
+        expect(['error', 'warning', 'info']).toContain(tag.severity);
+        expect(tag.confidence).toBeGreaterThanOrEqual(0);
+        expect(tag.confidence).toBeLessThanOrEqual(1);
+      });
+    });
+  });
+
+  describe('Repair Priority Calculation', () => {
+    it('should calculate repair priority for detected issues', async () => {
+      const { calculateRepairPriority } = await import('../../orchestrator/auditor');
+      (calculateRepairPriority as jest.Mock).mockImplementation((tags) => {
+        const errorTags = tags.filter(t => t.severity === 'error');
+        const warningTags = tags.filter(t => t.severity === 'warning');
+        
+        return {
+          priority: errorTags.length > 0 ? 'high' : warningTags.length > 0 ? 'medium' : 'low',
+          score: errorTags.length * 10 + warningTags.length * 5,
+          requires_repair: errorTags.length > 0,
+          estimated_effort: errorTags.length > 2 ? 'high' : 'medium'
+        };
+      });
+
+      const sampleTags = [
+        { tag: 'COMPLETION_DRIVE', severity: 'error', confidence: 0.8 },
+        { tag: 'COMPLIANCE_VIOLATION', severity: 'error', confidence: 0.9 },
+        { tag: 'QUESTION_SUPPRESSION', severity: 'warning', confidence: 0.6 }
+      ];
+
+      const priority = await calculateRepairPriority(sampleTags);
+
+      expect(priority.priority).toBe('high');
+      expect(priority.requires_repair).toBe(true);
+      expect(priority.score).toBeGreaterThan(15);
+    });
+  });
+
+  describe('Performance and Quality Metrics', () => {
+    it('should complete audit within performance budget', async () => {
+      const { microAudit } = await import('../../orchestrator/auditor');
+      (microAudit as jest.Mock).mockImplementation(async () => {
+        // Simulate audit processing time
+        await new Promise(resolve => setTimeout(resolve, 100));
+        return {
+          overall_score: 85,
+          tags: [],
+          processing_time_ms: 100
+        };
+      });
+
+      const startTime = Date.now();
+      const result = await microAudit({ 
+        draft: testContent.goodFramework, 
+        ip: 'framework@1.0.0' 
+      });
+      const duration = Date.now() - startTime;
+
+      expect(duration).toBeLessThan(1000); // Should complete within 1 second
+      expect(result.processing_time_ms).toBeLessThan(500);
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+});

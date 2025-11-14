@@ -1,0 +1,163 @@
+-- ABOUTME: EIP Schema (Schema Coexistence Approach)
+-- ABOUTME: Implements EIP tables with eip_ prefix for zero-risk migration
+
+-- EIP Schema Registry (version tracking for EIP components)
+CREATE TABLE IF NOT EXISTS eip_schema_registry (
+    key TEXT PRIMARY KEY,
+    version TEXT NOT NULL,
+    checksum TEXT NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- EIP Evidence Registry (compliance allow-list domains)
+CREATE TABLE IF NOT EXISTS eip_evidence_registry (
+    evidence_key TEXT PRIMARY KEY,
+    allow_web BOOLEAN DEFAULT FALSE,
+    allow_domains TEXT[]
+);
+
+-- EIP Entities (generic entities with eip_ prefix)
+CREATE TABLE IF NOT EXISTS eip_entities (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type TEXT NOT NULL,              -- e.g., 'concept','persona','offer','odoo_module','rate_snapshot'
+    name TEXT NOT NULL,
+    attrs JSONB NOT NULL DEFAULT '{}',
+    valid_from TIMESTAMPTZ DEFAULT NOW(),
+    valid_to TIMESTAMPTZ,
+    source_url TEXT
+);
+
+-- Indexes for eip_entities
+CREATE INDEX IF NOT EXISTS idx_eip_entities_type_name ON eip_entities (type, name);
+CREATE INDEX IF NOT EXISTS idx_eip_entities_attrs ON eip_entities USING GIN (attrs);
+
+-- EIP Evidence Snapshots (versioned evidence with eip_ prefix)
+CREATE TABLE IF NOT EXISTS eip_evidence_snapshots (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    evidence_key TEXT NOT NULL REFERENCES eip_evidence_registry(evidence_key),
+    version TEXT NOT NULL,              -- semver
+    data JSONB NOT NULL,
+    last_checked DATE NOT NULL
+);
+
+-- Unique index for eip_evidence_snapshots
+CREATE UNIQUE INDEX IF NOT EXISTS idx_eip_evidence_snapshots_key_version 
+    ON eip_evidence_snapshots (evidence_key, version);
+
+-- EIP Artifacts (content with eip_ prefix)
+CREATE TABLE IF NOT EXISTS eip_artifacts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    slug TEXT UNIQUE,
+    status TEXT CHECK (status IN ('seed','draft','published','rejected')) DEFAULT 'draft',
+    mdx TEXT NOT NULL,
+    frontmatter JSONB NOT NULL DEFAULT '{}',
+    ledger JSONB NOT NULL DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for eip_artifacts
+CREATE INDEX IF NOT EXISTS idx_eip_artifacts_persona ON eip_artifacts ((frontmatter->>'persona'));
+CREATE INDEX IF NOT EXISTS idx_eip_artifacts_funnel ON eip_artifacts ((frontmatter->>'funnel'));
+CREATE INDEX IF NOT EXISTS idx_eip_artifacts_status ON eip_artifacts (status);
+
+-- EIP Brand Profiles (brand DNA with eip_ prefix)
+CREATE TABLE IF NOT EXISTS eip_brand_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    brand TEXT UNIQUE,
+    version TEXT NOT NULL,
+    profile_json JSONB NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- EIP Jobs (orchestration tracking with eip_ prefix)
+CREATE TABLE IF NOT EXISTS eip_jobs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    stage TEXT,
+    started_at TIMESTAMPTZ DEFAULT NOW(),
+    inputs JSONB,
+    outputs JSONB,
+    tokens INTEGER,
+    cost_cents INTEGER,
+    duration_ms INTEGER,
+    fail_reason TEXT,
+    correlation_id TEXT
+);
+
+-- Indexes for eip_jobs
+CREATE INDEX IF NOT EXISTS idx_eip_jobs_correlation_id ON eip_jobs (correlation_id);
+CREATE INDEX IF NOT EXISTS idx_eip_jobs_stage ON eip_jobs (stage);
+
+-- Bridge Function: Get EIP artifacts for broker conversations
+CREATE OR REPLACE FUNCTION get_eip_artifacts_for_broker_conversation(
+    p_conversation_id INTEGER,
+    p_persona TEXT DEFAULT NULL,
+    p_funnel TEXT DEFAULT NULL
+)
+RETURNS TABLE (
+    id UUID,
+    slug TEXT,
+    status TEXT,
+    title TEXT,
+    persona TEXT,
+    funnel TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        a.id,
+        a.slug,
+        a.status,
+        a.frontmatter->>'title' as title,
+        a.frontmatter->>'persona' as persona,
+        a.frontmatter->>'funnel' as funnel
+    FROM eip_artifacts a
+    WHERE a.status = 'published'
+    AND (p_persona IS NULL OR a.frontmatter->>'persona' = p_persona)
+    AND (p_funnel IS NULL OR a.frontmatter->>'funnel' = p_funnel)
+    ORDER BY a.updated_at DESC
+    LIMIT 10;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Bridge Function: Link broker conversation to EIP entities
+CREATE OR REPLACE FUNCTION link_broker_conversation_to_eip_entities(
+    p_conversation_id INTEGER,
+    p_entity_types TEXT[] DEFAULT NULL
+)
+RETURNS TABLE (
+    entity_id UUID,
+    entity_type TEXT,
+    entity_name TEXT,
+    relevance_score NUMERIC
+) AS $$
+BEGIN
+    RETURN QUERY
+    WITH conversation_entities AS (
+        SELECT 
+            bc.loan_type,
+            bc.property_type,
+            bc.timeline,
+            bc.customer_name
+        FROM broker_conversations bc
+        WHERE bc.conversation_id = p_conversation_id
+        LIMIT 1
+    )
+    SELECT 
+        e.id as entity_id,
+        e.type as entity_type,
+        e.name as entity_name,
+        CASE 
+            WHEN e.type = 'loan_type' AND ce.loan_type = e.name THEN 1.0
+            WHEN e.type = 'property_type' AND ce.property_type = e.name THEN 1.0
+            WHEN e.type = 'timeline' AND ce.timeline = e.name THEN 1.0
+            ELSE 0.5
+        END as relevance_score
+    FROM conversation_entities ce, eip_entities e
+    WHERE (p_entity_types IS NULL OR e.type = ANY(p_entity_types))
+    AND e.valid_from <= NOW()
+    AND (e.valid_to IS NULL OR e.valid_to > NOW())
+    ORDER BY relevance_score DESC, e.name
+    LIMIT 20;
+END;
+$$ LANGUAGE plpgsql;

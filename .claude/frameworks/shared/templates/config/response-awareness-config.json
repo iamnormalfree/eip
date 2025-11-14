@@ -1,0 +1,82 @@
+{
+  "version": "2.0-nextnest-custom",
+  "upstream_version": "2.0.0",
+  "last_sync_date": "2025-10-18",
+
+  "paths": {
+    "verbose_logs": "docs/completion_drive_logs",
+    "plans_active": "docs/plans/active",
+    "plans_archive": "docs/plans/archive",
+    "work_log": "docs/work-log.md",
+    "upstream_reference": ".claude/upstream-reference"
+  },
+
+  "features": {
+    "verbose_logging": true,
+    "plan_persistence": true,
+    "worktree_integration": true,
+    "brainstorming_precheck": true,
+    "conversation_memory": false,
+    "learning_mode": true
+  },
+
+  "overrides": {
+    "use_local_router": true,
+    "custom_agents": ["worktree-helper"],
+    "custom_skills": [
+      "brainstorming",
+      "systematic-debugging",
+      "worktree-workflow"
+    ]
+  },
+
+  "tier_preferences": {
+    "light": {
+      "model": "claude-3-5-haiku-20241022",
+      "max_files": 1,
+      "enable_orchestration_firewall": false,
+      "description": "Single file changes, bug fixes, cosmetic updates"
+    },
+    "medium": {
+      "model": "claude-3-5-haiku-20241022",
+      "max_files": 5,
+      "enable_orchestration_firewall": true,
+      "optional_planning": true,
+      "description": "Multi-file features, moderate complexity"
+    },
+    "heavy": {
+      "model": "claude-sonnet-4-5-20250929",
+      "max_files": 15,
+      "enable_orchestration_firewall": true,
+      "mandatory_planning": true,
+      "use_plan_synthesis": true,
+      "use_preserving_tensions": true,
+      "description": "Complex single-domain features"
+    },
+    "full": {
+      "model": "claude-sonnet-4-5-20250929",
+      "max_files": "unlimited",
+      "enable_orchestration_firewall": true,
+      "mandatory_planning": true,
+      "use_plan_synthesis": true,
+      "use_preserving_tensions": true,
+      "use_knowledge_lineage": true,
+      "phase_chunking": true,
+      "description": "Multi-domain architecture changes"
+    }
+  },
+
+  "complexity_thresholds": {
+    "light_max": 1,
+    "medium_max": 4,
+    "heavy_max": 7,
+    "full_min": 8
+  },
+
+  "nextnest_specific": {
+    "tdd_mandatory": true,
+    "claude_md_compliance_check": true,
+    "canonical_references_check": true,
+    "component_placement_decision_tree": true
+  }
+}

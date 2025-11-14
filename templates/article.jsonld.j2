@@ -1,0 +1,135 @@
+{# ABOUTME: Nunjucks template for JSON-LD Article schema with metadata injection #}
+{# Template contract: structured content with frontmatter following schema.org Article type #}
+
+{
+  "@context": "https://schema.org",
+  "@type": ["Article", "EducationalContent"],
+  "headline": "{{ frontmatter.title | default('Generated Article') }}",
+  "description": "{{ frontmatter.description | default('Generated educational content using EIP framework') }}",
+  "dateCreated": "{{ frontmatter.created_at | default('' | now) | isoformat }}",
+  "dateModified": "{{ frontmatter.updated_at | default(frontmatter.created_at | default('' | now) | isoformat) }}",
+  "author": {
+    "@type": "Organization",
+    "name": "EIP Content Runtime"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EIP Content Runtime"
+  },
+  "keywords": "{{ frontmatter.keywords | default(['educational content', 'EIP', frontmatter.ip_pattern]) | join(', ') }}",
+  "inLanguage": "{{ frontmatter.language | default('en') }}",
+  "isPartOf": {
+    "@type": "CreativeWorkSeries",
+    "name": "EIP Educational Content"
+  },
+
+  {# Educational-specific properties #}
+  "educationalLevel": {% if frontmatter.tier == 'LIGHT' %}"Beginner"{% elif frontmatter.tier == 'MEDIUM' %}"Intermediate"{% elif frontmatter.tier == 'HEAVY' %}"Advanced"{% else %}"Intermediate"{% endif %},
+  "learningResourceType": "{{ frontmatter.learning_type | default('concept') }}",
+  "teaches": [
+    {% for objective in frontmatter.learning_objectives | default(['Understand core concepts', 'Apply knowledge practically']) %}
+      "{{ objective }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+
+  {# Quality metrics and compliance #}
+  "qualityAssurance": {
+    "@type": "PropertyValue",
+    "name": "Content Quality Score",
+    "value": {{ frontmatter.content_score | default(75) }},
+    "measurementTechnique": "EIP Quality Audit"
+  },
+
+  {% if frontmatter.compliance_level and frontmatter.compliance_level != 'low' %}
+  "compliesWith": {
+    "@type": "CreativeWork",
+    "name": "EIP Content Standards",
+    "description": "Educational-IP content generation quality standards"
+  },
+  {% endif %}
+
+  {# Provenance and generation metadata #}
+  "provenance": {
+    "@type": "ProvenanceStatement",
+    "wasGeneratedBy": {
+      "@type": "SoftwareApplication",
+      "name": "EIP Orchestrator",
+      "version": "1.0.0"
+    },
+    "usedIP": "{{ frontmatter.ip_pattern }}",
+    "generationProcess": [
+      "IP Selection",
+      "Evidence Retrieval",
+      "Content Generation",
+      "Quality Audit",
+      "Automated Repair",
+      "Metadata Enhancement"
+    ],
+    "qualityScore": {{ frontmatter.quality_score | default(frontmatter.content_score | default(75)) }}
+  },
+
+  {# Audience and targeting metadata #}
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "{{ frontmatter.persona | default('student') }}"
+  },
+
+  {% if frontmatter.funnel %}
+  "about": {
+    "@type": "Thing",
+    "name": "{{ frontmatter.funnel }}",
+    "description": "Content targeting specific conversion funnel"
+  },
+  {% endif %}
+
+  {# Content metrics #}
+  "wordCount": {{ frontmatter.word_count | default(500) }},
+  "timeRequired": "PT{{ frontmatter.reading_time | default(3) }}M",
+
+  {# Source references if available #}
+  {% if frontmatter.has_evidence and frontmatter.sources_count > 0 %}
+  "citation": [
+    {% for i in range(frontmatter.sources_count | default(0)) %}
+      {
+        "@type": "CreativeWork",
+        "name": "Source {{ i + 1 }}",
+        "identifier": "source_{{ i + 1 }}"
+      }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+  {% endif %}
+
+  {# Additional metadata #}
+  "identifier": "{{ frontmatter.correlation_id | default('article_' + (frontmatter.created_at | default('' | now) | isoformat) | replace(':', '') | replace('.', '') | replace('-', '')) }}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "#content"
+  },
+
+  {% if frontmatter.quality_tags %}
+  "genre": [
+    {% for tag in frontmatter.quality_tags %}
+      "{{ tag.tag | lower | replace('_', ' ') }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+  {% endif %}
+
+  {# Domain and complexity information #}
+  {% if frontmatter.content_domain %}
+  "about": {
+    "@type": "Thing",
+    "name": "{{ frontmatter.content_domain }}",
+    "description": "Content domain classification"
+  },
+  {% endif %}
+
+  {% if frontmatter.query_complexity %}
+  "learningOutcome": "Content complexity level: {{ frontmatter.query_complexity }}",
+  {% endif %}
+
+  "interactionStatistic": {
+    "@type": "InteractionCounter",
+    "interactionType": "https://schema.org/ViewAction",
+    "userInteractionCount": 0
+  }
+}

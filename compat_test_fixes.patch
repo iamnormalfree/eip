@@ -1,0 +1,22 @@
+--- lib_supabase/utils/__tests__/compat.test.ts.orig
++++ lib_supabase/utils/__tests__/compat.test.ts
+@@ -76,6 +76,9 @@
+ 
+   describe('getWithAliases()', () => {
+     beforeEach(() => {
++      // Enable legacy compatibility for dual-read tests
++      process.env.EIP_LEGACY_COMPAT = 'true';
++      
+       // Get fresh storage mocks from global setup
+       const { localStorageMock, sessionStorageMock } = global.getStorageMocks();
+       
+@@ -213,6 +216,9 @@
+ 
+   describe('Dual-read single-write integration', () => {
+     beforeEach(() => {
++      // Enable legacy compatibility for dual-read tests
++      process.env.EIP_LEGACY_COMPAT = 'true';
++      
+       // Get fresh storage mocks from global setup
+       const { localStorageMock } = global.getStorageMocks();
+       
