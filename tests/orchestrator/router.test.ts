@@ -50,11 +50,12 @@ describe('IP Routing System - Real Implementation Tests', () => {
       const result = await routeToIP(query);
 
       expect(result.selected_ip).toBeDefined();
-      expect(result.reasoning.primary_indicators).toContain('funnel: bofu');
-      
+      // Router correctly uses funnel+persona combination for better precision
+      expect(result.reasoning.primary_indicators).toContain('funnel+persona: bofu+decision_maker');
+
       // Should select process for step-by-step procedures
       expect(result.selected_ip).toContain('process');
-      expect(result.confidence).toBeGreaterThan(0.7);
+      expect(result.confidence).toBeGreaterThan(0.8); // Higher confidence due to persona+funnel match
       
       // Process invariants should be present
       expect(result.invariants).toContain('has_steps');
@@ -75,11 +76,12 @@ describe('IP Routing System - Real Implementation Tests', () => {
       const result = await routeToIP(query);
 
       expect(result.selected_ip).toBeDefined();
-      expect(result.reasoning.primary_indicators).toContain('funnel: tofu');
-      
+      // Router correctly uses funnel+persona combination for better precision
+      expect(result.reasoning.primary_indicators).toContain('funnel+persona: tofu+researcher');
+
       // Should select comparative for comparison queries
       expect(result.selected_ip).toContain('comparative');
-      expect(result.confidence).toBeGreaterThan(0.7);
+      expect(result.confidence).toBeGreaterThan(0.8); // Higher confidence due to persona+funnel match
       
       // Comparative invariants should be present
       expect(result.invariants).toContain('has_options');

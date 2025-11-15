@@ -21,6 +21,10 @@ interface IPMapping {
   use_cases: string[];
 }
 
+// Router versioning and metadata
+export const ROUTER_VERSION = '1.0.0';
+export const ROUTER_LAST_UPDATED = '2025-11-15';
+
 // Educational IP registry - deterministic mapping with invariants
 const IP_REGISTRY: Record<string, IPMapping> = {
   'framework@1.0.0': {
@@ -91,6 +95,11 @@ export async function routeToIP(input: RouterInput): Promise<{
   alternatives: string[];
   invariants: string[]; // IP invariants for compliance
 }> {
+  // Handle null/undefined input gracefully
+  if (!input) {
+    input = {};
+  }
+
   const funnel = (input.funnel || '').toLowerCase().trim();
   const persona = (input.persona || '').toLowerCase().trim();
   const brief = (input.brief || input.query || '').toLowerCase();
@@ -239,6 +248,11 @@ export async function routeToIP(input: RouterInput): Promise<{
  * Routes to IP using simple string return
  */
 export function routeIP(input: RouterInput): string {
+  // Handle null/undefined input gracefully
+  if (!input) {
+    input = {};
+  }
+
   // Use the new routeToIP but return just the IP string for compatibility
   const funnel = (input.funnel || '').toLowerCase().trim();
   const persona = (input.persona || '').toLowerCase().trim();
@@ -341,6 +355,20 @@ export function getIPMetadata(ipId: string): IPMapping | null {
 export function getIPInvariants(ipId: string): string[] {
   const mapping = IP_REGISTRY[ipId];
   return mapping ? mapping.invariants : [];
+}
+
+/**
+ * Get router metadata for versioning and change tracking
+ */
+export function getRouterMetadata() {
+  return {
+    version: ROUTER_VERSION,
+    last_updated: ROUTER_LAST_UPDATED,
+    available_ips: Object.keys(IP_REGISTRY),
+    ip_count: Object.keys(IP_REGISTRY).length,
+    supported_funnels: [...new Set(Object.values(IP_REGISTRY).flatMap(ip => ip.funnels))],
+    supported_personas: [...new Set(Object.values(IP_REGISTRY).flatMap(ip => ip.personas))]
+  };
 }
 
 // Export all available IPs for reference
