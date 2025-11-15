@@ -1,0 +1,154 @@
+--- a/orchestrator/retrieval.ts
++++ b/orchestrator/retrieval.ts
+@@ -122,7 +122,7 @@
+ }
+ 
+ // Enhanced Simple BM25 implementation with index loading capabilities
+ class SimpleBM25 {
+-  private docs: Array<{ id: string; content: string; terms: string[]; metadata?: any }>;
++  private docs: Array<{ id: string; content?: string; terms?: string[]; metadata?: any; fields?: any; field_terms?: any }>;
+   private docCount: number;
+   private avgDocLength: number;
+   private k1: number = 1.2;
+@@ -183,7 +183,7 @@
+       
+       // Store the loaded index data
+       this.loadedDocuments = indexData;
+-      
+-      // Load index data for search
+-      this.docs = indexData.documents;
++      
++      // Load index data for search (maintain backward compatibility)
++      this.docs = indexData.documents as any;
+       this.docCount = indexData.document_count;
+       this.avgDocLength = indexData.doc_stats.avg_doc_length;
+@@ -262,8 +262,9 @@
+     let df = 0;
+     if (this.loadedDocuments) {
+       // New field structure - check all field terms
+-      df = documentsForIDF.filter(doc => {
++      df = (documentsForIDF as any[]).filter((doc: any) => {
+         const allTerms = [
++          ...(doc.terms || []),
+           ...(doc.field_terms?.concept_abstract || []),
+           ...(doc.field_terms?.artifact_summary || []),
+           ...(doc.field_terms?.entity_name || []),
+@@ -272,7 +273,7 @@
+         return allTerms.includes(term);
+       }).length;
+     } else {
+-      // Old structure - use doc.terms
+-      df = documentsForIDF.filter(doc => (doc as any).terms?.includes(term)).length;
++      // Old structure - use doc.terms if available
++      df = documentsForIDF.filter((doc: any) => doc.terms?.includes(term) || 
++        (typeof doc.content === 'string' && doc.content.toLowerCase().includes(term))).length;
+     }
+@@ -287,6 +288,7 @@
+     // FIXED: Use loaded documents if available, otherwise fall back to in-memory docs
+     const documentsToSearch = this.loadedDocuments ? this.loadedDocuments.documents : this.docs;
++    const documentsArray = Array.isArray(documentsToSearch) ? documentsToSearch : [];
+     const fieldWeights = this.loadedDocuments?.field_weights || {
+       concept_abstract: 2.0,
+       artifact_summary: 1.0,
+@@ -294,44 +296,51 @@
+       content: 1.0
+     };
+ 
+-    for (const doc of documentsToSearch) {
++    for (const doc of documentsArray) {
++      const docAny = doc as any;
+       let score = 0;
+ 
+       // NEW: Field-weighted BM25 scoring
+-      if (doc.field_terms) {
++      if (docAny.field_terms) {
+         // Document has field structure (from loaded index)
+         const allTerms = [
+-          ...(doc.field_terms.concept_abstract || []),
+-          ...(doc.field_terms.artifact_summary || []),
+-          ...(doc.field_terms.entity_name || []),
+-          ...(doc.field_terms.content || [])
++          ...(docAny.field_terms.concept_abstract || []),
++          ...(docAny.field_terms.artifact_summary || []),
++          ...(docAny.field_terms.entity_name || []),
++          ...(docAny.field_terms.content || [])
+         ];
+         const docLength = allTerms.length;
+ 
+         for (const term of queryTerms) {
+           let termScore = 0;
+ 
+           // Check each field for the term and apply field weight
+-          if (doc.field_terms.concept_abstract?.includes(term)) {
+-            const tf = doc.field_terms.concept_abstract.filter(t => t === term).length;
++          if (docAny.field_terms.concept_abstract?.includes(term)) {
++            const tf = docAny.field_terms.concept_abstract.filter((t: string) => t === term).length;
+             const idf = this.idf(term);
+             const fieldWeight = fieldWeights.concept_abstract || 2.0;
+             termScore += this.calculateBM25Score(tf, idf, docLength, fieldWeight);
+           }
+ 
+-          if (doc.field_terms.artifact_summary?.includes(term)) {
+-            const tf = doc.field_terms.artifact_summary.filter(t => t === term).length;
++          if (docAny.field_terms.artifact_summary?.includes(term)) {
++            const tf = docAny.field_terms.artifact_summary.filter((t: string) => t === term).length;
+             const idf = this.idf(term);
+             const fieldWeight = fieldWeights.artifact_summary || 1.0;
+             termScore += this.calculateBM25Score(tf, idf, docLength, fieldWeight);
+           }
+ 
+-          if (doc.field_terms.entity_name?.includes(term)) {
+-            const tf = doc.field_terms.entity_name.filter(t => t === term).length;
++          if (docAny.field_terms.entity_name?.includes(term)) {
++            const tf = docAny.field_terms.entity_name.filter((t: string) => t === term).length;
+             const idf = this.idf(term);
+             const fieldWeight = fieldWeights.entity_name || 1.5;
+             termScore += this.calculateBM25Score(tf, idf, docLength, fieldWeight);
+           }
+ 
+-          if (doc.field_terms.content?.includes(term)) {
+-            const tf = doc.field_terms.content.filter(t => t === term).length;
++          if (docAny.field_terms.content?.includes(term)) {
++            const tf = docAny.field_terms.content.filter((t: string) => t === term).length;
+             const idf = this.idf(term);
+             const fieldWeight = fieldWeights.content || 1.0;
+             termScore += this.calculateBM25Score(tf, idf, docLength, fieldWeight);
+@@ -339,14 +348,14 @@
+ 
+           score += termScore;
+         }
+-      } else {
++      } else if (docAny.terms) {
+         // Fallback to old format for backward compatibility
+-        const docLength = doc.terms.length;
++        const docLength = docAny.terms.length;
+         for (const term of queryTerms) {
+-          if (!doc.terms.includes(term)) continue;
++          if (!docAny.terms.includes(term)) continue;
+ 
+-          const tf = doc.terms.filter(t => t === term).length;
++          const tf = docAny.terms.filter((t: string) => t === term).length;
+           const idf = this.idf(term);
+           const fieldWeight = 1.0; // Default weight for old format
+           score += this.calculateBM25Score(tf, idf, docLength, fieldWeight);
+@@ -354,6 +363,18 @@
+       }
+ 
++      // Fallback for documents without proper structure (tokenize content)
++      if (!docAny.field_terms && !docAny.terms && docAny.content) {
++        const docTerms = this.tokenize(docAny.content);
++        const docLength = docTerms.length;
++        for (const term of queryTerms) {
++          if (docTerms.includes(term)) {
++            const tf = docTerms.filter((t: string) => t === term).length;
++            const idf = this.idf(term);
++            score += this.calculateBM25Score(tf, idf, docLength, 1.0);
++          }
++        }
++      }
++
+       if (score > 0) {
+-        scores[doc.id] = score;
++        scores[docAny.id] = score;
+       }
+     }

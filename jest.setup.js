@@ -88,3 +88,7 @@ Object.defineProperty(global, 'performance', {
 
 // Set test environment
 process.env.NODE_ENV = 'test';
+
+// Mock Supabase environment variables for tests
+process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://mock-supabase-url.supabase.co';
+process.env.SUPABASE_SERVICE_ROLE_KEY = 'mock-service-role-key-for-testing';

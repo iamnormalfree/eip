@@ -51,7 +51,7 @@ describe('BM25 Retrieval System', () => {
       
       const result = await parallelRetrieve(query);
       
-      result.candidates.forEach((candidate: any, index: number) => {
+      result.candidates.forEach(function(candidate, index) {
         expect(candidate).toHaveProperty('id');
         expect(candidate).toHaveProperty('content');
         expect(candidate).toHaveProperty('source');
@@ -105,7 +105,7 @@ describe('BM25 Retrieval System', () => {
       expect(result.flags.has_gov_source).toBe(true);
       
       // Verify MAS sources are ranked higher
-      const masSources = result.candidates.filter((c: any) => 
+      const masSources = result.candidates.filter((c) => 
         c.metadata?.domain === 'mas.gov.sg'
       );
       expect(masSources.length).toBeGreaterThan(0);
@@ -157,7 +157,7 @@ describe('BM25 Retrieval System', () => {
 
     it('should handle malformed queries without crashing', async () => {
       const malformedQuery = { 
-        query: null as any,
+        query: null,
         invalid_field: 'should be ignored'
       };
       

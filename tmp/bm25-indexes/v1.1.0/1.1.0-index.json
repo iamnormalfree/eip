@@ -1,0 +1,1779 @@
+{
+  "version": "1.1.0",
+  "build_timestamp": "2025-11-15T06:54:15.111Z",
+  "document_count": 52,
+  "field_weights": {
+    "concept_abstract": 2,
+    "artifact_summary": 1,
+    "entity_name": 1.5,
+    "content": 1
+  },
+  "documents": [
+    {
+      "id": "entity_460da171-e083-428a-9375-c5c61867014c",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Fixed Rate Mortgage",
+        "content": "Fixed Rate Mortgage concept loan_type low"
+      },
+      "field_terms": {
+        "entity_name": [
+          "fixed",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "fixed",
+          "rate",
+          "mortgage",
+          "concept",
+          "loan_type",
+          "low"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Fixed Rate Mortgage",
+        "attrs": {
+          "category": "loan_type",
+          "risk_level": "low",
+          "tenure_options": [
+            15,
+            20,
+            25,
+            30
+          ]
+        }
+      }
+    },
+    {
+      "id": "entity_aab10520-2159-466d-9fa7-aa0a4710426f",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Loan Pre-Approval",
+        "content": "Loan Pre-Approval offer 30days service 3days"
+      },
+      "field_terms": {
+        "entity_name": [
+          "loan",
+          "pre",
+          "approval"
+        ],
+        "content": [
+          "loan",
+          "pre",
+          "approval",
+          "offer",
+          "30days",
+          "service",
+          "3days"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Loan Pre-Approval",
+        "attrs": {
+          "validity": "30days",
+          "service_type": "service",
+          "processing_time": "3days"
+        }
+      }
+    },
+    {
+      "id": "entity_8c84231d-06a6-4d76-986d-3e27de8a3748",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Mortgage Consultation",
+        "content": "Mortgage Consultation offer free 30min advisory"
+      },
+      "field_terms": {
+        "entity_name": [
+          "mortgage",
+          "consultation"
+        ],
+        "content": [
+          "mortgage",
+          "consultation",
+          "offer",
+          "free",
+          "30min",
+          "advisory"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Mortgage Consultation",
+        "attrs": {
+          "cost": "free",
+          "duration": "30min",
+          "service_type": "advisory"
+        }
+      }
+    },
+    {
+      "id": "entity_737cfb2e-f60c-4f75-9e69-0364fdc8dbf5",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Property Investor",
+        "content": "Property Investor persona advanced high"
+      },
+      "field_terms": {
+        "entity_name": [
+          "property",
+          "investor"
+        ],
+        "content": [
+          "property",
+          "investor",
+          "persona",
+          "advanced",
+          "high"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "Property Investor",
+        "attrs": {
+          "age_range": [
+            30,
+            50
+          ],
+          "experience": "advanced",
+          "income_level": "high"
+        }
+      }
+    },
+    {
+      "id": "entity_28c235f6-5d81-4085-a5f5-cfcf7430e8e4",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "First-Time Home Buyer",
+        "content": "First-Time Home Buyer persona beginner middle"
+      },
+      "field_terms": {
+        "entity_name": [
+          "first",
+          "time",
+          "home",
+          "buyer"
+        ],
+        "content": [
+          "first",
+          "time",
+          "home",
+          "buyer",
+          "persona",
+          "beginner",
+          "middle"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "First-Time Home Buyer",
+        "attrs": {
+          "age_range": [
+            25,
+            35
+          ],
+          "experience": "beginner",
+          "income_level": "middle"
+        }
+      }
+    },
+    {
+      "id": "entity_06de4a60-a327-4ba4-989e-ef53d9f3976d",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Private Condominium",
+        "content": "Private Condominium concept property_type all_buyers"
+      },
+      "field_terms": {
+        "entity_name": [
+          "private",
+          "condominium"
+        ],
+        "content": [
+          "private",
+          "condominium",
+          "concept",
+          "property_type",
+          "all_buyers"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Private Condominium",
+        "attrs": {
+          "category": "property_type",
+          "min_price": 800000,
+          "eligibility": "all_buyers"
+        }
+      }
+    },
+    {
+      "id": "entity_509f2dd0-567a-4838-874f-f2d1d85da33b",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "HDB BTO Flat",
+        "content": "HDB BTO Flat concept property_type first_timer"
+      },
+      "field_terms": {
+        "entity_name": [
+          "hdb",
+          "bto",
+          "flat"
+        ],
+        "content": [
+          "hdb",
+          "bto",
+          "flat",
+          "concept",
+          "property_type",
+          "first_timer"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "HDB BTO Flat",
+        "attrs": {
+          "category": "property_type",
+          "max_price": 600000,
+          "eligibility": "first_timer"
+        }
+      }
+    },
+    {
+      "id": "entity_a1f9ad53-015e-45f4-8f5e-e8644c8674f1",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Floating Rate Mortgage",
+        "content": "Floating Rate Mortgage concept SORA loan_type medium"
+      },
+      "field_terms": {
+        "entity_name": [
+          "floating",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "floating",
+          "rate",
+          "mortgage",
+          "concept",
+          "sora",
+          "loan_type",
+          "medium"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Floating Rate Mortgage",
+        "attrs": {
+          "basis": "SORA",
+          "category": "loan_type",
+          "risk_level": "medium"
+        }
+      }
+    },
+    {
+      "id": "entity_71d82785-3bf3-4200-8847-064288923a92",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Floating Rate Mortgage",
+        "content": "Floating Rate Mortgage concept SORA loan_type medium"
+      },
+      "field_terms": {
+        "entity_name": [
+          "floating",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "floating",
+          "rate",
+          "mortgage",
+          "concept",
+          "sora",
+          "loan_type",
+          "medium"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Floating Rate Mortgage",
+        "attrs": {
+          "basis": "SORA",
+          "category": "loan_type",
+          "risk_level": "medium"
+        }
+      }
+    },
+    {
+      "id": "entity_513a6b1c-e22a-4832-9c98-69d073d4f4fa",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Loan Pre-Approval",
+        "content": "Loan Pre-Approval offer 30days service 3days"
+      },
+      "field_terms": {
+        "entity_name": [
+          "loan",
+          "pre",
+          "approval"
+        ],
+        "content": [
+          "loan",
+          "pre",
+          "approval",
+          "offer",
+          "30days",
+          "service",
+          "3days"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Loan Pre-Approval",
+        "attrs": {
+          "validity": "30days",
+          "service_type": "service",
+          "processing_time": "3days"
+        }
+      }
+    },
+    {
+      "id": "entity_cd7f4ecf-7aab-4e84-9a4a-77b72cfe1961",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Mortgage Consultation",
+        "content": "Mortgage Consultation offer free 30min advisory"
+      },
+      "field_terms": {
+        "entity_name": [
+          "mortgage",
+          "consultation"
+        ],
+        "content": [
+          "mortgage",
+          "consultation",
+          "offer",
+          "free",
+          "30min",
+          "advisory"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Mortgage Consultation",
+        "attrs": {
+          "cost": "free",
+          "duration": "30min",
+          "service_type": "advisory"
+        }
+      }
+    },
+    {
+      "id": "entity_ea6a840c-8878-4c91-b3cd-65e4aed23b32",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Property Investor",
+        "content": "Property Investor persona advanced high"
+      },
+      "field_terms": {
+        "entity_name": [
+          "property",
+          "investor"
+        ],
+        "content": [
+          "property",
+          "investor",
+          "persona",
+          "advanced",
+          "high"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "Property Investor",
+        "attrs": {
+          "age_range": [
+            30,
+            50
+          ],
+          "experience": "advanced",
+          "income_level": "high"
+        }
+      }
+    },
+    {
+      "id": "entity_09c0d30d-bd04-465a-90ba-12ffdde0ae13",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "First-Time Home Buyer",
+        "content": "First-Time Home Buyer persona beginner middle"
+      },
+      "field_terms": {
+        "entity_name": [
+          "first",
+          "time",
+          "home",
+          "buyer"
+        ],
+        "content": [
+          "first",
+          "time",
+          "home",
+          "buyer",
+          "persona",
+          "beginner",
+          "middle"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "First-Time Home Buyer",
+        "attrs": {
+          "age_range": [
+            25,
+            35
+          ],
+          "experience": "beginner",
+          "income_level": "middle"
+        }
+      }
+    },
+    {
+      "id": "entity_9993ea32-c865-41da-8b15-0a6a93ed53eb",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Private Condominium",
+        "content": "Private Condominium concept property_type all_buyers"
+      },
+      "field_terms": {
+        "entity_name": [
+          "private",
+          "condominium"
+        ],
+        "content": [
+          "private",
+          "condominium",
+          "concept",
+          "property_type",
+          "all_buyers"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Private Condominium",
+        "attrs": {
+          "category": "property_type",
+          "min_price": 800000,
+          "eligibility": "all_buyers"
+        }
+      }
+    },
+    {
+      "id": "entity_3027ec3d-90d1-4b0e-aecc-03547068bd10",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "HDB BTO Flat",
+        "content": "HDB BTO Flat concept property_type first_timer"
+      },
+      "field_terms": {
+        "entity_name": [
+          "hdb",
+          "bto",
+          "flat"
+        ],
+        "content": [
+          "hdb",
+          "bto",
+          "flat",
+          "concept",
+          "property_type",
+          "first_timer"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "HDB BTO Flat",
+        "attrs": {
+          "category": "property_type",
+          "max_price": 600000,
+          "eligibility": "first_timer"
+        }
+      }
+    },
+    {
+      "id": "entity_af37a541-9613-475f-9668-57e3774e0289",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Fixed Rate Mortgage",
+        "content": "Fixed Rate Mortgage concept loan_type low"
+      },
+      "field_terms": {
+        "entity_name": [
+          "fixed",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "fixed",
+          "rate",
+          "mortgage",
+          "concept",
+          "loan_type",
+          "low"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Fixed Rate Mortgage",
+        "attrs": {
+          "category": "loan_type",
+          "risk_level": "low",
+          "tenure_options": [
+            15,
+            20,
+            25,
+            30
+          ]
+        }
+      }
+    },
+    {
+      "id": "entity_23bad0ab-ed2c-48fe-baa1-f8bc49e30f24",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Fixed Rate Mortgage",
+        "content": "Fixed Rate Mortgage concept loan_type low"
+      },
+      "field_terms": {
+        "entity_name": [
+          "fixed",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "fixed",
+          "rate",
+          "mortgage",
+          "concept",
+          "loan_type",
+          "low"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Fixed Rate Mortgage",
+        "attrs": {
+          "category": "loan_type",
+          "risk_level": "low",
+          "tenure_options": [
+            15,
+            20,
+            25,
+            30
+          ]
+        }
+      }
+    },
+    {
+      "id": "entity_8c825307-120c-4b3d-b768-23ecced86b35",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Loan Pre-Approval",
+        "content": "Loan Pre-Approval offer 30days service 3days"
+      },
+      "field_terms": {
+        "entity_name": [
+          "loan",
+          "pre",
+          "approval"
+        ],
+        "content": [
+          "loan",
+          "pre",
+          "approval",
+          "offer",
+          "30days",
+          "service",
+          "3days"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Loan Pre-Approval",
+        "attrs": {
+          "validity": "30days",
+          "service_type": "service",
+          "processing_time": "3days"
+        }
+      }
+    },
+    {
+      "id": "entity_84f97d1c-fc50-40c7-ad75-c17da26b8bf4",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Mortgage Consultation",
+        "content": "Mortgage Consultation offer free 30min advisory"
+      },
+      "field_terms": {
+        "entity_name": [
+          "mortgage",
+          "consultation"
+        ],
+        "content": [
+          "mortgage",
+          "consultation",
+          "offer",
+          "free",
+          "30min",
+          "advisory"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Mortgage Consultation",
+        "attrs": {
+          "cost": "free",
+          "duration": "30min",
+          "service_type": "advisory"
+        }
+      }
+    },
+    {
+      "id": "entity_de758cd6-a94f-4ecc-81f4-98e32d6d9a10",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Property Investor",
+        "content": "Property Investor persona advanced high"
+      },
+      "field_terms": {
+        "entity_name": [
+          "property",
+          "investor"
+        ],
+        "content": [
+          "property",
+          "investor",
+          "persona",
+          "advanced",
+          "high"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "Property Investor",
+        "attrs": {
+          "age_range": [
+            30,
+            50
+          ],
+          "experience": "advanced",
+          "income_level": "high"
+        }
+      }
+    },
+    {
+      "id": "entity_4865f1bd-47da-4f4a-9f8b-eff1da1cb6df",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "First-Time Home Buyer",
+        "content": "First-Time Home Buyer persona beginner middle"
+      },
+      "field_terms": {
+        "entity_name": [
+          "first",
+          "time",
+          "home",
+          "buyer"
+        ],
+        "content": [
+          "first",
+          "time",
+          "home",
+          "buyer",
+          "persona",
+          "beginner",
+          "middle"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "First-Time Home Buyer",
+        "attrs": {
+          "age_range": [
+            25,
+            35
+          ],
+          "experience": "beginner",
+          "income_level": "middle"
+        }
+      }
+    },
+    {
+      "id": "entity_ed4ec260-99a0-4e32-bcff-6612b2b88d25",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Private Condominium",
+        "content": "Private Condominium concept property_type all_buyers"
+      },
+      "field_terms": {
+        "entity_name": [
+          "private",
+          "condominium"
+        ],
+        "content": [
+          "private",
+          "condominium",
+          "concept",
+          "property_type",
+          "all_buyers"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Private Condominium",
+        "attrs": {
+          "category": "property_type",
+          "min_price": 800000,
+          "eligibility": "all_buyers"
+        }
+      }
+    },
+    {
+      "id": "entity_9a37b1ac-0058-49cb-ba5f-a594512c3c0a",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "HDB BTO Flat",
+        "content": "HDB BTO Flat concept property_type first_timer"
+      },
+      "field_terms": {
+        "entity_name": [
+          "hdb",
+          "bto",
+          "flat"
+        ],
+        "content": [
+          "hdb",
+          "bto",
+          "flat",
+          "concept",
+          "property_type",
+          "first_timer"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "HDB BTO Flat",
+        "attrs": {
+          "category": "property_type",
+          "max_price": 600000,
+          "eligibility": "first_timer"
+        }
+      }
+    },
+    {
+      "id": "entity_e19c7892-fee5-420e-973a-50aa270191b4",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Floating Rate Mortgage",
+        "content": "Floating Rate Mortgage concept SORA loan_type medium"
+      },
+      "field_terms": {
+        "entity_name": [
+          "floating",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "floating",
+          "rate",
+          "mortgage",
+          "concept",
+          "sora",
+          "loan_type",
+          "medium"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Floating Rate Mortgage",
+        "attrs": {
+          "basis": "SORA",
+          "category": "loan_type",
+          "risk_level": "medium"
+        }
+      }
+    },
+    {
+      "id": "entity_3d7f94ea-7307-460f-82f9-ab8368ea69f9",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "loan_inquiry",
+        "content": "loan_inquiry funnel research understand_loan_options"
+      },
+      "field_terms": {
+        "entity_name": [
+          "loan_inquiry"
+        ],
+        "content": [
+          "loan_inquiry",
+          "funnel",
+          "research",
+          "understand_loan_options"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "funnel",
+        "name": "loan_inquiry",
+        "attrs": {
+          "stage": "research",
+          "intent": "understand_loan_options"
+        }
+      }
+    },
+    {
+      "id": "entity_402af23b-cbd2-4b9d-a9b2-8dd7392379a3",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "mortgage_application",
+        "content": "mortgage_application funnel consideration apply_for_mortgage"
+      },
+      "field_terms": {
+        "entity_name": [
+          "mortgage_application"
+        ],
+        "content": [
+          "mortgage_application",
+          "funnel",
+          "consideration",
+          "apply_for_mortgage"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "funnel",
+        "name": "mortgage_application",
+        "attrs": {
+          "stage": "consideration",
+          "intent": "apply_for_mortgage"
+        }
+      }
+    },
+    {
+      "id": "entity_b05a23cc-4755-470c-a956-843f35547073",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "housing_loan_specialist",
+        "content": "housing_loan_specialist persona hdb_loans first_time_homebuyers"
+      },
+      "field_terms": {
+        "entity_name": [
+          "housing_loan_specialist"
+        ],
+        "content": [
+          "housing_loan_specialist",
+          "persona",
+          "hdb_loans",
+          "first_time_homebuyers"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "housing_loan_specialist",
+        "attrs": {
+          "expertise": [
+            "hdb_loans"
+          ],
+          "specialization": "first_time_homebuyers"
+        }
+      }
+    },
+    {
+      "id": "entity_3e055271-bd55-46ae-904f-2e8a0151708a",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "property_tax_advisor",
+        "content": "property_tax_advisor persona property_tax singapore_property_tax"
+      },
+      "field_terms": {
+        "entity_name": [
+          "property_tax_advisor"
+        ],
+        "content": [
+          "property_tax_advisor",
+          "persona",
+          "property_tax",
+          "singapore_property_tax"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "property_tax_advisor",
+        "attrs": {
+          "expertise": [
+            "property_tax"
+          ],
+          "specialization": "singapore_property_tax"
+        }
+      }
+    },
+    {
+      "id": "entity_be7eb10a-a6e5-408d-a30f-64881b1d237d",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Mortgage Consultation",
+        "content": "Mortgage Consultation offer free 30min advisory"
+      },
+      "field_terms": {
+        "entity_name": [
+          "mortgage",
+          "consultation"
+        ],
+        "content": [
+          "mortgage",
+          "consultation",
+          "offer",
+          "free",
+          "30min",
+          "advisory"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Mortgage Consultation",
+        "attrs": {
+          "cost": "free",
+          "duration": "30min",
+          "service_type": "advisory"
+        }
+      }
+    },
+    {
+      "id": "entity_433fd4c5-5cb0-4366-a5ea-8704b474b90b",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Property Investor",
+        "content": "Property Investor persona advanced high"
+      },
+      "field_terms": {
+        "entity_name": [
+          "property",
+          "investor"
+        ],
+        "content": [
+          "property",
+          "investor",
+          "persona",
+          "advanced",
+          "high"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "Property Investor",
+        "attrs": {
+          "age_range": [
+            30,
+            50
+          ],
+          "experience": "advanced",
+          "income_level": "high"
+        }
+      }
+    },
+    {
+      "id": "entity_e77207f6-58ad-4bed-a6b2-3a534fcfccd9",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "First-Time Home Buyer",
+        "content": "First-Time Home Buyer persona beginner middle"
+      },
+      "field_terms": {
+        "entity_name": [
+          "first",
+          "time",
+          "home",
+          "buyer"
+        ],
+        "content": [
+          "first",
+          "time",
+          "home",
+          "buyer",
+          "persona",
+          "beginner",
+          "middle"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "First-Time Home Buyer",
+        "attrs": {
+          "age_range": [
+            25,
+            35
+          ],
+          "experience": "beginner",
+          "income_level": "middle"
+        }
+      }
+    },
+    {
+      "id": "entity_2ea73cca-c88f-4d79-9534-69544012df21",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Private Condominium",
+        "content": "Private Condominium concept property_type all_buyers"
+      },
+      "field_terms": {
+        "entity_name": [
+          "private",
+          "condominium"
+        ],
+        "content": [
+          "private",
+          "condominium",
+          "concept",
+          "property_type",
+          "all_buyers"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Private Condominium",
+        "attrs": {
+          "category": "property_type",
+          "min_price": 800000,
+          "eligibility": "all_buyers"
+        }
+      }
+    },
+    {
+      "id": "entity_91b9ad44-bfdd-40fc-b541-01cd814c7852",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "HDB BTO Flat",
+        "content": "HDB BTO Flat concept property_type first_timer"
+      },
+      "field_terms": {
+        "entity_name": [
+          "hdb",
+          "bto",
+          "flat"
+        ],
+        "content": [
+          "hdb",
+          "bto",
+          "flat",
+          "concept",
+          "property_type",
+          "first_timer"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "HDB BTO Flat",
+        "attrs": {
+          "category": "property_type",
+          "max_price": 600000,
+          "eligibility": "first_timer"
+        }
+      }
+    },
+    {
+      "id": "entity_9cf49709-0f57-48e1-b18e-f3a4a19cb0d0",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Fixed Rate Mortgage",
+        "content": "Fixed Rate Mortgage concept loan_type low"
+      },
+      "field_terms": {
+        "entity_name": [
+          "fixed",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "fixed",
+          "rate",
+          "mortgage",
+          "concept",
+          "loan_type",
+          "low"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Fixed Rate Mortgage",
+        "attrs": {
+          "category": "loan_type",
+          "risk_level": "low",
+          "tenure_options": [
+            15,
+            20,
+            25,
+            30
+          ]
+        }
+      }
+    },
+    {
+      "id": "entity_76b332a9-faf5-4913-8897-8a8199c3a948",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Floating Rate Mortgage",
+        "content": "Floating Rate Mortgage concept SORA loan_type medium"
+      },
+      "field_terms": {
+        "entity_name": [
+          "floating",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "floating",
+          "rate",
+          "mortgage",
+          "concept",
+          "sora",
+          "loan_type",
+          "medium"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Floating Rate Mortgage",
+        "attrs": {
+          "basis": "SORA",
+          "category": "loan_type",
+          "risk_level": "medium"
+        }
+      }
+    },
+    {
+      "id": "entity_8c1251c9-7762-445c-ba0b-b6600558e85b",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Loan Pre-Approval",
+        "content": "Loan Pre-Approval offer 30days service 3days"
+      },
+      "field_terms": {
+        "entity_name": [
+          "loan",
+          "pre",
+          "approval"
+        ],
+        "content": [
+          "loan",
+          "pre",
+          "approval",
+          "offer",
+          "30days",
+          "service",
+          "3days"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Loan Pre-Approval",
+        "attrs": {
+          "validity": "30days",
+          "service_type": "service",
+          "processing_time": "3days"
+        }
+      }
+    },
+    {
+      "id": "entity_bdbfccb4-2b06-4dd5-b9bc-15709bf7dea9",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Floating Rate Mortgage",
+        "content": "Floating Rate Mortgage concept SORA loan_type medium"
+      },
+      "field_terms": {
+        "entity_name": [
+          "floating",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "floating",
+          "rate",
+          "mortgage",
+          "concept",
+          "sora",
+          "loan_type",
+          "medium"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Floating Rate Mortgage",
+        "attrs": {
+          "basis": "SORA",
+          "category": "loan_type",
+          "risk_level": "medium"
+        }
+      }
+    },
+    {
+      "id": "entity_42a34547-7025-4602-a588-ddcf34222f31",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Loan Pre-Approval",
+        "content": "Loan Pre-Approval offer 30days service 3days"
+      },
+      "field_terms": {
+        "entity_name": [
+          "loan",
+          "pre",
+          "approval"
+        ],
+        "content": [
+          "loan",
+          "pre",
+          "approval",
+          "offer",
+          "30days",
+          "service",
+          "3days"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Loan Pre-Approval",
+        "attrs": {
+          "validity": "30days",
+          "service_type": "service",
+          "processing_time": "3days"
+        }
+      }
+    },
+    {
+      "id": "entity_0c0867af-d6a6-4f58-bc58-c1f161814345",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Mortgage Consultation",
+        "content": "Mortgage Consultation offer free 30min advisory"
+      },
+      "field_terms": {
+        "entity_name": [
+          "mortgage",
+          "consultation"
+        ],
+        "content": [
+          "mortgage",
+          "consultation",
+          "offer",
+          "free",
+          "30min",
+          "advisory"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Mortgage Consultation",
+        "attrs": {
+          "cost": "free",
+          "duration": "30min",
+          "service_type": "advisory"
+        }
+      }
+    },
+    {
+      "id": "entity_eabcc307-6db5-4b42-8c7e-257594947f3a",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Property Investor",
+        "content": "Property Investor persona advanced high"
+      },
+      "field_terms": {
+        "entity_name": [
+          "property",
+          "investor"
+        ],
+        "content": [
+          "property",
+          "investor",
+          "persona",
+          "advanced",
+          "high"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "Property Investor",
+        "attrs": {
+          "age_range": [
+            30,
+            50
+          ],
+          "experience": "advanced",
+          "income_level": "high"
+        }
+      }
+    },
+    {
+      "id": "entity_fbc33b56-9b36-484b-8fdd-32b321d74527",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "First-Time Home Buyer",
+        "content": "First-Time Home Buyer persona beginner middle"
+      },
+      "field_terms": {
+        "entity_name": [
+          "first",
+          "time",
+          "home",
+          "buyer"
+        ],
+        "content": [
+          "first",
+          "time",
+          "home",
+          "buyer",
+          "persona",
+          "beginner",
+          "middle"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "First-Time Home Buyer",
+        "attrs": {
+          "age_range": [
+            25,
+            35
+          ],
+          "experience": "beginner",
+          "income_level": "middle"
+        }
+      }
+    },
+    {
+      "id": "entity_157a1680-8547-4ccd-a512-7e907996ee5c",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Private Condominium",
+        "content": "Private Condominium concept property_type all_buyers"
+      },
+      "field_terms": {
+        "entity_name": [
+          "private",
+          "condominium"
+        ],
+        "content": [
+          "private",
+          "condominium",
+          "concept",
+          "property_type",
+          "all_buyers"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Private Condominium",
+        "attrs": {
+          "category": "property_type",
+          "min_price": 800000,
+          "eligibility": "all_buyers"
+        }
+      }
+    },
+    {
+      "id": "entity_81a60efd-bfac-4d16-b623-7ca786735d6e",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "HDB BTO Flat",
+        "content": "HDB BTO Flat concept property_type first_timer"
+      },
+      "field_terms": {
+        "entity_name": [
+          "hdb",
+          "bto",
+          "flat"
+        ],
+        "content": [
+          "hdb",
+          "bto",
+          "flat",
+          "concept",
+          "property_type",
+          "first_timer"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "HDB BTO Flat",
+        "attrs": {
+          "category": "property_type",
+          "max_price": 600000,
+          "eligibility": "first_timer"
+        }
+      }
+    },
+    {
+      "id": "entity_d415477c-1202-44f2-bd1f-a402b7913096",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Fixed Rate Mortgage",
+        "content": "Fixed Rate Mortgage concept loan_type low"
+      },
+      "field_terms": {
+        "entity_name": [
+          "fixed",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "fixed",
+          "rate",
+          "mortgage",
+          "concept",
+          "loan_type",
+          "low"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Fixed Rate Mortgage",
+        "attrs": {
+          "category": "loan_type",
+          "risk_level": "low",
+          "tenure_options": [
+            15,
+            20,
+            25,
+            30
+          ]
+        }
+      }
+    },
+    {
+      "id": "entity_c566a96b-2f58-4f21-abbc-7618a4dde3d5",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Floating Rate Mortgage",
+        "content": "Floating Rate Mortgage concept SORA loan_type medium"
+      },
+      "field_terms": {
+        "entity_name": [
+          "floating",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "floating",
+          "rate",
+          "mortgage",
+          "concept",
+          "sora",
+          "loan_type",
+          "medium"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Floating Rate Mortgage",
+        "attrs": {
+          "basis": "SORA",
+          "category": "loan_type",
+          "risk_level": "medium"
+        }
+      }
+    },
+    {
+      "id": "entity_bade9ec3-59a0-448c-ba46-a393df7cefc9",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Loan Pre-Approval",
+        "content": "Loan Pre-Approval offer 30days service 3days"
+      },
+      "field_terms": {
+        "entity_name": [
+          "loan",
+          "pre",
+          "approval"
+        ],
+        "content": [
+          "loan",
+          "pre",
+          "approval",
+          "offer",
+          "30days",
+          "service",
+          "3days"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Loan Pre-Approval",
+        "attrs": {
+          "validity": "30days",
+          "service_type": "service",
+          "processing_time": "3days"
+        }
+      }
+    },
+    {
+      "id": "entity_24f83ff5-3a24-4014-9eb0-12e840f288a4",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Mortgage Consultation",
+        "content": "Mortgage Consultation offer free 30min advisory"
+      },
+      "field_terms": {
+        "entity_name": [
+          "mortgage",
+          "consultation"
+        ],
+        "content": [
+          "mortgage",
+          "consultation",
+          "offer",
+          "free",
+          "30min",
+          "advisory"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "offer",
+        "name": "Mortgage Consultation",
+        "attrs": {
+          "cost": "free",
+          "duration": "30min",
+          "service_type": "advisory"
+        }
+      }
+    },
+    {
+      "id": "entity_917126db-7172-4c3f-bd61-53618f1ecca8",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Property Investor",
+        "content": "Property Investor persona advanced high"
+      },
+      "field_terms": {
+        "entity_name": [
+          "property",
+          "investor"
+        ],
+        "content": [
+          "property",
+          "investor",
+          "persona",
+          "advanced",
+          "high"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "Property Investor",
+        "attrs": {
+          "age_range": [
+            30,
+            50
+          ],
+          "experience": "advanced",
+          "income_level": "high"
+        }
+      }
+    },
+    {
+      "id": "entity_040fa155-33d1-4e7c-b9bc-7d3c2dce1467",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "First-Time Home Buyer",
+        "content": "First-Time Home Buyer persona beginner middle"
+      },
+      "field_terms": {
+        "entity_name": [
+          "first",
+          "time",
+          "home",
+          "buyer"
+        ],
+        "content": [
+          "first",
+          "time",
+          "home",
+          "buyer",
+          "persona",
+          "beginner",
+          "middle"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "persona",
+        "name": "First-Time Home Buyer",
+        "attrs": {
+          "age_range": [
+            25,
+            35
+          ],
+          "experience": "beginner",
+          "income_level": "middle"
+        }
+      }
+    },
+    {
+      "id": "entity_edcf7d75-2786-4999-ac78-fe016f30cc7c",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Private Condominium",
+        "content": "Private Condominium concept property_type all_buyers"
+      },
+      "field_terms": {
+        "entity_name": [
+          "private",
+          "condominium"
+        ],
+        "content": [
+          "private",
+          "condominium",
+          "concept",
+          "property_type",
+          "all_buyers"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Private Condominium",
+        "attrs": {
+          "category": "property_type",
+          "min_price": 800000,
+          "eligibility": "all_buyers"
+        }
+      }
+    },
+    {
+      "id": "entity_d058fe15-ffe3-40e5-afb3-634a2bfc1e47",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "HDB BTO Flat",
+        "content": "HDB BTO Flat concept property_type first_timer"
+      },
+      "field_terms": {
+        "entity_name": [
+          "hdb",
+          "bto",
+          "flat"
+        ],
+        "content": [
+          "hdb",
+          "bto",
+          "flat",
+          "concept",
+          "property_type",
+          "first_timer"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "HDB BTO Flat",
+        "attrs": {
+          "category": "property_type",
+          "max_price": 600000,
+          "eligibility": "first_timer"
+        }
+      }
+    },
+    {
+      "id": "entity_d952b791-a570-4319-b202-9d28508a5bfd",
+      "fields": {
+        "concept_abstract": "",
+        "entity_name": "Fixed Rate Mortgage",
+        "content": "Fixed Rate Mortgage concept loan_type low"
+      },
+      "field_terms": {
+        "entity_name": [
+          "fixed",
+          "rate",
+          "mortgage"
+        ],
+        "content": [
+          "fixed",
+          "rate",
+          "mortgage",
+          "concept",
+          "loan_type",
+          "low"
+        ]
+      },
+      "metadata": {
+        "type": "entity",
+        "entity_type": "concept",
+        "name": "Fixed Rate Mortgage",
+        "attrs": {
+          "category": "loan_type",
+          "risk_level": "low",
+          "tenure_options": [
+            15,
+            20,
+            25,
+            30
+          ]
+        }
+      }
+    }
+  ],
+  "doc_stats": {
+    "avg_doc_length": 8.576923076923077,
+    "total_docs": 52,
+    "k1": 1.2,
+    "b": 0.75
+  }
+}
