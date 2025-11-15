@@ -310,28 +310,28 @@ export class BudgetEnforcer {
   createDLQRecord(): any {
     const breaches = this.getBreaches();
     const primaryBreach = breaches[0];
-    
+
     const recoverySuggestions: string[] = [];
-    
+
     // Generate recovery suggestions based on breach types
     if (breaches.some(b => b.type === 'tokens')) {
       recoverySuggestions.push('Consider reducing input complexity or using higher tier budget');
       recoverySuggestions.push('Review and optimize token usage in generation prompts');
     }
-    
+
     if (breaches.some(b => b.type === 'time')) {
       recoverySuggestions.push('Consider optimizing performance bottlenecks');
       recoverySuggestions.push('Use asynchronous processing where possible');
     }
-    
+
     if (this.circuitBreaker.getState() === 'OPEN') {
       recoverySuggestions.push('Wait for circuit breaker recovery timeout (30s)');
       recoverySuggestions.push('Check for systemic issues causing repeated failures');
     }
-    
+
     return {
-      fail_reason: primaryBreach ? 
-        'Budget breach: ' + primaryBreach.type + ' exceeded in ' + primaryBreach.stage : 
+      fail_reason: primaryBreach ?
+        'Budget breach: ' + primaryBreach.type + ' exceeded in ' + primaryBreach.stage :
         'Circuit breaker open - too many budget violations',
       budget_tier: this.tier,
       tokens_used: this.tracker.tokens_used,
@@ -344,15 +344,5 @@ export class BudgetEnforcer {
       circuit_breaker_triggered: this.circuitBreaker.getState() !== 'CLOSED',
       recovery_suggestions: recoverySuggestions
     };
-  }
-
-  /**
-   * Circuit breaker check - alias for canExecute()
-   * This provides the interface expected by tests
-   */
-  canProceed(): { ok: boolean; reason?: string } {
-    return this.circuitBreaker.canExecute() ? 
-      { ok: true } : 
-      { ok: false, reason: 'Circuit breaker is ' + this.circuitBreaker.getState() + '. Too many budget violations.' };
   }
 }
