@@ -51,7 +51,7 @@ interface PublishResult {
         tokens: number;
         compliance_checked: boolean;
       }>;
-      human_review_required: boolean;
+      humanReviewRequired: boolean;
       review_status: string;
     };
     [key: string]: any;
@@ -606,7 +606,7 @@ export async function publishArtifact(input: PublishInput): Promise<PublishResul
     compliance_sources: complianceSources,
     provenance: {
       generation_trace: generationTrace,
-      human_review_required: humanReviewRequired,
+      humanReviewRequired: humanReviewRequired,
       review_status: humanReviewRequired ? 'pending' : 'auto_approved'
     },
     generation_timestamp: new Date().toISOString(),
@@ -653,7 +653,7 @@ export async function publishArtifact(input: PublishInput): Promise<PublishResul
     compliance_sources: complianceSources.length,
     invariants_validated: ipInvariants.validated.length,
     invariants_failed: ipInvariants.failed.length,
-    human_review_required
+    humanReviewRequired
   });
 
   return {
