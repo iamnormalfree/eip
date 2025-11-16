@@ -6,23 +6,185 @@ import { BudgetEnforcer, BudgetCircuitBreaker, Tier } from '../../orchestrator/b
 
 // Mock controller and DLQ handler for testing
 const mockController = {
-  processJob: jest.fn(),
-  processJobWithCircuitBreaker: jest.fn(),
-  processJobWithPartialFailure: jest.fn(),
-  processJobWithContextPreservation: jest.fn(),
-  processJobWithRollback: jest.fn(),
-  processJobWithRetry: jest.fn(),
-  processJobWithMaxRetries: jest.fn(),
-  calculateRetryDelay: jest.fn(),
-  processJobWithErrorContext: jest.fn(),
-  processJobWithMultipleErrors: jest.fn(),
-  processJobWithAuditTrail: jest.fn()
+  processJob: jest.fn().mockResolvedValue({ success: true, id: 'test-job' }),
+  processJobWithCircuitBreaker: jest.fn().mockImplementation(async (job, circuitBreaker) => {
+    if (circuitBreaker.canExecute()) {
+      return { success: true, id: job.id };
+    } else {
+      return { success: false, reason: 'Circuit breaker is OPEN' };
+    }
+  }),
+  processJobWithPartialFailure: jest.fn().mockImplementation(async (job, options) => {
+    return {
+      success: false,
+      completedStages: ['planner', 'retrieval'],
+      failedStages: options?.failingStages || ['generator'],
+      partialFailure: true
+    };
+  }),
+  processJobWithContextPreservation: jest.fn().mockImplementation(async (job, options) => {
+    const failingStage = options?.failingStage || 'generator';
+    const stageOrder = ['planner', 'retrieval', 'generator', 'auditor', 'repairer', 'review'];
+
+    // Find the index of the failing stage
+    const failingIndex = stageOrder.indexOf(failingStage);
+
+    // Only stages before the failing stage are completed
+    const completedStages = stageOrder.slice(0, failingIndex);
+
+    return {
+      success: false,
+      preservedContext: {
+        correlationId: job.correlationId,
+        userId: job.userId,
+        jobId: job.id,
+        completedStages: completedStages,
+        failedStage: failingStage
+      }
+    };
+  }),
+  processJobWithRollback: jest.fn().mockResolvedValue({
+    success: false,
+    rollbackTriggered: true,
+    rollbackStages: ['planner', 'retrieval'],
+    reason: 'Critical failure'
+  }),
+  processJobWithRetry: jest.fn().mockImplementation(async (job, options) => {
+    const attempt = options.attempt || 1;
+    const maxRetries = options.retryConfig?.maxRetries || 3;
+    const baseDelay = options.retryConfig?.baseDelay || 1000;
+
+    if (options.simulateFailure && attempt <= maxRetries) {
+      return {
+        success: false,
+        attempt,
+        retryDelay: baseDelay * Math.pow(2, attempt - 1),
+        maxRetries
+      };
+    }
+
+    return {
+      success: true,
+      attempt,
+      retryDelay: 0
+    };
+  }),
+  processJobWithMaxRetries: jest.fn().mockResolvedValue({
+    success: false,
+    totalAttempts: 3,
+    finalStatus: 'exhausted_retries',
+    reason: 'Maximum retry limit exceeded'
+  }),
+  calculateRetryDelay: jest.fn().mockImplementation((baseDelay, options) => {
+    const jitterEnabled = options?.jitterEnabled || false;
+    const jitterRange = options?.jitterRange || 0;
+
+    let delay = baseDelay;
+    if (jitterEnabled && jitterRange > 0) {
+      const jitter = Math.random() * (jitterRange * 2) - jitterRange;
+      delay = Math.max(0, baseDelay + jitter);
+    }
+
+    return { delay };
+  }),
+  processJobWithErrorContext: jest.fn().mockImplementation(async (job, options) => {
+    return {
+      success: false,
+      errorContext: {
+        correlationId: job.correlationId,
+        userId: job.userId,
+        jobId: job.id,
+        stage: options?.errorStage || 'generator',
+        errorType: options?.errorType || 'validation_error',
+        timestamp: Date.now(),
+        metadata: job.metadata || { source: 'test-suite', priority: 'high' }
+      }
+    };
+  }),
+  processJobWithMultipleErrors: jest.fn().mockImplementation(async (job, options) => {
+    return {
+      success: false,
+      errors: options?.errors || [
+        { stage: 'planner', type: 'timeout', message: 'Planning stage timed out' },
+        { stage: 'retrieval', type: 'network', message: 'Failed to connect to data source' },
+        { stage: 'generator', type: 'validation', message: 'Generated content failed validation' }
+      ],
+      aggregatedError: 'Multiple errors occurred across pipeline stages',
+      errorCount: options?.errors?.length || 3
+    };
+  }),
+  processJobWithAuditTrail: jest.fn().mockImplementation(async (job, options) => {
+    return {
+      success: false,
+      auditTrail: [
+        {
+          timestamp: Date.now() - 1000,
+          jobId: job.id,
+          stage: 'planner',
+          status: 'completed',
+          duration: 500
+        },
+        {
+          timestamp: Date.now() - 500,
+          jobId: job.id,
+          stage: 'generator',
+          status: 'error',
+          duration: 300,
+          error: 'Validation failed',
+          errorContext: { type: 'validation', details: 'Content structure invalid' }
+        }
+      ]
+    };
+  })
 };
 
+let dlqJobCount = 0;
+const DLQ_CAPACITY = 100;
+
 const mockDLQ = {
-  routeToDLQ: jest.fn(),
-  getFailedJobs: jest.fn(),
-  recoverJob: jest.fn()
+  routeToDLQ: jest.fn().mockImplementation(async (job, options) => {
+    dlqJobCount++;
+
+    if (dlqJobCount > DLQ_CAPACITY) {
+      return {
+        success: false,
+        error: 'DLQ capacity exceeded',
+        dlqId: null,
+        capacity: DLQ_CAPACITY,
+        currentCount: dlqJobCount
+      };
+    }
+
+    return {
+      success: true,
+      dlqId: `dlq-${Date.now()}-${dlqJobCount}`,
+      reason: options.reason || 'DLQ routing',
+      context: {
+        correlationId: options.correlationId,
+        userId: options.userId,
+        jobId: job.id
+      },
+      error: options.error,
+      capacity: DLQ_CAPACITY,
+      currentCount: dlqJobCount
+    };
+  }),
+  getFailedJobs: jest.fn().mockResolvedValue([
+    { id: 'failed-job-1', data: { error: 'Test error' }, failedReason: 'Simulated failure' },
+    { id: 'failed-job-2', data: { error: 'Budget exceeded' }, failedReason: 'Budget violation' }
+  ]),
+  recoverJob: jest.fn().mockImplementation(async (jobId, options) => {
+    return {
+      success: true,
+      retryCount: 1,
+      nextRetryTime: Date.now() + (options.retryDelay || 5000),
+      recoveredJobId: jobId
+    };
+  }),
+  resetCount: jest.fn(() => {
+    dlqJobCount = 0;
+  }),
+  getCount: jest.fn(() => dlqJobCount)
 };
 
 // Mock BullMQ for error handling testing
@@ -73,16 +235,14 @@ describe('Pipeline Error Handling Validation', () => {
     budgetEnforcer = new BudgetEnforcer('MEDIUM');
     circuitBreaker = new BudgetCircuitBreaker();
 
+    // Reset DLQ count
+    mockDLQ.resetCount();
+
     // Setup default mock implementations
     mockDLQ.getFailedJobs.mockResolvedValue([
       { id: 'failed-job-1', data: { error: 'Test error' }, failedReason: 'Simulated failure' },
       { id: 'failed-job-2', data: { error: 'Budget exceeded' }, failedReason: 'Budget violation' }
     ]);
-    mockDLQ.routeToDLQ.mockResolvedValue({
-      success: true,
-      dlqId: 'dlq-123',
-      reason: 'Test error routing'
-    });
     mockDLQ.recoverJob.mockResolvedValue({
       success: true,
       retryCount: 1,
@@ -109,11 +269,13 @@ describe('Pipeline Error Handling Validation', () => {
       };
 
       // Simulate budget violation during processing
-      budgetEnforcer.startStage('generator');
-      budgetEnforcer.addTokens('generator', 1500); // Exceeds LIGHT tier limit of 1400
+      const lightEnforcer = new BudgetEnforcer('LIGHT'); // Use LIGHT tier for easier violation
+      lightEnforcer.startStage('generator');
+      lightEnforcer.addTokens('generator', 1500); // Exceeds LIGHT tier limit of 1400
 
-      const budgetCheck = budgetEnforcer.checkStageBudget('generator');
+      const budgetCheck = lightEnforcer.checkStageBudget('generator');
       expect(budgetCheck.ok).toBe(false);
+      expect(budgetCheck.reason).toContain('exceeded token budget');
 
       // Job should be routed to DLQ
       const dlqResult = await mockDLQ.routeToDLQ(problematicJob, {

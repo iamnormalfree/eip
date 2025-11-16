@@ -133,8 +133,17 @@ describe('Pipeline Performance Validation', () => {
         const startTime = Date.now();
         mediumEnforcer.startStage(stage as any);
 
-        // Simulate stage work with varying token usage
-        const tokensUsed = Math.floor(Math.random() * 400) + 100;
+        // Simulate stage work with controlled token usage to stay within individual stage limits
+        // MEDIUM tier stage limits from budgets.yaml
+        const stageTokenAllocation: Record<string, number> = {
+          'planner': 500,    // Limit: 1000
+          'retrieval': 200,  // Limit: 400
+          'generator': 800,  // Limit: 2400
+          'auditor': 300,    // Limit: 700
+          'repairer': 400,   // Limit: 600
+          'review': 100      // No limit defined, use small value
+        };
+        const tokensUsed = stageTokenAllocation[stage] || 100;
         mediumEnforcer.addTokens(stage as any, tokensUsed);
 
         // Simulate stage duration
@@ -155,13 +164,14 @@ describe('Pipeline Performance Validation', () => {
       const totalTokens = stageMetrics.reduce((sum, m) => sum + m.tokens, 0);
       const totalDuration = stageMetrics.reduce((sum, m) => sum + m.duration, 0);
 
-      expect(totalTokens).toBeLessThanOrEqual(2400);
+      // Total should be within individual stage limits and overall budget
+      expect(totalTokens).toBe(2300); // Sum of our allocations: 500+200+800+300+400+100
       expect(totalDuration).toBeLessThan(45000); // 45 seconds
 
       // Check remaining tokens via tracker
       const tracker = mediumEnforcer.getTracker();
       expect(tracker.tokens_used).toBe(totalTokens);
-      expect(2400 - tracker.tokens_used).toBeGreaterThan(0); // Should have remaining budget
+      expect(totalTokens).toBeLessThan(2400); // Within overall budget
     });
   });
 

@@ -5,8 +5,8 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: [
-    '<rootDir>/lib_supabase', 
-    '<rootDir>/orchestrator', 
+    '<rootDir>/lib_supabase',
+    '<rootDir>/orchestrator',
     '<rootDir>/tests',
     '<rootDir>/src'
   ],
@@ -19,12 +19,35 @@ module.exports = {
     'tests/**/*.test.tsx'
   ],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
-    '^.+\\.tsx$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: {
+        module: 'CommonJS',
+        target: 'ES2020',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        isolatedModules: false,
+        importHelpers: false,
+        moduleResolution: 'node'
+      }
+    }],
+    '^.+\\.tsx$': ['ts-jest', {
+      tsconfig: {
+        module: 'CommonJS',
+        target: 'ES2020',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        jsx: 'react',
+        importHelpers: false,
+        moduleResolution: 'node'
+      }
+    }],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  setupFiles: [
+    '<rootDir>/tests/setup/jest.polyfills.ts'
+  ],
   setupFilesAfterEnv: [
-    '<rootDir>/jest.setup.js', 
+    '<rootDir>/jest.setup.js',
     '<rootDir>/jest.eip.setup.js',
     '<rootDir>/tests/setup/jest.setup.ts'
   ],
@@ -32,8 +55,14 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/$1',
     '^@/(.*)lib_supabase(.*)$': '<rootDir>/lib_supabase/$1',
     '^@/(.*)orchestrator(.*)$': '<rootDir>/orchestrator/$1',
-    '^@/(.*)src(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)src(.*)$': '<rootDir>/src/$1',
+    '^uuid$': '<rootDir>/node_modules/uuid/dist/index.js',
+    '^uuid/(.*)$': '<rootDir>/node_modules/uuid/dist/$1',
+    '^uuid/dist-node/(.*)$': '<rootDir>/node_modules/uuid/dist/$1'
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(winston|js-yaml|uuid|bullmq|msgpackr|ioredis|uuid/dist|uuid/dist-node|msgpackr))'
+  ],
   collectCoverageFrom: [
     'lib_supabase/**/*.{ts,tsx}',
     'orchestrator/**/*.{ts}',
@@ -108,7 +137,15 @@ module.exports = {
     'EIP_COVERAGE_THRESHOLD': 80,
     'EIP_INTEGRATION_TESTING': true,
     'ts-jest': {
-      useESM: true
+      useESM: false,
+      tsconfig: {
+        target: 'ES2020',
+        module: 'CommonJS',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        isolatedModules: false,
+        importHelpers: false
+      }
     }
   },
 

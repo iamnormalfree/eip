@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "build_timestamp": "2025-11-15T14:34:27.395Z",
-  "document_count": 10,
+  "build_timestamp": "2025-11-16T10:01:46.951Z",
+  "document_count": 100,
   "field_weights": {
     "concept_abstract": 2,
     "artifact_summary": 1,
@@ -10,1829 +10,4309 @@
   },
   "documents": [
     {
-      "id": "memory-test-0",
+      "id": "doc0",
       "fields": {
-        "content": "Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document financial investment retirement with index 0",
-        "concept_abstract": "Large content memory test document number 0 featuring financial investment retirement"
+        "content": "Test document number 0 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 0 for performance testing",
+        "artifact_summary": "Summary for test document 0 covering performance benchmarks"
       },
       "field_terms": {
         "concept_abstract": [
-          "large",
-          "content",
-          "memory",
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
           "test",
           "document",
           "number",
-          "featuring",
-          "financial",
-          "investment",
-          "retirement"
-        ],
-        "content": [
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "financial",
-          "investment",
-          "retirement",
           "with",
-          "index"
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
         ]
       },
       "metadata": {
-        "category": "memory-test",
-        "domain": "test.com"
+        "type": "test",
+        "index": 0
       }
     },
     {
-      "id": "memory-test-1",
+      "id": "doc1",
       "fields": {
-        "content": "Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document regulatory compliance framework with index 1",
-        "concept_abstract": "Large content memory test document number 1 featuring regulatory compliance framework"
+        "content": "Test document number 1 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 1 for performance testing",
+        "artifact_summary": "Summary for test document 1 covering performance benchmarks"
       },
       "field_terms": {
         "concept_abstract": [
-          "large",
-          "content",
-          "memory",
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
           "test",
           "document",
           "number",
-          "featuring",
-          "regulatory",
-          "compliance",
-          "framework"
-        ],
-        "content": [
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "regulatory",
-          "compliance",
-          "framework",
           "with",
-          "index"
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
         ]
       },
       "metadata": {
-        "category": "memory-test",
-        "domain": "test.com"
+        "type": "test",
+        "index": 1
       }
     },
     {
-      "id": "memory-test-2",
+      "id": "doc2",
       "fields": {
-        "content": "Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document educational planning strategy with index 2",
-        "concept_abstract": "Large content memory test document number 2 featuring educational planning strategy"
+        "content": "Test document number 2 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 2 for performance testing",
+        "artifact_summary": "Summary for test document 2 covering performance benchmarks"
       },
       "field_terms": {
         "concept_abstract": [
-          "large",
-          "content",
-          "memory",
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
           "test",
           "document",
           "number",
-          "featuring",
-          "educational",
-          "planning",
-          "strategy"
-        ],
-        "content": [
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "educational",
-          "planning",
-          "strategy",
           "with",
-          "index"
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
         ]
       },
       "metadata": {
-        "category": "memory-test",
-        "domain": "test.com"
+        "type": "test",
+        "index": 2
       }
     },
     {
-      "id": "memory-test-3",
+      "id": "doc3",
       "fields": {
-        "content": "Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document financial investment retirement with index 3",
-        "concept_abstract": "Large content memory test document number 3 featuring financial investment retirement"
+        "content": "Test document number 3 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 3 for performance testing",
+        "artifact_summary": "Summary for test document 3 covering performance benchmarks"
       },
       "field_terms": {
         "concept_abstract": [
-          "large",
-          "content",
-          "memory",
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
           "test",
           "document",
           "number",
-          "featuring",
-          "financial",
-          "investment",
-          "retirement"
-        ],
-        "content": [
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "financial",
-          "investment",
-          "retirement",
           "with",
-          "index"
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
         ]
       },
       "metadata": {
-        "category": "memory-test",
-        "domain": "test.com"
+        "type": "test",
+        "index": 3
       }
     },
     {
-      "id": "memory-test-4",
+      "id": "doc4",
       "fields": {
-        "content": "Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document regulatory compliance framework with index 4",
-        "concept_abstract": "Large content memory test document number 4 featuring regulatory compliance framework"
+        "content": "Test document number 4 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 4 for performance testing",
+        "artifact_summary": "Summary for test document 4 covering performance benchmarks"
       },
       "field_terms": {
         "concept_abstract": [
-          "large",
-          "content",
-          "memory",
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
           "test",
           "document",
           "number",
-          "featuring",
-          "regulatory",
-          "compliance",
-          "framework"
-        ],
-        "content": [
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "regulatory",
-          "compliance",
-          "framework",
           "with",
-          "index"
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
         ]
       },
       "metadata": {
-        "category": "memory-test",
-        "domain": "test.com"
+        "type": "test",
+        "index": 4
       }
     },
     {
-      "id": "memory-test-5",
+      "id": "doc5",
       "fields": {
-        "content": "Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document educational planning strategy with index 5",
-        "concept_abstract": "Large content memory test document number 5 featuring educational planning strategy"
+        "content": "Test document number 5 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 5 for performance testing",
+        "artifact_summary": "Summary for test document 5 covering performance benchmarks"
       },
       "field_terms": {
         "concept_abstract": [
-          "large",
-          "content",
-          "memory",
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
           "test",
           "document",
           "number",
-          "featuring",
-          "educational",
-          "planning",
-          "strategy"
-        ],
-        "content": [
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "educational",
-          "planning",
-          "strategy",
           "with",
-          "index"
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
         ]
       },
       "metadata": {
-        "category": "memory-test",
-        "domain": "test.com"
+        "type": "test",
+        "index": 5
       }
     },
     {
-      "id": "memory-test-6",
+      "id": "doc6",
       "fields": {
-        "content": "Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document financial investment retirement with index 6",
-        "concept_abstract": "Large content memory test document number 6 featuring financial investment retirement"
+        "content": "Test document number 6 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 6 for performance testing",
+        "artifact_summary": "Summary for test document 6 covering performance benchmarks"
       },
       "field_terms": {
         "concept_abstract": [
-          "large",
-          "content",
-          "memory",
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
           "test",
           "document",
           "number",
-          "featuring",
-          "financial",
-          "investment",
-          "retirement"
-        ],
-        "content": [
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "financial",
-          "investment",
-          "retirement",
           "with",
-          "index"
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
         ]
       },
       "metadata": {
-        "category": "memory-test",
-        "domain": "test.com"
+        "type": "test",
+        "index": 6
       }
     },
     {
-      "id": "memory-test-7",
+      "id": "doc7",
       "fields": {
-        "content": "Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document regulatory compliance framework with index 7",
-        "concept_abstract": "Large content memory test document number 7 featuring regulatory compliance framework"
+        "content": "Test document number 7 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 7 for performance testing",
+        "artifact_summary": "Summary for test document 7 covering performance benchmarks"
       },
       "field_terms": {
         "concept_abstract": [
-          "large",
-          "content",
-          "memory",
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
           "test",
           "document",
           "number",
-          "featuring",
-          "regulatory",
-          "compliance",
-          "framework"
-        ],
-        "content": [
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "regulatory",
-          "compliance",
-          "framework",
           "with",
-          "index"
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
         ]
       },
       "metadata": {
-        "category": "memory-test",
-        "domain": "test.com"
+        "type": "test",
+        "index": 7
       }
     },
     {
-      "id": "memory-test-8",
+      "id": "doc8",
       "fields": {
-        "content": "Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document educational planning strategy with index 8",
-        "concept_abstract": "Large content memory test document number 8 featuring educational planning strategy"
+        "content": "Test document number 8 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 8 for performance testing",
+        "artifact_summary": "Summary for test document 8 covering performance benchmarks"
       },
       "field_terms": {
         "concept_abstract": [
-          "large",
-          "content",
-          "memory",
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
           "test",
           "document",
           "number",
-          "featuring",
-          "educational",
-          "planning",
-          "strategy"
-        ],
-        "content": [
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "educational",
-          "planning",
-          "strategy",
           "with",
-          "index"
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
         ]
       },
       "metadata": {
-        "category": "memory-test",
-        "domain": "test.com"
+        "type": "test",
+        "index": 8
       }
     },
     {
-      "id": "memory-test-9",
+      "id": "doc9",
       "fields": {
-        "content": "Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document Large content document financial investment retirement with index 9",
-        "concept_abstract": "Large content memory test document number 9 featuring financial investment retirement"
+        "content": "Test document number 9 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 9 for performance testing",
+        "artifact_summary": "Summary for test document 9 covering performance benchmarks"
       },
       "field_terms": {
         "concept_abstract": [
-          "large",
-          "content",
-          "memory",
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
           "test",
           "document",
           "number",
-          "featuring",
-          "financial",
-          "investment",
-          "retirement"
-        ],
-        "content": [
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "large",
-          "content",
-          "document",
-          "financial",
-          "investment",
-          "retirement",
           "with",
-          "index"
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
         ]
       },
       "metadata": {
-        "category": "memory-test",
-        "domain": "test.com"
+        "type": "test",
+        "index": 9
+      }
+    },
+    {
+      "id": "doc10",
+      "fields": {
+        "content": "Test document number 10 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 10 for performance testing",
+        "artifact_summary": "Summary for test document 10 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 10
+      }
+    },
+    {
+      "id": "doc11",
+      "fields": {
+        "content": "Test document number 11 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 11 for performance testing",
+        "artifact_summary": "Summary for test document 11 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 11
+      }
+    },
+    {
+      "id": "doc12",
+      "fields": {
+        "content": "Test document number 12 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 12 for performance testing",
+        "artifact_summary": "Summary for test document 12 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 12
+      }
+    },
+    {
+      "id": "doc13",
+      "fields": {
+        "content": "Test document number 13 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 13 for performance testing",
+        "artifact_summary": "Summary for test document 13 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 13
+      }
+    },
+    {
+      "id": "doc14",
+      "fields": {
+        "content": "Test document number 14 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 14 for performance testing",
+        "artifact_summary": "Summary for test document 14 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 14
+      }
+    },
+    {
+      "id": "doc15",
+      "fields": {
+        "content": "Test document number 15 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 15 for performance testing",
+        "artifact_summary": "Summary for test document 15 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 15
+      }
+    },
+    {
+      "id": "doc16",
+      "fields": {
+        "content": "Test document number 16 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 16 for performance testing",
+        "artifact_summary": "Summary for test document 16 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 16
+      }
+    },
+    {
+      "id": "doc17",
+      "fields": {
+        "content": "Test document number 17 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 17 for performance testing",
+        "artifact_summary": "Summary for test document 17 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 17
+      }
+    },
+    {
+      "id": "doc18",
+      "fields": {
+        "content": "Test document number 18 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 18 for performance testing",
+        "artifact_summary": "Summary for test document 18 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 18
+      }
+    },
+    {
+      "id": "doc19",
+      "fields": {
+        "content": "Test document number 19 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 19 for performance testing",
+        "artifact_summary": "Summary for test document 19 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 19
+      }
+    },
+    {
+      "id": "doc20",
+      "fields": {
+        "content": "Test document number 20 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 20 for performance testing",
+        "artifact_summary": "Summary for test document 20 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 20
+      }
+    },
+    {
+      "id": "doc21",
+      "fields": {
+        "content": "Test document number 21 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 21 for performance testing",
+        "artifact_summary": "Summary for test document 21 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 21
+      }
+    },
+    {
+      "id": "doc22",
+      "fields": {
+        "content": "Test document number 22 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 22 for performance testing",
+        "artifact_summary": "Summary for test document 22 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 22
+      }
+    },
+    {
+      "id": "doc23",
+      "fields": {
+        "content": "Test document number 23 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 23 for performance testing",
+        "artifact_summary": "Summary for test document 23 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 23
+      }
+    },
+    {
+      "id": "doc24",
+      "fields": {
+        "content": "Test document number 24 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 24 for performance testing",
+        "artifact_summary": "Summary for test document 24 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 24
+      }
+    },
+    {
+      "id": "doc25",
+      "fields": {
+        "content": "Test document number 25 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 25 for performance testing",
+        "artifact_summary": "Summary for test document 25 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 25
+      }
+    },
+    {
+      "id": "doc26",
+      "fields": {
+        "content": "Test document number 26 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 26 for performance testing",
+        "artifact_summary": "Summary for test document 26 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 26
+      }
+    },
+    {
+      "id": "doc27",
+      "fields": {
+        "content": "Test document number 27 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 27 for performance testing",
+        "artifact_summary": "Summary for test document 27 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 27
+      }
+    },
+    {
+      "id": "doc28",
+      "fields": {
+        "content": "Test document number 28 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 28 for performance testing",
+        "artifact_summary": "Summary for test document 28 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 28
+      }
+    },
+    {
+      "id": "doc29",
+      "fields": {
+        "content": "Test document number 29 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 29 for performance testing",
+        "artifact_summary": "Summary for test document 29 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 29
+      }
+    },
+    {
+      "id": "doc30",
+      "fields": {
+        "content": "Test document number 30 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 30 for performance testing",
+        "artifact_summary": "Summary for test document 30 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 30
+      }
+    },
+    {
+      "id": "doc31",
+      "fields": {
+        "content": "Test document number 31 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 31 for performance testing",
+        "artifact_summary": "Summary for test document 31 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 31
+      }
+    },
+    {
+      "id": "doc32",
+      "fields": {
+        "content": "Test document number 32 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 32 for performance testing",
+        "artifact_summary": "Summary for test document 32 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 32
+      }
+    },
+    {
+      "id": "doc33",
+      "fields": {
+        "content": "Test document number 33 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 33 for performance testing",
+        "artifact_summary": "Summary for test document 33 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 33
+      }
+    },
+    {
+      "id": "doc34",
+      "fields": {
+        "content": "Test document number 34 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 34 for performance testing",
+        "artifact_summary": "Summary for test document 34 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 34
+      }
+    },
+    {
+      "id": "doc35",
+      "fields": {
+        "content": "Test document number 35 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 35 for performance testing",
+        "artifact_summary": "Summary for test document 35 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 35
+      }
+    },
+    {
+      "id": "doc36",
+      "fields": {
+        "content": "Test document number 36 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 36 for performance testing",
+        "artifact_summary": "Summary for test document 36 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 36
+      }
+    },
+    {
+      "id": "doc37",
+      "fields": {
+        "content": "Test document number 37 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 37 for performance testing",
+        "artifact_summary": "Summary for test document 37 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 37
+      }
+    },
+    {
+      "id": "doc38",
+      "fields": {
+        "content": "Test document number 38 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 38 for performance testing",
+        "artifact_summary": "Summary for test document 38 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 38
+      }
+    },
+    {
+      "id": "doc39",
+      "fields": {
+        "content": "Test document number 39 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 39 for performance testing",
+        "artifact_summary": "Summary for test document 39 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 39
+      }
+    },
+    {
+      "id": "doc40",
+      "fields": {
+        "content": "Test document number 40 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 40 for performance testing",
+        "artifact_summary": "Summary for test document 40 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 40
+      }
+    },
+    {
+      "id": "doc41",
+      "fields": {
+        "content": "Test document number 41 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 41 for performance testing",
+        "artifact_summary": "Summary for test document 41 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 41
+      }
+    },
+    {
+      "id": "doc42",
+      "fields": {
+        "content": "Test document number 42 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 42 for performance testing",
+        "artifact_summary": "Summary for test document 42 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 42
+      }
+    },
+    {
+      "id": "doc43",
+      "fields": {
+        "content": "Test document number 43 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 43 for performance testing",
+        "artifact_summary": "Summary for test document 43 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 43
+      }
+    },
+    {
+      "id": "doc44",
+      "fields": {
+        "content": "Test document number 44 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 44 for performance testing",
+        "artifact_summary": "Summary for test document 44 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 44
+      }
+    },
+    {
+      "id": "doc45",
+      "fields": {
+        "content": "Test document number 45 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 45 for performance testing",
+        "artifact_summary": "Summary for test document 45 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 45
+      }
+    },
+    {
+      "id": "doc46",
+      "fields": {
+        "content": "Test document number 46 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 46 for performance testing",
+        "artifact_summary": "Summary for test document 46 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 46
+      }
+    },
+    {
+      "id": "doc47",
+      "fields": {
+        "content": "Test document number 47 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 47 for performance testing",
+        "artifact_summary": "Summary for test document 47 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 47
+      }
+    },
+    {
+      "id": "doc48",
+      "fields": {
+        "content": "Test document number 48 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 48 for performance testing",
+        "artifact_summary": "Summary for test document 48 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 48
+      }
+    },
+    {
+      "id": "doc49",
+      "fields": {
+        "content": "Test document number 49 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 49 for performance testing",
+        "artifact_summary": "Summary for test document 49 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 49
+      }
+    },
+    {
+      "id": "doc50",
+      "fields": {
+        "content": "Test document number 50 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 50 for performance testing",
+        "artifact_summary": "Summary for test document 50 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 50
+      }
+    },
+    {
+      "id": "doc51",
+      "fields": {
+        "content": "Test document number 51 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 51 for performance testing",
+        "artifact_summary": "Summary for test document 51 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 51
+      }
+    },
+    {
+      "id": "doc52",
+      "fields": {
+        "content": "Test document number 52 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 52 for performance testing",
+        "artifact_summary": "Summary for test document 52 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 52
+      }
+    },
+    {
+      "id": "doc53",
+      "fields": {
+        "content": "Test document number 53 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 53 for performance testing",
+        "artifact_summary": "Summary for test document 53 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 53
+      }
+    },
+    {
+      "id": "doc54",
+      "fields": {
+        "content": "Test document number 54 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 54 for performance testing",
+        "artifact_summary": "Summary for test document 54 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 54
+      }
+    },
+    {
+      "id": "doc55",
+      "fields": {
+        "content": "Test document number 55 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 55 for performance testing",
+        "artifact_summary": "Summary for test document 55 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 55
+      }
+    },
+    {
+      "id": "doc56",
+      "fields": {
+        "content": "Test document number 56 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 56 for performance testing",
+        "artifact_summary": "Summary for test document 56 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 56
+      }
+    },
+    {
+      "id": "doc57",
+      "fields": {
+        "content": "Test document number 57 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 57 for performance testing",
+        "artifact_summary": "Summary for test document 57 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 57
+      }
+    },
+    {
+      "id": "doc58",
+      "fields": {
+        "content": "Test document number 58 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 58 for performance testing",
+        "artifact_summary": "Summary for test document 58 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 58
+      }
+    },
+    {
+      "id": "doc59",
+      "fields": {
+        "content": "Test document number 59 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 59 for performance testing",
+        "artifact_summary": "Summary for test document 59 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 59
+      }
+    },
+    {
+      "id": "doc60",
+      "fields": {
+        "content": "Test document number 60 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 60 for performance testing",
+        "artifact_summary": "Summary for test document 60 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 60
+      }
+    },
+    {
+      "id": "doc61",
+      "fields": {
+        "content": "Test document number 61 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 61 for performance testing",
+        "artifact_summary": "Summary for test document 61 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 61
+      }
+    },
+    {
+      "id": "doc62",
+      "fields": {
+        "content": "Test document number 62 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 62 for performance testing",
+        "artifact_summary": "Summary for test document 62 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 62
+      }
+    },
+    {
+      "id": "doc63",
+      "fields": {
+        "content": "Test document number 63 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 63 for performance testing",
+        "artifact_summary": "Summary for test document 63 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 63
+      }
+    },
+    {
+      "id": "doc64",
+      "fields": {
+        "content": "Test document number 64 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 64 for performance testing",
+        "artifact_summary": "Summary for test document 64 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 64
+      }
+    },
+    {
+      "id": "doc65",
+      "fields": {
+        "content": "Test document number 65 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 65 for performance testing",
+        "artifact_summary": "Summary for test document 65 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 65
+      }
+    },
+    {
+      "id": "doc66",
+      "fields": {
+        "content": "Test document number 66 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 66 for performance testing",
+        "artifact_summary": "Summary for test document 66 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 66
+      }
+    },
+    {
+      "id": "doc67",
+      "fields": {
+        "content": "Test document number 67 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 67 for performance testing",
+        "artifact_summary": "Summary for test document 67 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 67
+      }
+    },
+    {
+      "id": "doc68",
+      "fields": {
+        "content": "Test document number 68 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 68 for performance testing",
+        "artifact_summary": "Summary for test document 68 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 68
+      }
+    },
+    {
+      "id": "doc69",
+      "fields": {
+        "content": "Test document number 69 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 69 for performance testing",
+        "artifact_summary": "Summary for test document 69 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 69
+      }
+    },
+    {
+      "id": "doc70",
+      "fields": {
+        "content": "Test document number 70 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 70 for performance testing",
+        "artifact_summary": "Summary for test document 70 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 70
+      }
+    },
+    {
+      "id": "doc71",
+      "fields": {
+        "content": "Test document number 71 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 71 for performance testing",
+        "artifact_summary": "Summary for test document 71 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 71
+      }
+    },
+    {
+      "id": "doc72",
+      "fields": {
+        "content": "Test document number 72 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 72 for performance testing",
+        "artifact_summary": "Summary for test document 72 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 72
+      }
+    },
+    {
+      "id": "doc73",
+      "fields": {
+        "content": "Test document number 73 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 73 for performance testing",
+        "artifact_summary": "Summary for test document 73 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 73
+      }
+    },
+    {
+      "id": "doc74",
+      "fields": {
+        "content": "Test document number 74 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 74 for performance testing",
+        "artifact_summary": "Summary for test document 74 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 74
+      }
+    },
+    {
+      "id": "doc75",
+      "fields": {
+        "content": "Test document number 75 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 75 for performance testing",
+        "artifact_summary": "Summary for test document 75 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 75
+      }
+    },
+    {
+      "id": "doc76",
+      "fields": {
+        "content": "Test document number 76 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 76 for performance testing",
+        "artifact_summary": "Summary for test document 76 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 76
+      }
+    },
+    {
+      "id": "doc77",
+      "fields": {
+        "content": "Test document number 77 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 77 for performance testing",
+        "artifact_summary": "Summary for test document 77 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 77
+      }
+    },
+    {
+      "id": "doc78",
+      "fields": {
+        "content": "Test document number 78 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 78 for performance testing",
+        "artifact_summary": "Summary for test document 78 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 78
+      }
+    },
+    {
+      "id": "doc79",
+      "fields": {
+        "content": "Test document number 79 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 79 for performance testing",
+        "artifact_summary": "Summary for test document 79 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 79
+      }
+    },
+    {
+      "id": "doc80",
+      "fields": {
+        "content": "Test document number 80 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 80 for performance testing",
+        "artifact_summary": "Summary for test document 80 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 80
+      }
+    },
+    {
+      "id": "doc81",
+      "fields": {
+        "content": "Test document number 81 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 81 for performance testing",
+        "artifact_summary": "Summary for test document 81 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 81
+      }
+    },
+    {
+      "id": "doc82",
+      "fields": {
+        "content": "Test document number 82 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 82 for performance testing",
+        "artifact_summary": "Summary for test document 82 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 82
+      }
+    },
+    {
+      "id": "doc83",
+      "fields": {
+        "content": "Test document number 83 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 83 for performance testing",
+        "artifact_summary": "Summary for test document 83 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 83
+      }
+    },
+    {
+      "id": "doc84",
+      "fields": {
+        "content": "Test document number 84 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 84 for performance testing",
+        "artifact_summary": "Summary for test document 84 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 84
+      }
+    },
+    {
+      "id": "doc85",
+      "fields": {
+        "content": "Test document number 85 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 85 for performance testing",
+        "artifact_summary": "Summary for test document 85 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 85
+      }
+    },
+    {
+      "id": "doc86",
+      "fields": {
+        "content": "Test document number 86 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 86 for performance testing",
+        "artifact_summary": "Summary for test document 86 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 86
+      }
+    },
+    {
+      "id": "doc87",
+      "fields": {
+        "content": "Test document number 87 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 87 for performance testing",
+        "artifact_summary": "Summary for test document 87 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 87
+      }
+    },
+    {
+      "id": "doc88",
+      "fields": {
+        "content": "Test document number 88 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 88 for performance testing",
+        "artifact_summary": "Summary for test document 88 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 88
+      }
+    },
+    {
+      "id": "doc89",
+      "fields": {
+        "content": "Test document number 89 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 89 for performance testing",
+        "artifact_summary": "Summary for test document 89 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 89
+      }
+    },
+    {
+      "id": "doc90",
+      "fields": {
+        "content": "Test document number 90 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 90 for performance testing",
+        "artifact_summary": "Summary for test document 90 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 90
+      }
+    },
+    {
+      "id": "doc91",
+      "fields": {
+        "content": "Test document number 91 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 91 for performance testing",
+        "artifact_summary": "Summary for test document 91 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 91
+      }
+    },
+    {
+      "id": "doc92",
+      "fields": {
+        "content": "Test document number 92 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 92 for performance testing",
+        "artifact_summary": "Summary for test document 92 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 92
+      }
+    },
+    {
+      "id": "doc93",
+      "fields": {
+        "content": "Test document number 93 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 93 for performance testing",
+        "artifact_summary": "Summary for test document 93 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 93
+      }
+    },
+    {
+      "id": "doc94",
+      "fields": {
+        "content": "Test document number 94 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 94 for performance testing",
+        "artifact_summary": "Summary for test document 94 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 94
+      }
+    },
+    {
+      "id": "doc95",
+      "fields": {
+        "content": "Test document number 95 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 95 for performance testing",
+        "artifact_summary": "Summary for test document 95 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 95
+      }
+    },
+    {
+      "id": "doc96",
+      "fields": {
+        "content": "Test document number 96 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 96 for performance testing",
+        "artifact_summary": "Summary for test document 96 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 96
+      }
+    },
+    {
+      "id": "doc97",
+      "fields": {
+        "content": "Test document number 97 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 97 for performance testing",
+        "artifact_summary": "Summary for test document 97 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 97
+      }
+    },
+    {
+      "id": "doc98",
+      "fields": {
+        "content": "Test document number 98 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 98 for performance testing",
+        "artifact_summary": "Summary for test document 98 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 98
+      }
+    },
+    {
+      "id": "doc99",
+      "fields": {
+        "content": "Test document number 99 with sufficient content to test indexing performance",
+        "concept_abstract": "Test document abstract number 99 for performance testing",
+        "artifact_summary": "Summary for test document 99 covering performance benchmarks"
+      },
+      "field_terms": {
+        "concept_abstract": [
+          "test",
+          "document",
+          "abstract",
+          "number",
+          "for",
+          "performance",
+          "testing"
+        ],
+        "artifact_summary": [
+          "summary",
+          "for",
+          "test",
+          "document",
+          "covering",
+          "performance",
+          "benchmarks"
+        ],
+        "content": [
+          "test",
+          "document",
+          "number",
+          "with",
+          "sufficient",
+          "content",
+          "test",
+          "indexing",
+          "performance"
+        ]
+      },
+      "metadata": {
+        "type": "test",
+        "index": 99
       }
     }
   ],
   "doc_stats": {
-    "avg_doc_length": 165,
-    "total_docs": 10,
+    "avg_doc_length": 23,
+    "total_docs": 100,
     "k1": 1.2,
     "b": 0.75
   }

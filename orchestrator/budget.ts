@@ -83,6 +83,20 @@ export class BudgetCircuitBreaker {
   getFailureCount(): number {
     return this.failures;
   }
+
+  getMetrics(): {
+    failureCount: number;
+    state: string;
+    lastFailureTime: number;
+    openTime?: number;
+  } {
+    return {
+      failureCount: this.failures,
+      state: this.state,
+      lastFailureTime: this.lastFailureTime,
+      openTime: this.state === 'OPEN' ? this.lastFailureTime : undefined
+    };
+  }
 }
 
 export class BudgetEnforcer {

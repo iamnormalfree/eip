@@ -10,6 +10,20 @@ import { repairDraft } from './repairer';
 import { publishArtifact } from './publisher';
 import { isLegacyCompat } from '../lib_supabase/utils/compat';
 import { submitContentGenerationJob } from '../lib_supabase/queue/eip-queue';
+import {
+  startCorrelation,
+  updateCorrelation,
+  endCorrelation,
+  logStageStart,
+  logStageComplete,
+  logBudgetEnforcement,
+  logCircuitBreaker,
+  logDLQRouting,
+  logQueueSubmission,
+  logPerformance,
+  logError,
+  getLogger
+} from './logger';
 
 type Brief = {
   brief: string;
@@ -43,7 +57,10 @@ interface PipelineContext {
  */
 async function runOnce(input: Brief): Promise<{ success: boolean; artifact?: any; error?: string; queue_job_id?: string }> {
   // Check if queue mode is enabled or forced
-  const queueMode = input.queue_mode || process.env.EIP_QUEUE_MODE === 'enabled';
+  // Explicit false takes precedence over environment variable
+  const queueMode = input.queue_mode === false
+    ? false
+    : input.queue_mode || process.env.EIP_QUEUE_MODE === 'enabled';
   
   if (queueMode) {
     console.log('🚀 Queue-first mode: Submitting job to EIP queue system');
@@ -56,24 +73,40 @@ async function runOnce(input: Brief): Promise<{ success: boolean; artifact?: any
 
 /**
  * Queue-First Processing: Submit job to EIP queue system
- * 
+ *
  * Integration contract: Expose EIP job processing interface with budget checkpoints
  */
 async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?: any; error?: string; queue_job_id?: string }> {
+  // Start correlation tracking
+  const correlationId = startCorrelation({
+    jobId: `queue-${Date.now()}`,
+    persona: input.persona,
+    funnel: input.funnel,
+    tier: input.tier || 'MEDIUM',
+    userId: undefined, // Could be added later
+    startTime: Date.now()
+  });
+
   try {
     // Validate required inputs
     if (!input.brief) {
+      logError(correlationId, new Error('Brief is required for content generation'), {
+        stage: 'validation',
+        input: { ...input, brief: '[REDACTED]' }
+      });
+      endCorrelation(correlationId);
       return { success: false, error: 'Brief is required for content generation' };
     }
 
     const tier = input.tier || 'MEDIUM';
-    
-    console.log(`📋 Submitting to EIP Queue System:`, {
-      brief: input.brief.substring(0, 100) + (input.brief.length > 100 ? '...' : ''),
+
+    getLogger().info(`Submitting to EIP Queue System`, {
+      correlationId,
+      brief_length: input.brief.length,
       tier,
       persona: input.persona,
       funnel: input.funnel,
-      correlation_id: input.correlation_id,
+      event: 'queue_submission_start'
     });
 
     // Submit job to queue
@@ -82,18 +115,25 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
       persona: input.persona,
       funnel: input.funnel,
       tier,
-      correlation_id: input.correlation_id,
+      correlation_id: correlationId,
       priority: tier === 'HEAVY' ? 1 : tier === 'MEDIUM' ? 3 : 5,
       metadata: {
         submission_source: 'orchestrator_controller',
         queue_mode: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        correlation_id: correlationId
       }
     });
 
     if (queueResult.success) {
-      console.log(`✅ Job successfully submitted to EIP queue: ${queueResult.jobId}`);
-      
+      logQueueSubmission(correlationId, queueResult.jobId, {
+        tier,
+        priority: tier === 'HEAVY' ? 1 : tier === 'MEDIUM' ? 3 : 5,
+        submission_source: 'orchestrator_controller'
+      });
+
+      endCorrelation(correlationId);
+
       return {
         success: true,
         queue_job_id: queueResult.jobId,
@@ -103,30 +143,54 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
             tier,
             status: 'queued',
             submitted_at: new Date().toISOString(),
-            processing_mode: 'queue_first'
+            correlation_id: correlationId
+          },
+          metadata: {
+            budget_tier: tier,
+            processing_mode: 'queue_first',
+            correlation_id: correlationId,
+            queue_job_id: queueResult.jobId,
+            submitted_at: new Date().toISOString()
           }
         }
       };
     } else {
-      console.error(`❌ Failed to submit job to EIP queue:`, queueResult.error);
-      
+      logError(correlationId, new Error(`Queue submission failed: ${queueResult.error}`), {
+        stage: 'queue_submission',
+        queue_error: queueResult.error
+      });
+
       // Fallback to direct execution if queue submission fails
-      console.log('🔄 Queue submission failed, falling back to direct execution...');
+      getLogger().info('Queue submission failed, falling back to direct execution', {
+        correlationId,
+        event: 'fallback_to_direct'
+      });
+
+      endCorrelation(correlationId);
       return await runDirectly(input);
     }
 
   } catch (error) {
-    console.error('❌ Queue processing failed:', error);
-    
-    // Fallback to direct execution on error
-    console.log('🔄 Queue processing failed, falling back to direct execution...');
+    logError(correlationId, error instanceof Error ? error : new Error('Unknown queue processing error'), {
+      stage: 'queue_processing',
+      error_type: error instanceof Error ? error.constructor.name : 'Unknown'
+    });
+
+    // Fallback to direct execution on queue processing exceptions
+    getLogger().info('Queue processing failed, falling back to direct execution', {
+      correlationId,
+      event: 'fallback_to_direct',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+
+    endCorrelation(correlationId);
     return await runDirectly(input);
   }
 }
 
 /**
  * Direct Execution: Original orchestrator logic for compatibility
- * 
+ *
  * Preserves existing functionality for:
  * - Legacy compatibility mode
  * - Fallback when queue system is unavailable
@@ -137,229 +201,536 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
   const tier = input.tier || 'MEDIUM';
   const budget = new BudgetEnforcer(tier);
   let db: OrchestratorDB | null = null;
-  
+
+  // Start correlation tracking for direct execution
+  const correlationId = startCorrelation({
+    jobId: `direct-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+    persona: input.persona,
+    funnel: input.funnel,
+    tier: tier,
+    userId: undefined,
+    startTime: Date.now()
+  });
+
   try {
     db = new OrchestratorDB();
-    console.log('Database connection initialized');
+    getLogger().info('Database connection initialized', {
+      correlationId,
+      event: 'database_connected'
+    });
   } catch (dbError) {
-    console.warn('Database not available, running without persistence:', dbError instanceof Error ? dbError.message : 'Unknown error');
+    getLogger().warn('Database not available, running without persistence', {
+      correlationId,
+      error: dbError instanceof Error ? dbError.message : 'Unknown error',
+      event: 'database_unavailable'
+    });
     db = null;
   }
 
   // Create initial job record (if database available)
-  let jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  let jobId = correlationId;
   if (db) {
-    const { job, error: createError } = await db.createJob({
-      brief: input.brief,
-      persona: input.persona,
-      funnel: input.funnel,
-      tier: input.tier || 'MEDIUM',
-      status: 'queued',
-      stage: 'started',
-      inputs: input,
-      correlation_id: input.correlation_id
-    });
+    try {
+      const { job, error: createError } = await db.createJob({
+        brief: input.brief,
+        persona: input.persona,
+        funnel: input.funnel,
+        tier: input.tier || 'MEDIUM',
+        status: 'queued',
+        stage: 'started',
+        inputs: input,
+        correlation_id: correlationId
+      });
 
-    if (!createError) {
-      jobId = job.id;
-    } else {
-      console.warn('Failed to create job record:', createError);
+      if (!createError) {
+        jobId = job.id;
+        getLogger().info('Job record created in database', {
+          correlationId,
+          jobId,
+          event: 'job_created'
+        });
+      } else {
+        getLogger().warn('Failed to create job record', {
+          correlationId,
+          error: createError,
+          event: 'job_creation_failed'
+        });
+      }
+    } catch (createError) {
+      getLogger().warn('Database job creation failed', {
+        correlationId,
+        error: createError instanceof Error ? createError.message : 'Unknown error',
+        event: 'job_creation_exception'
+      });
     }
   }
 
-  console.log('Started job:', jobId, 'with tier:', tier);
+  getLogger().info('Started direct execution job', {
+    correlationId,
+    jobId,
+    tier,
+    brief_length: input.brief.length,
+    event: 'direct_execution_started'
+  });
+
+  updateCorrelation(correlationId, { jobId });
 
   try {
     // Stage 1: IP Routing (minimal budget impact)
+    logStageStart(correlationId, 'planner', { persona: input.persona, funnel: input.funnel });
+    const stageStartTime = Date.now();
+
     budget.startStage('planner');
     const routingResult = await routeToIP({ persona: input.persona, funnel: input.funnel, brief: input.brief });
     const ip = routingResult.selected_ip;
     budget.addTokens('planner', 10); // Small token cost for routing
     budget.endStage('planner');
 
+    const stageDuration = Date.now() - stageStartTime;
     const budgetCheck = budget.checkStageBudget('planner');
+
+    logStageComplete(correlationId, 'planner', {
+      stageDuration,
+      tokensUsed: 10,
+      budgetRemaining: budget.getBudget().planner ? budget.getBudget().planner! - 10 : 0,
+      selectedIP: ip,
+      routingConfidence: routingResult.confidence
+    });
+
     if (!budgetCheck.ok) {
+      logBudgetEnforcement(correlationId, 'planner_budget_exceeded', {
+        stage: 'planner',
+        reason: budgetCheck.reason,
+        tokensUsed: 10
+      });
       throw new Error(budgetCheck.reason);
     }
 
     // Update job with IP selection (if database available)
     if (db) {
-      await db.updateJob(jobId, { stage: 'ip_selected', outputs: { ip_selected: ip } });
+      try {
+        await db.updateJob(jobId, { stage: 'ip_selected', outputs: { ip_selected: ip } });
+        getLogger().info('Job updated with IP selection', {
+          correlationId,
+          jobId,
+          selectedIP: ip,
+          event: 'job_updated_ip'
+        });
+      } catch (updateError) {
+        getLogger().warn('Failed to update job with IP selection', {
+          correlationId,
+          jobId,
+          error: updateError instanceof Error ? updateError.message : 'Unknown error',
+          event: 'job_update_failed'
+        });
+      }
     }
 
     // Stage 2: Retrieval (BM25/graph/vector)
+    logStageStart(correlationId, 'retrieval', { query_length: input.brief.length });
+    const retrievalStartTime = Date.now();
+
     budget.startStage('retrieval');
     const retrieval = await parallelRetrieve({ query: input.brief });
     budget.addTokens('retrieval', 50); // Estimated token cost for retrieval
     budget.endStage('retrieval');
 
+    const retrievalDuration = Date.now() - retrievalStartTime;
+    logStageComplete(correlationId, 'retrieval', {
+      stageDuration: retrievalDuration,
+      tokensUsed: 50,
+      budgetRemaining: budget.getBudget().retrieval ? budget.getBudget().retrieval! - 50 : 0,
+      candidatesFound: retrieval.candidates?.length || 0,
+      retrievalFlags: retrieval.flags
+    });
+
     // Stage 3: Generation (main content creation)
+    logStageStart(correlationId, 'generator', { ip, brief_length: input.brief.length });
+    const generationStartTime = Date.now();
+
     budget.startStage('generator');
     const draft = await generateDraft(input.brief, ip, retrieval);
     const estimatedTokens = draft.length / 4; // Rough token estimation
     budget.addTokens('generator', estimatedTokens);
     budget.endStage('generator');
 
+    const generationDuration = Date.now() - generationStartTime;
+    logStageComplete(correlationId, 'generator', {
+      stageDuration: generationDuration,
+      tokensUsed: estimatedTokens,
+      budgetRemaining: budget.getBudget().generator ? budget.getBudget().generator! - estimatedTokens : 0,
+      draftLength: draft.length
+    });
+
     const genBudgetCheck = budget.checkStageBudget('generator');
     if (!genBudgetCheck.ok) {
+      logBudgetEnforcement(correlationId, 'generator_budget_exceeded', {
+        stage: 'generator',
+        reason: genBudgetCheck.reason,
+        tokensUsed: estimatedTokens,
+        draftLength: draft.length
+      });
       throw new Error(genBudgetCheck.reason);
     }
 
     // Update job with draft (if database available)
     if (db) {
-      await db.updateJob(jobId, { 
-        stage: 'generated', 
-        outputs: { draft, ip, retrieval_flags: retrieval.flags },
-        tokens: budget.getTracker().tokens_used 
-      });
+      try {
+        await db.updateJob(jobId, {
+          stage: 'generated',
+          outputs: { draft, ip, retrieval_flags: retrieval.flags },
+          tokens: budget.getTracker().tokens_used
+        });
+        getLogger().info('Job updated with generated draft', {
+          correlationId,
+          jobId,
+          draftLength: draft.length,
+          tokensUsed: budget.getTracker().tokens_used,
+          event: 'job_updated_draft'
+        });
+      } catch (updateError) {
+        getLogger().warn('Failed to update job with draft', {
+          correlationId,
+          jobId,
+          error: updateError instanceof Error ? updateError.message : 'Unknown error',
+          event: 'job_update_failed'
+        });
+      }
     }
 
     // Stage 4: Audit (quality checks)
+    logStageStart(correlationId, 'auditor', { draft_length: draft.length, ip });
+    const auditStartTime = Date.now();
+
     budget.startStage('auditor');
     const audit = await microAudit({ draft, ip });
     budget.addTokens('auditor', 30); // Estimated token cost for audit
     budget.endStage('auditor');
 
+    const auditDuration = Date.now() - auditStartTime;
+    logStageComplete(correlationId, 'auditor', {
+      stageDuration: auditDuration,
+      tokensUsed: 30,
+      budgetRemaining: budget.getBudget().auditor ? budget.getBudget().auditor! - 30 : 0,
+      auditTags: audit.tags?.length || 0,
+      auditScore: audit.score
+    });
+
     const auditBudgetCheck = budget.checkStageBudget('auditor');
     if (!auditBudgetCheck.ok) {
+      logBudgetEnforcement(correlationId, 'auditor_budget_exceeded', {
+        stage: 'auditor',
+        reason: auditBudgetCheck.reason,
+        tokensUsed: 30,
+        auditTags: audit.tags?.length || 0
+      });
       throw new Error(auditBudgetCheck.reason);
     }
 
     // Update job with audit results (if database available)
     if (db) {
-      await db.updateJob(jobId, { 
-        stage: 'audited',
-        outputs: { draft, ip, retrieval_flags: retrieval.flags, audit_tags: audit.tags }
-      });
+      try {
+        await db.updateJob(jobId, {
+          stage: 'audited',
+          outputs: { draft, ip, retrieval_flags: retrieval.flags, audit_tags: audit.tags }
+        });
+        getLogger().info('Job updated with audit results', {
+          correlationId,
+          jobId,
+          auditTags: audit.tags?.length || 0,
+          event: 'job_updated_audit'
+        });
+      } catch (updateError) {
+        getLogger().warn('Failed to update job with audit results', {
+          correlationId,
+          jobId,
+          error: updateError instanceof Error ? updateError.message : 'Unknown error',
+          event: 'job_update_failed'
+        });
+      }
     }
 
     // Stage 5: Repair (if needed)
+    logStageStart(correlationId, 'repairer', { needsRepair: audit.tags?.length > 0 });
+    const repairStartTime = Date.now();
+
     budget.startStage('repairer');
     const repaired = await repairDraft({ draft, audit });
     budget.addTokens('repairer', 20); // Estimated token cost for repairs
     budget.endStage('repairer');
 
+    const repairDuration = Date.now() - repairStartTime;
+    logStageComplete(correlationId, 'repairer', {
+      stageDuration: repairDuration,
+      tokensUsed: 20,
+      budgetRemaining: budget.getBudget().repairer ? budget.getBudget().repairer! - 20 : 0,
+      originalLength: draft.length,
+      repairedLength: repaired.length
+    });
+
     const repairBudgetCheck = budget.checkStageBudget('repairer');
     if (!repairBudgetCheck.ok) {
+      logBudgetEnforcement(correlationId, 'repairer_budget_exceeded', {
+        stage: 'repairer',
+        reason: repairBudgetCheck.reason,
+        tokensUsed: 20
+      });
       throw new Error(repairBudgetCheck.reason);
     }
 
     // Stage 6: Re-audit after repair
+    logStageStart(correlationId, 'review', { repaired_length: repaired.length });
+    const reviewStartTime = Date.now();
+
     const finalAudit = await microAudit({ draft: repaired, ip });
+    const reviewDuration = Date.now() - reviewStartTime;
+
+    logStageComplete(correlationId, 'review', {
+      stageDuration: reviewDuration,
+      tokensUsed: 0, // Final audit doesn't consume additional budget
+      budgetRemaining: budget.getBudget().review || 0,
+      finalAuditTags: finalAudit.tags?.length || 0,
+      finalAuditScore: finalAudit.score
+    });
     
     // Stage 7: Publishing
-    const artifact = await publishArtifact({ 
-      draft: repaired, 
-      ip, 
-      audit: finalAudit, 
+    logStageStart(correlationId, 'publisher', {
+      artifact_length: repaired.length,
+      final_audit_tags: finalAudit.tags?.length || 0
+    });
+    const publishStartTime = Date.now();
+
+    const artifact = await publishArtifact({
+      draft: repaired,
+      ip,
+      audit: finalAudit,
       retrieval,
       metadata: {
         brief: input.brief,
         persona: input.persona,
         funnel: input.funnel,
         tier: tier,
-        correlation_id: input.correlation_id,
+        correlation_id: correlationId,
         processing_mode: 'direct_execution'
       }
+    });
+
+    const publishDuration = Date.now() - publishStartTime;
+    logStageComplete(correlationId, 'publisher', {
+      stageDuration: publishDuration,
+      tokensUsed: 0, // Publishing doesn't consume additional budget
+      budgetRemaining: 0,
+      artifactCreated: true,
+      artifactType: artifact.jsonld['@type'] || 'Article'
     });
 
     // Create artifact record (if database available)
     let savedArtifact = null;
     if (db) {
-      const { artifact: dbArtifact, error: artifactError } = await db.createArtifact({
-        job_id: jobId,
-        brief: input.brief,
-        ip_used: ip,
-        persona: input.persona,
-        funnel: input.funnel,
-        tier: tier,
-        status: 'draft',
-        content: artifact.mdx,
-        frontmatter: artifact.frontmatter,
-        jsonld: artifact.jsonld,
-        ledger: artifact.ledger
-      });
+      try {
+        const { artifact: dbArtifact, error: artifactError } = await db.createArtifact({
+          job_id: jobId,
+          brief: input.brief,
+          ip_used: ip,
+          persona: input.persona,
+          funnel: input.funnel,
+          tier: tier,
+          status: 'draft',
+          content: artifact.mdx,
+          frontmatter: artifact.frontmatter,
+          jsonld: artifact.jsonld,
+          ledger: artifact.ledger
+        });
 
-      if (!artifactError) {
-        savedArtifact = dbArtifact;
-      } else {
-        console.warn('Failed to save artifact:', artifactError);
+        if (!artifactError) {
+          savedArtifact = dbArtifact;
+          getLogger().info('Artifact saved to database', {
+            correlationId,
+            jobId,
+            artifactId: dbArtifact.id,
+            event: 'artifact_saved'
+          });
+        } else {
+          getLogger().warn('Failed to save artifact', {
+            correlationId,
+            jobId,
+            error: artifactError,
+            event: 'artifact_save_failed'
+          });
+        }
+      } catch (saveError) {
+        getLogger().warn('Artifact database save exception', {
+          correlationId,
+          jobId,
+          error: saveError instanceof Error ? saveError.message : 'Unknown error',
+          event: 'artifact_save_exception'
+        });
       }
     }
 
     // Final budget check and job completion
     const tracker = budget.getTracker();
-    const duration = Date.now() - tracker.start_time;
-    
+    const totalDuration = Date.now() - tracker.start_time;
+    const totalCost = calculateCostCents(tracker.tokens_used, tier);
+
+    // Log final performance metrics
+    logPerformance(correlationId, {
+      stageDuration: totalDuration,
+      tokensUsed: tracker.tokens_used,
+      budgetRemaining: 0, // All budgets used
+      memoryUsage: process.memoryUsage().heapUsed,
+      queueProcessingTime: 0 // Not applicable for direct execution
+    });
+
+    // Update job completion status
     if (db) {
-      await db.updateJob(jobId, {
-        stage: 'completed',
-        outputs: { 
-          artifact_id: savedArtifact?.id,
-          ip, 
-          tags: finalAudit.tags,
-          jsonld_type: artifact.jsonld['@type'] || 'Article'
-        },
-        tokens: tracker.tokens_used,
-        duration_ms: duration,
-        cost_cents: calculateCostCents(tracker.tokens_used, tier)
-      });
+      try {
+        await db.updateJob(jobId, {
+          stage: 'completed',
+          outputs: {
+            artifact_id: savedArtifact?.id,
+            ip,
+            tags: finalAudit.tags,
+            jsonld_type: artifact.jsonld['@type'] || 'Article'
+          },
+          tokens: tracker.tokens_used,
+          duration_ms: totalDuration,
+          cost_cents: totalCost
+        });
+        getLogger().info('Job marked as completed', {
+          correlationId,
+          jobId,
+          totalDuration,
+          totalCost,
+          event: 'job_completed'
+        });
+      } catch (updateError) {
+        getLogger().warn('Failed to update job completion status', {
+          correlationId,
+          jobId,
+          error: updateError instanceof Error ? updateError.message : 'Unknown error',
+          event: 'job_completion_update_failed'
+        });
+      }
     }
 
-    console.log('✅ Job completed:', jobId, {
+    getLogger().info('Direct execution job completed successfully', {
+      correlationId,
+      jobId,
       ip,
       tokens: tracker.tokens_used,
-      duration_ms: duration,
+      duration_ms: totalDuration,
+      cost_cents: totalCost,
       tags: finalAudit.tags.length,
       breaches: budget.hasBreaches() ? budget.getBreaches().length : 0,
       db_persisted: !!db,
-      processing_mode: 'direct_execution'
+      processing_mode: 'direct_execution',
+      event: 'job_success'
     });
 
-    return { 
-      success: true, 
+    endCorrelation(correlationId);
+
+    return {
+      success: true,
       artifact: {
         ...savedArtifact,
         metadata: {
           budget_tier: tier,
           tokens_used: tracker.tokens_used,
-          duration_ms: duration,
+          duration_ms: totalDuration,
+          cost_cents: totalCost,
           breaches: budget.getBreaches(),
           db_persisted: !!db,
-          processing_mode: 'direct_execution'
+          processing_mode: 'direct_execution',
+          correlation_id: correlationId
         }
       }
     };
 
   } catch (error) {
-    console.error('❌ Job failed:', jobId, error);
+    const errorObj = error instanceof Error ? error : new Error('Unknown error');
+    logError(correlationId, errorObj, {
+      jobId,
+      stage: 'pipeline_execution',
+      tokens_used: budget.getTracker().tokens_used,
+      duration_ms: Date.now() - budget.getTracker().start_time
+    });
 
     // Check if this is a budget breach
     if (budget.shouldFailToDLQ()) {
       const dlqRecord = budget.createDLQRecord();
+      logDLQRouting(correlationId, dlqRecord);
+      logCircuitBreaker(correlationId, 'triggered', 'Budget breach detected');
+
       if (db) {
-        await db.failJobToDLQ(jobId, dlqRecord);
+        try {
+          await db.failJobToDLQ(jobId, dlqRecord);
+          getLogger().info('Job sent to DLQ in database', {
+            correlationId,
+            jobId,
+            dlq_reason: dlqRecord.fail_reason,
+            event: 'dlq_database_recorded'
+          });
+        } catch (dlqError) {
+          getLogger().warn('Failed to record DLQ in database', {
+            correlationId,
+            jobId,
+            error: dlqError instanceof Error ? dlqError.message : 'Unknown error',
+            event: 'dlq_database_failed'
+          });
+        }
       }
-      
-      console.error('Job sent to DLQ due to budget breach:', dlqRecord);
-      return { 
-        success: false, 
+
+      endCorrelation(correlationId);
+
+      return {
+        success: false,
         error: 'Budget breach: ' + dlqRecord.fail_reason,
-        dlq: dlqRecord
+        dlq: dlqRecord,
+        correlation_id: correlationId
       };
     }
 
     // Regular failure
     if (db) {
-      await db.updateJob(jobId, {
-        stage: 'failed',
-        fail_reason: error instanceof Error ? error.message : 'Unknown error'
-      });
+      try {
+        await db.updateJob(jobId, {
+          stage: 'failed',
+          fail_reason: errorObj.message
+        });
+        getLogger().info('Job failure recorded in database', {
+          correlationId,
+          jobId,
+          fail_reason: errorObj.message,
+          event: 'job_failure_recorded'
+        });
+      } catch (updateError) {
+        getLogger().warn('Failed to record job failure in database', {
+          correlationId,
+          jobId,
+          error: updateError instanceof Error ? updateError.message : 'Unknown error',
+          event: 'job_failure_record_failed'
+        });
+      }
     }
 
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    getLogger().error('Direct execution job failed', {
+      correlationId,
+      jobId,
+      error: errorObj.message,
+      error_type: errorObj.constructor.name,
+      tokens_used: budget.getTracker().tokens_used,
+      duration_ms: Date.now() - budget.getTracker().start_time,
+      processing_mode: 'direct_execution',
+      event: 'job_failure'
+    });
+
+    endCorrelation(correlationId);
+
+    return {
+      success: false,
+      error: errorObj.message,
+      correlation_id: correlationId
     };
   }
 }
