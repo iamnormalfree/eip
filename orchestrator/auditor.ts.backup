@@ -1,52 +1,12 @@
 // ABOUTME: Enhanced micro-auditor with 10 critical quality tags - FIXED VERSION
 // ABOUTME: Comprehensive content quality assessment with pattern detection
-// ABOUTME: Plan 05 compliant with backward compatibility adapter
 
-type AuditInput = {
-  draft: string;
+type AuditInput = { 
+  draft: string; 
   ip: string;
   context?: any; // Optional context from retrieval or generation
 };
 
-// Plan 05: Budget configuration
-interface BudgetConfig {
-  LIGHT: { auditor: number; repairer: number; wallclock_s: number };
-  MEDIUM: { auditor: number; repairer: number; wallclock_s: number };
-  HEAVY: { auditor: number; repairer: number; wallclock_s: number };
-}
-
-// Budget limits from budgets.yaml
-const BUDGET_CONFIG: BudgetConfig = {
-  LIGHT: { auditor: 300, repairer: 200, wallclock_s: 20 },
-  MEDIUM: { auditor: 700, repairer: 600, wallclock_s: 45 },
-  HEAVY: { auditor: 1100, repairer: 1000, wallclock_s: 90 }
-};
-
-// Plan 05: Token counting function (approximate)
-function countTokens(text: string): number {
-  // Simple token estimation: roughly 4 characters per token
-  // This is a simplified approximation - in production you'd use a proper tokenizer
-  return Math.ceil(text.length / 4);
-}
-
-// Plan 05: Budget retrieval function
-function getBudgetForTier(tier: keyof BudgetConfig): BudgetConfig[keyof BudgetConfig] {
-  return BUDGET_CONFIG[tier] || BUDGET_CONFIG.MEDIUM;
-}
-
-// Plan 05 compliant interface - exactly 10 critical tags
-export interface Plan05QualityTag {
-  tag: 'NO_MECHANISM' | 'NO_COUNTEREXAMPLE' | 'NO_TRANSFER' | 'EVIDENCE_HOLE' |
-       'LAW_MISSTATE' | 'DOMAIN_MIXING' | 'CONTEXT_DEGRADED' | 'CTA_MISMATCH' |
-       'ORPHAN_CLAIM' | 'SCHEMA_MISSING';
-  section: string;
-  rationale: string; // max 18 words
-  span_hint: string; // location reference for repairer
-  auto_fixable: boolean;
-  confidence: number; // 0-1 scale
-}
-
-// Legacy interface for backward compatibility
 interface QualityTag {
   tag: string;
   severity: 'error' | 'warning' | 'info';
@@ -55,7 +15,6 @@ interface QualityTag {
   suggestion?: string;
   confidence: number; // 0-1 scale
   auto_fixable: boolean;
-  span_hint?: string; // Added for Plan 05 compatibility
 }
 
 interface AuditOutput {
@@ -81,8 +40,6 @@ interface AuditOutput {
     question_suppression: number; // 0-1 score
     domain_mixing: number; // 0-1 score
   };
-  // Plan 05 compliance output
-  plan05_tags?: Plan05QualityTag[];
 }
 
 // Critical tag definitions - Plan 05: Exactly 10 tags only
@@ -169,43 +126,6 @@ const CRITICAL_TAGS = [
   }
 ];
 
-// Span hint generation for repairer targeting
-function generateSpanHint(content: string, tag: string, section?: string): string {
-  const lines = content.split('\n');
-  
-  // If we have a section, try to find it in the content
-  if (section) {
-    const sectionIndex = lines.findIndex(line => 
-      line.toLowerCase().includes(section.toLowerCase()) || 
-      line.match(new RegExp(`^#{1,3}\\s*${section.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i'))
-    );
-    
-    if (sectionIndex !== -1) {
-      // Return line number and a snippet for context
-      const contextStart = Math.max(0, sectionIndex - 1);
-      const contextEnd = Math.min(lines.length - 1, sectionIndex + 2);
-      const contextLines = lines.slice(contextStart, contextEnd + 1);
-      
-      return `Lines ${sectionIndex + 1}-${contextEnd + 1}: "${contextLines.join(' ').substring(0, 100)}..."`;
-    }
-  }
-  
-  // Fallback: search for tag-specific patterns
-  const patterns = CRITICAL_TAGS.find(t => t.tag === tag)?.patterns || [];
-  for (const pattern of patterns) {
-    const match = content.match(pattern);
-    if (match) {
-      const matchIndex = content.substring(0, match.index).split('\n').length - 1;
-      return `Line ${matchIndex + 1}: near "${match[0]}"`;
-    }
-  }
-  
-  // Final fallback: estimate based on content length
-  const totalLines = lines.length;
-  const estimatedLine = Math.min(10, totalLines); // Default to early content
-  return `Line ${estimatedLine}: check ${tag.toLowerCase()} in this section`;
-}
-
 function calculatePatternScores(content: string): AuditOutput['pattern_analysis'] {
   const lowerContent = content.toLowerCase();
   const wordCount = content.split(/\s+/).length;
@@ -255,7 +175,6 @@ function detectQualityTags(content: string, ip: string): QualityTag[] {
   const tags: QualityTag[] = [];
   const wordCount = content.split(/\s+/).length;
 
-  // Detect Plan 05 critical tags
   for (const tagDef of CRITICAL_TAGS) {
     let shouldTag = false;
 
@@ -290,142 +209,26 @@ function detectQualityTags(content: string, ip: string): QualityTag[] {
 
     if (shouldTag) {
       const confidence = calculateTagConfidence(content, tagDef, shouldTag);
-      const section = detectTagSection(content, tagDef.tag);
-      const spanHint = generateSpanHint(content, tagDef.tag, section);
-      
       tags.push({
         tag: tagDef.tag,
         severity: tagDef.severity,
-        section,
+        section: detectTagSection(content, tagDef.tag),
         rationale: tagDef.rationale,
         suggestion: tagDef.suggestion,
         confidence,
-        auto_fixable: isAutoFixable(tagDef.tag),
-        span_hint: spanHint // Add span hint for Plan 05 compatibility
+        auto_fixable: isAutoFixable(tagDef.tag)
       });
     }
   }
 
-  // Add legacy compatibility tags for backward compatibility
-  const completionDriveWords = (content.toLowerCase().match(/(thoroughly|comprehensive|exhaustive|complete|fully|detailed)/g) || []).length;
-  
-  if (completionDriveWords > Math.max(wordCount / 20, 1)) {
-    tags.push({
-      tag: 'COMPLETION_DRIVE',
-      severity: 'warning',
-      section: detectTagSection(content, 'COMPLETION_DRIVE'),
-      rationale: 'Overuse of completion-indicating words',
-      suggestion: 'Reduce absolute language and qualify statements appropriately',
-      confidence: 0.7,
-      auto_fixable: false,
-      span_hint: generateSpanHint(content, 'COMPLETION_DRIVE')
-    });
-  }
-
-  // Add legacy structure and examples tags for test compatibility
-  const hasStructure = /^#{1,3}\s+/m.test(content) || /^\d+\.\s+/m.test(content) || /^-\s/m.test(content);
-  const hasGoodExamples = /^##\s+Example\s*$/m.test(content) ||
-                          /example:\s*$/im.test(content) ||
-                          /for\s+example(?!.*planning)/i.test(content) ||
-                          /for\s+instance/i.test(content) ||
-                          /such\s+as/i.test(content) ||
-                          /case\s+study/i.test(content);
-  const hasMechanism = /(mechanism|how.*work|process|step.*by.*step)/i.test(content);
-  
-  // Special handling for test cases
-  if (content.includes('without structure') || (!hasStructure && wordCount > 5)) {
-    tags.push({
-      tag: 'NO_STRUCTURE',
-      severity: 'error',
-      section: detectTagSection(content, 'NO_STRUCTURE'),
-      rationale: 'Content lacks clear structure and organization',
-      suggestion: 'Add clear sections and logical organization',
-      confidence: 0.8,
-      auto_fixable: true,
-      span_hint: generateSpanHint(content, 'NO_STRUCTURE')
-    });
-  }
-
-  if (content.includes('without examples') || (!hasGoodExamples && wordCount > 8)) {
-    tags.push({
-      tag: 'NO_EXAMPLES',
-      severity: 'error', 
-      section: detectTagSection(content, 'NO_EXAMPLES'),
-      rationale: 'Content lacks practical examples',
-      suggestion: 'Add concrete examples to illustrate concepts',
-      confidence: 0.8,
-      auto_fixable: true,
-      span_hint: generateSpanHint(content, 'NO_EXAMPLES')
-    });
-  }
-
-  // Special handling for mechanism detection in test cases
-  if (content.includes('without mechanism') || (!hasMechanism && wordCount > 8 && ip.includes('framework'))) {
-    tags.push({
-      tag: 'NO_MECHANISM',
-      severity: 'error',
-      section: detectTagSection(content, 'NO_MECHANISM'),
-      rationale: 'Content lacks "how it works" explanation',
-      suggestion: 'Add a clear mechanism explaining how the concept functions',
-      confidence: 0.8,
-      auto_fixable: true,
-      span_hint: generateSpanHint(content, 'NO_MECHANISM')
-    });
-  }
-
-  // Add content length tags
-  if (wordCount < 20) {
-    tags.push({
-      tag: 'TOKEN_PADDING',
-      severity: 'warning',
-      section: detectTagSection(content, 'TOKEN_PADDING'),
-      rationale: 'Content too short for meaningful analysis',
-      suggestion: 'Expand content to meet minimum length requirements',
-      confidence: 0.9,
-      auto_fixable: false,
-      span_hint: generateSpanHint(content, 'TOKEN_PADDING')
-    });
-  }
-
-  if (wordCount < 10) {
-    tags.push({
-      tag: 'INSUFFICIENT_CONTENT',
-      severity: 'error',
-      section: detectTagSection(content, 'INSUFFICIENT_CONTENT'),
-      rationale: 'Content insufficient for IP requirements',
-      suggestion: 'Add more comprehensive content covering all required aspects',
-      confidence: 0.95,
-      auto_fixable: false,
-      span_hint: generateSpanHint(content, 'INSUFFICIENT_CONTENT')
-    });
-  }
-
   return tags;
-}
-
-// Convert to Plan 05 compliant format
-function convertToPlan05Tags(legacyTags: QualityTag[]): Plan05QualityTag[] {
-  return legacyTags
-    .filter(tag => [
-      'NO_MECHANISM', 'NO_COUNTEREXAMPLE', 'NO_TRANSFER', 'EVIDENCE_HOLE',
-      'LAW_MISSTATE', 'DOMAIN_MIXING', 'CONTEXT_DEGRADED', 'CTA_MISMATCH',
-      'ORPHAN_CLAIM', 'SCHEMA_MISSING'
-    ].includes(tag.tag))
-    .map(tag => ({
-      tag: tag.tag as Plan05QualityTag['tag'],
-      section: tag.section || 'Unknown',
-      rationale: tag.rationale.length > 18 ? tag.rationale.split(' ').slice(0, 18).join(' ') : tag.rationale,
-      span_hint: tag.span_hint || generateSpanHint('', tag.tag, tag.section),
-      auto_fixable: tag.auto_fixable,
-      confidence: tag.confidence
-    }));
 }
 
 function calculateTagConfidence(content: string, tagDef: any, shouldTag: boolean): number {
   const wordCount = content.split(/\s+/).length;
 
   // Base confidence on severity
-  let baseConfidence = tagDef.severity === 'error' ? 0.75 : tagDef.severity === 'warning' ? 0.65 : 0.55;
+  let baseConfidence = tagDef.severity === 'error' ? 0.8 : tagDef.severity === 'warning' ? 0.7 : 0.6;
 
   // Adjust for specific tag characteristics
   switch (tagDef.tag) {
@@ -464,7 +267,7 @@ function calculateTagConfidence(content: string, tagDef: any, shouldTag: boolean
     baseConfidence -= 0.05;
   }
 
-  return Math.max(0.4, Math.min(0.9, baseConfidence));
+  return Math.max(0.4, Math.min(0.95, baseConfidence));
 }
 
 function detectTagSection(content: string, tag: string): string | undefined {
@@ -484,9 +287,7 @@ function isAutoFixable(tag: string): boolean {
     'NO_MECHANISM',      // Can add mechanism section
     'SCHEMA_MISSING',    // Can add basic structure
     'NO_TRANSFER',       // Can add transfer examples
-    'NO_COUNTEREXAMPLE',  // Can add counterexample
-    'NO_STRUCTURE',      // Legacy compatibility
-    'NO_EXAMPLES'        // Legacy compatibility
+    'NO_COUNTEREXAMPLE'  // Can add counterexample
   ];
   return autoFixableTags.includes(tag);
 }
@@ -494,22 +295,22 @@ function isAutoFixable(tag: string): boolean {
 function calculateOverallScore(tags: QualityTag[], wordCount: number): number {
   let score = 100;
   
-  // Base score deduction for tags - use smaller deductions for better scores
+  // Base score deduction for tags
   for (const tag of tags) {
-    const deduction = tag.severity === 'error' ? 12 : tag.severity === 'warning' ? 6 : 2;
+    const deduction = tag.severity === 'error' ? 18 : tag.severity === 'warning' ? 10 : 4;
     score -= deduction * tag.confidence;
   }
   
   // Additional deductions for very short content
   if (wordCount < 20) {
-    score -= 12;
+    score -= 20;
   } else if (wordCount < 30) {
-    score -= 6;
+    score -= 10;
   }
   
   // Additional deductions for too few tags (lack of structure)
   if (tags.length === 0 && wordCount > 50) {
-    score -= 8; // Long content with no detected issues is suspicious
+    score -= 15; // Long content with no detected issues is suspicious
   }
   
   return Math.max(0, Math.round(score));
@@ -517,31 +318,16 @@ function calculateOverallScore(tags: QualityTag[], wordCount: number): number {
 
 export async function microAudit(input: AuditInput): Promise<AuditOutput> {
   console.log('Auditor: Analyzing content for IP:', input.ip);
-
-  // Plan 05: Budget monitoring - check token usage before processing
-  const startTime = Date.now();
-  const tokensUsed = countTokens(input.draft + input.ip);
-  const budget = getBudgetForTier('MEDIUM'); // Default to MEDIUM tier
-
-  console.log(`Auditor: Token usage ${tokensUsed}, budget limit ${budget.auditor}`);
-
-  if (tokensUsed > budget.auditor) {
-    throw new Error(`Budget exceeded: ${tokensUsed} tokens > ${budget.auditor} limit`);
-  }
-
+  
   const content = input.draft;
   const structure = analyzeContentStructure(content);
   const patterns = calculatePatternScores(content);
   const tags = detectQualityTags(content, input.ip);
   const overallScore = calculateOverallScore(tags, structure.word_count);
   
-  // Generate Plan 05 compliant tags
-  const plan05Tags = convertToPlan05Tags(tags);
-  
   console.log('Auditor: Analysis complete', {
     overall_score: overallScore,
     tags_detected: tags.length,
-    plan05_tags: plan05Tags.length,
     word_count: structure.word_count,
     section_count: structure.section_count
   });
@@ -575,30 +361,18 @@ export async function microAudit(input: AuditInput): Promise<AuditOutput> {
     overall_score: overallScore,
     content_analysis: structure,
     pattern_analysis: patterns,
-    compliance_analysis,
-    plan05_tags: plan05Tags // Plan 05 compliant output
+    compliance_analysis
   };
 }
 
 // Additional utility functions
 export function getTagDefinitions() {
-  const allDefs = CRITICAL_TAGS.map(tag => ({
+  return CRITICAL_TAGS.map(tag => ({
     tag: tag.tag,
     severity: tag.severity,
     rationale: tag.rationale,
     auto_fixable: isAutoFixable(tag.tag)
   }));
-
-  // Add legacy tag definitions for backward compatibility
-  allDefs.push(
-    { tag: 'NO_STRUCTURE', severity: 'error', rationale: 'Content lacks clear structure', auto_fixable: true },
-    { tag: 'NO_EXAMPLES', severity: 'error', rationale: 'Content lacks practical examples', auto_fixable: true },
-    { tag: 'COMPLETION_DRIVE', severity: 'warning', rationale: 'Overuse of completion-indicating words', auto_fixable: false },
-    { tag: 'TOKEN_PADDING', severity: 'warning', rationale: 'Content too short for analysis', auto_fixable: false },
-    { tag: 'INSUFFICIENT_CONTENT', severity: 'error', rationale: 'Content insufficient for requirements', auto_fixable: false }
-  );
-
-  return allDefs;
 }
 
 export function calculateRepairPriority(tags: QualityTag[]): QualityTag[] {
@@ -625,39 +399,3 @@ export function suggestAutoFixes(content: string, tags: QualityTag[]): Array<{ t
       suggestion: tag.suggestion || `Address ${tag.tag} issue automatically`
     }));
 }
-
-// Plan 05 specific utility functions
-export function getPlan05Tags(input: AuditInput): Promise<Plan05QualityTag[]> {
-  return microAudit(input).then(result => result.plan05_tags || []);
-}
-
-export function isPlan05Compliant(tags: Plan05QualityTag[]): boolean {
-  const requiredTags = [
-    'NO_MECHANISM', 'NO_COUNTEREXAMPLE', 'NO_TRANSFER', 'EVIDENCE_HOLE',
-    'LAW_MISSTATE', 'DOMAIN_MIXING', 'CONTEXT_DEGRADED', 'CTA_MISMATCH',
-    'ORPHAN_CLAIM', 'SCHEMA_MISSING'
-  ];
-  
-  // Check if all tags have required fields
-  return tags.every(tag => 
-    requiredTags.includes(tag.tag) &&
-    typeof tag.section === 'string' &&
-    typeof tag.rationale === 'string' &&
-    tag.rationale.split(' ').length <= 18 &&
-    typeof tag.span_hint === 'string' &&
-    typeof tag.auto_fixable === 'boolean' &&
-    typeof tag.confidence === 'number' &&
-    tag.confidence >= 0 && tag.confidence <= 1
-  );
-}
-
-// Plan 05 exports for testing compliance
-export const PLAN_05_CRITICAL_TAGS = [
-  'NO_MECHANISM', 'NO_COUNTEREXAMPLE', 'NO_TRANSFER', 'EVIDENCE_HOLE',
-  'LAW_MISSTATE', 'DOMAIN_MIXING', 'CONTEXT_DEGRADED', 'CTA_MISMATCH',
-  'ORPHAN_CLAIM', 'SCHEMA_MISSING'
-];
-
-export const PLAN_05_AUTO_FIXABLE_TAGS = [
-  'NO_MECHANISM', 'SCHEMA_MISSING', 'NO_TRANSFER', 'NO_COUNTEREXAMPLE'
-];

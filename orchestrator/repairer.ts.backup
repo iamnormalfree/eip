@@ -1,0 +1,255 @@
+// ABOUTME: Diff-bounded repairer with targeted fixes
+// ABOUTME: Applies minimal, focused repairs based on audit tags
+
+type RepairInput = { 
+  draft: string; 
+  audit: { 
+    tags: Array<{ 
+      tag: string; 
+      severity: string; 
+      section?: string; 
+      suggestion?: string;
+      auto_fixable: boolean;
+      confidence: number;
+    }>;
+    content_analysis?: any;
+    pattern_analysis?: any;
+  };
+};
+
+interface RepairResult {
+  repaired_draft: string;
+  fixes_applied: Array<{
+    tag: string;
+    action: string;
+    changes_made: number;
+    confidence: number;
+  }>;
+  repair_summary: {
+    total_fixes: number;
+    sections_modified: string[];
+    overall_improvement: number;
+  };
+}
+
+interface DiffBound {
+  max_additions: number;
+  max_deletions: number;
+  max_modifications: number;
+}
+
+class DiffBoundedRepairer {
+  private diffBounds: DiffBound;
+
+  constructor(bounds?: Partial<DiffBound>) {
+    this.diffBounds = {
+      max_additions: bounds?.max_additions || 200,
+      max_deletions: bounds?.max_deletions || 100,
+      max_modifications: bounds?.max_modifications || 150
+    };
+  }
+
+  async repairDraft(input: RepairInput): Promise<RepairResult> {
+    console.log('Repairer: Starting diff-bounded repair process');
+    
+    const originalDraft = input.draft;
+    let repairedDraft = originalDraft;
+    const fixesApplied: RepairResult['fixes_applied'] = [];
+    const sectionsModified = new Set<string>();
+
+    // Process tags in priority order
+    const prioritizedTags = this.prioritizeTags(input.audit.tags);
+    
+    for (const tag of prioritizedTags) {
+      if (tag.auto_fixable && tag.confidence > 0.5) {
+        const fixResult = await this.applyFix(repairedDraft, tag);
+        
+        if (fixResult.changes_made > 0) {
+          repairedDraft = fixResult.repaired_content;
+          fixesApplied.push({
+            tag: tag.tag,
+            action: fixResult.action_description,
+            changes_made: fixResult.changes_made,
+            confidence: tag.confidence
+          });
+          
+          if (tag.section) {
+            sectionsModified.add(tag.section);
+          }
+          
+          // Check diff bounds
+          if (!this.withinDiffBounds(originalDraft, repairedDraft)) {
+            console.log('Repairer: Diff bounds reached, stopping repairs');
+            break;
+          }
+        }
+      }
+    }
+
+    const improvement = this.calculateImprovement(originalDraft, repairedDraft, input.audit.tags);
+    
+    const repairSummary: RepairResult['repair_summary'] = {
+      total_fixes: fixesApplied.length,
+      sections_modified: Array.from(sectionsModified),
+      overall_improvement: improvement
+    };
+
+    console.log('Repairer: Repair complete', repairSummary);
+    
+    return {
+      repaired_draft: repairedDraft,
+      fixes_applied: fixesApplied,
+      repair_summary: repairSummary
+    };
+  }
+
+  private prioritizeTags(tags: RepairInput['audit']['tags']): RepairInput['audit']['tags'] {
+    const severityOrder = { error: 3, warning: 2, info: 1 };
+    
+    return tags
+      .filter(tag => tag.auto_fixable)
+      .sort((a, b) => {
+        const aSeverity = severityOrder[a.severity as keyof typeof severityOrder] || 0;
+        const bSeverity = severityOrder[b.severity as keyof typeof severityOrder] || 0;
+        
+        if (aSeverity !== bSeverity) {
+          return bSeverity - aSeverity;
+        }
+        
+        return b.confidence - a.confidence;
+      });
+  }
+
+  private async applyFix(content: string, tag: RepairInput['audit']['tags'][0]): Promise<{
+    repaired_content: string;
+    action_description: string;
+    changes_made: number;
+  }> {
+    switch (tag.tag) {
+      case 'NO_MECHANISM':
+        return this.addMechanism(content);
+      case 'NO_COUNTEREXAMPLE':
+        return this.addCounterexample(content);
+      case 'NO_TRANSFER':
+        return this.addTransfer(content);
+      case 'SCHEMA_MISSING':
+        return this.addSchema(content);
+      // Non-auto-fixable tags (require human intervention):
+      case 'EVIDENCE_HOLE':
+      case 'LAW_MISSTATE':
+      case 'DOMAIN_MIXING':
+      case 'CONTEXT_DEGRADED':
+      case 'CTA_MISMATCH':
+      case 'ORPHAN_CLAIM':
+      default:
+        return {
+          repaired_content: content,
+          action_description: 'No auto-fix available for ' + tag.tag + ' (requires human review)',
+          changes_made: 0
+        };
+    }
+  }
+
+  // Plan 05: Diff-bounded fixes - ±3 sentences maximum
+
+  private addSchema(content: string): { repaired_content: string; action_description: string; changes_made: number } {
+    // Check if content already has structure
+    if (/^#{1,3}\s+/m.test(content)) {
+      return { repaired_content: content, action_description: 'Schema already present', changes_made: 0 };
+    }
+
+    // Add minimal structure (diff-bounded)
+    const withSchema = `# Overview\n\n${content.trim()}\n\n## Key Points\n\n## Application`;
+
+    return {
+      repaired_content: withSchema,
+      action_description: 'Added basic schema structure',
+      changes_made: 3 // Minimal additions
+    };
+  }
+
+  private addMechanism(content: string): { repaired_content: string; action_description: string; changes_made: number } {
+    // Check if mechanism already exists
+    if (/mechanism|how.*work|process/i.test(content)) {
+      return { repaired_content: content, action_description: 'Mechanism already present', changes_made: 0 };
+    }
+
+    // Add minimal mechanism explanation (diff-bounded)
+    const mechanismText = '\n\n## How It Works\n\nThis operates through a systematic process. First, it evaluates the current state. Then it applies specific procedures to achieve desired outcomes.';
+
+    return {
+      repaired_content: content + mechanismText,
+      action_description: 'Added mechanism explanation',
+      changes_made: 3 // 3 sentences maximum
+    };
+  }
+
+  private addCounterexample(content: string): { repaired_content: string; action_description: string; changes_made: number } {
+    // Check if counterexamples already exist
+    if (/counterexample|fail|limitation|exception/i.test(content)) {
+      return { repaired_content: content, action_description: 'Counterexample already present', changes_made: 0 };
+    }
+
+    // Add minimal counterexample (diff-bounded)
+    const counterexampleText = '\n\n## Limitations\n\nThis approach may not work in highly complex scenarios. For example, it might fail when dealing with ambiguous requirements.';
+
+    return {
+      repaired_content: content + counterexampleText,
+      action_description: 'Added counterexample',
+      changes_made: 3 // 3 sentences maximum
+    };
+  }
+
+  private addTransfer(content: string): { repaired_content: string; action_description: string; changes_made: number } {
+    // Check if transfer examples already exist
+    if (/transfer|apply.*to|different.*context/i.test(content)) {
+      return { repaired_content: content, action_description: 'Transfer examples already present', changes_made: 0 };
+    }
+
+    // Add minimal transfer example (diff-bounded)
+    const transferText = '\n\n## Applications\n\nThis can be applied to different contexts. For instance, the same principles work in educational settings and business environments.';
+
+    return {
+      repaired_content: content + transferText,
+      action_description: 'Added transfer examples',
+      changes_made: 3 // 3 sentences maximum
+    };
+  }
+
+  private withinDiffBounds(original: string, repaired: string): boolean {
+    const originalLines = original.split('\n');
+    const repairedLines = repaired.split('\n');
+    
+    const additions = Math.max(0, repairedLines.length - originalLines.length);
+    const deletions = Math.max(0, originalLines.length - repairedLines.length);
+    const modifications = Math.min(originalLines.length, repairedLines.length);
+    
+    return additions <= this.diffBounds.max_additions &&
+           deletions <= this.diffBounds.max_deletions &&
+           modifications <= this.diffBounds.max_modifications;
+  }
+
+  private calculateImprovement(original: string, repaired: string, tags: RepairInput['audit']['tags']): number {
+    // Simple improvement calculation based on fixes applied vs. issues detected
+    const totalIssues = tags.length;
+    const fixableIssues = tags.filter(tag => tag.auto_fixable).length;
+    const estimatedFixes = (repaired.length - original.length) / 50; // Rough estimate
+    
+    return Math.min(100, Math.round((estimatedFixes / fixableIssues) * 100));
+  }
+}
+
+export async function repairDraft(input: RepairInput): Promise<string> {
+  console.log('Repairer: Processing draft with', input.audit.tags.length, 'audit tags');
+  
+  const repairer = new DiffBoundedRepairer();
+  const result = await repairer.repairDraft(input);
+  
+  console.log('Repairer: Applied', result.repair_summary.total_fixes, 'fixes');
+  
+  return result.repaired_draft;
+}
+
+// Additional exports for advanced usage
+export { DiffBoundedRepairer, type RepairResult, type DiffBound };
+export { calculateRepairPriority, suggestAutoFixes } from './auditor';

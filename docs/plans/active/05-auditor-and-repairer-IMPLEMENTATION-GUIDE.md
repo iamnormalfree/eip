@@ -27,7 +27,7 @@ We generate educational content using "Educational IPs" - reusable thinking patt
 ## 🔧 TECHNICAL CONTEXT
 
 ### **Toolchain You'll Use:**
-- **OpenAI API** - Already configured in `lib_supabase/ai/`
+- **Pattern-Based Detection** - No AI calls required - uses regex pattern matching
 - **Jest** - Testing framework (see `jest.config.js`)
 - **TypeScript** - Strong typing required
 - **YAML** - IP definitions stored in YAML format
@@ -89,20 +89,39 @@ npm test tests/orchestrator/auditor.test.ts
 ```typescript
 // Add this function to auditor.ts
 async function detectCriticalTags(draft: string, ip: string): Promise<QualityTag[]> {
-  const prompt = `
-You are a content quality auditor. Check this educational content for CRITICAL flaws only.
+  // NO AI calls - uses pattern-based detection
+  const tags: QualityTag[] = [];
 
-IP: ${ip}
-Content: ${draft}
+  for (const tagDef of CRITICAL_TAGS) {
+    let shouldTag = false;
 
-Return JSON with these tags ONLY: ${CRITICAL_TAGS.join(', ')}
-For each tag found: {tag, section, rationale: max 18 words, span_hint}
+    // Pattern-based detection logic - no AI required
+    if (tagDef.is_absence_tag) {
+      // For absence tags, detect when NONE of the patterns are found
+      shouldTag = !tagDef.patterns.some(pattern => pattern.test(draft));
+    } else {
+      // For presence tags, detect when ANY of the patterns are found
+      shouldTag = tagDef.patterns.some(pattern => pattern.test(draft));
+    }
 
-NO REWRITES. Only tag detection.
-`;
+    if (shouldTag) {
+      const confidence = calculateTagConfidence(draft, tagDef, shouldTag);
+      const spanHint = generateSpanHint(draft, tagDef.tag);
 
-  const result = await callOpenAI(prompt);
-  return parseAIResponse(result); // Your parsing logic
+      tags.push({
+        tag: tagDef.tag,
+        severity: tagDef.severity,
+        section: detectTagSection(draft, tagDef.tag),
+        rationale: tagDef.rationale,
+        suggestion: tagDef.suggestion,
+        confidence,
+        auto_fixable: isAutoFixable(tagDef.tag),
+        span_hint: spanHint
+      });
+    }
+  }
+
+  return tags;
 }
 ```
 
