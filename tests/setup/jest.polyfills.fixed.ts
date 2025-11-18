@@ -1,17 +1,16 @@
 // ABOUTME: Simplified Node.js polyfills for Jest test environment
 // ABOUTME: Must run before any modules that require these globals
 
-// Only add polyfills when not in browser/jsdom environment
-if (typeof global !== 'undefined' && typeof window === 'undefined') {
-  // setImmediate polyfill for Winston logger compatibility
-  if (typeof global.setImmediate === 'undefined') {
-    global.setImmediate = setImmediate;
-  }
+// setImmediate polyfill for jsdom environment
+if (typeof global.setImmediate === 'undefined') {
+  global.setImmediate = (callback: (...args: any[]) => void, ...args: any[]) => {
+    return setTimeout(() => callback(...args), 0);
+  };
+}
 
-  // Essential clearImmediate polyfill
-  if (typeof global.clearImmediate === 'undefined') {
-    global.clearImmediate = clearImmediate;
-  }
+// clearImmediate polyfill
+if (typeof global.clearImmediate === 'undefined') {
+  global.clearImmediate = (id: any) => clearTimeout(id);
 }
 
 // Ensure process exists (needed for many modules)

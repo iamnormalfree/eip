@@ -1,0 +1,46 @@
+# ABOUTME: Singapore Mortgage Compliance Rules for EIP
+# ABOUTME: Ensures generated mortgage educational content complies with Singapore regulations
+
+domain: singapore-mortgage
+allow_list_domains:
+  - mas.gov.sg
+  - hra.gov.sg
+  - iras.gov.sg
+  - hdb.gov.sg
+
+rule_atoms:
+  financial_disclaimer_required:
+    condition: content_mentions_specific_loan_amounts_or_rates
+    action: include_disclaimer
+    template: "Disclaimer: This is for educational purposes only. Please consult with a qualified financial advisor or bank for personalized advice."
+    priority: critical
+
+  mas_reference_validation:
+    condition: references_mas_regulations
+    action: validate_source
+    valid_sources:
+      - "https://www.mas.gov.sg/"
+    priority: critical
+
+  tdsr_explanation_required:
+    condition: mentions_loan_calculations
+    action: include_tdsr_explanation
+    template: "Note: Total Debt Servicing Ratio (TDSR) limits monthly debt payments to 55% of gross monthly income."
+    priority: high
+
+  risk_warnings:
+    condition: discusses_mortgage_risks
+    action: include_risk_warning
+    template: "Risk Warning: Property values can fluctuate. Consider market risks, interest rate changes, and personal financial stability."
+    priority: medium
+
+  no_specific_financial_advice:
+    condition: content_contains_recommendations
+    action: ensure_educational_tone
+    template: "Educational Context: This information helps you understand mortgage calculations better."
+    priority: high
+
+required_disclaimers:
+  - "Content is educational only, not financial advice"
+  - "Consult qualified professionals for personal decisions"
+  - "Regulations may change; check official sources"

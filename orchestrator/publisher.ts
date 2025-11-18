@@ -25,6 +25,7 @@ type PublishInput = {
     funnel?: string;
     tier?: string;
     correlation_id?: string;
+    processing_mode?: string;
   };
 };
 

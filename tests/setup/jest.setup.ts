@@ -1,8 +1,17 @@
 // ABOUTME: Global Jest setup for EIP test infrastructure
 // ABOUTME: Configures test environment, mocks, and utilities
 
+// Import Jest globals for setup files
+import '@jest/globals';
+
+// Import global Jest DOM type overrides
+import '../../types/jest.d.ts';
+
 // Extend Jest matchers with testing-library matchers
 import '@testing-library/jest-dom';
+
+// Import MockFactory setup for centralized mock management
+import './mock-factory.setup';
 
 // Mock console methods to reduce test noise
 const originalConsole = global.console;
@@ -22,7 +31,7 @@ afterAll(() => {
 });
 
 // Set test environment variables
-process.env.NODE_ENV = 'test';
+(process.env as any).NODE_ENV = 'test';
 process.env.EIP_TEST_MODE = 'steel_thread';
 process.env.EIP_MOCK_EXTERNAL_SERVICES = 'true';
 
@@ -39,7 +48,7 @@ beforeAll(() => {
   process.env.LOG_LEVEL = 'error';
 });
 
-// Mock problematic ES modules
+// Mock problematic ES modules - replaced with MockFactory approach
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'mock-uuid-v4-1234'),
   v1: jest.fn(() => 'mock-uuid-v1-1234'),
@@ -86,9 +95,9 @@ jest.mock('ioredis', () => ({
 // Global test timeout handling
 jest.setTimeout(30000);
 
-// Cleanup after each test
+// Cleanup after each test - MockFactory handles mock clearing
 afterEach(() => {
   jest.clearAllTimers();
   jest.useRealTimers();
-  jest.clearAllMocks();
+  // Note: jest.clearAllMocks() is handled by mockFactory.reset()
 });

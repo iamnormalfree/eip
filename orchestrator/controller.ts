@@ -24,6 +24,14 @@ import {
   logError,
   getLogger
 } from './logger';
+import {
+  recordPipelineStart,
+  recordPipelineCompletion,
+  recordQueueOperation,
+  recordBudgetViolation,
+  recordComplianceCheck,
+  updateErrorRate
+} from './monitoring';
 
 type Brief = {
   brief: string;
@@ -55,7 +63,7 @@ interface PipelineContext {
  * - sequential_integration: Maintain existing direct execution for compatibility
  * - contract::final::queue_system_to_all_domains
  */
-async function runOnce(input: Brief): Promise<{ success: boolean; artifact?: any; error?: string; queue_job_id?: string }> {
+async function runOnce(input: Brief): Promise<{ success: boolean; artifact?: any; error?: string; queue_job_id?: string; dlq?: any; correlation_id?: string }> {
   // Check if queue mode is enabled or forced
   // Explicit false takes precedence over environment variable
   const queueMode = input.queue_mode === false
@@ -126,6 +134,10 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
     });
 
     if (queueResult.success) {
+      // Record successful queue operation for monitoring
+      recordQueueOperation('submit', 'success');
+      recordPipelineCompletion(tier, 'queue_first', 'success', 0, 0);
+
       logQueueSubmission(correlationId, queueResult.jobId, {
         tier,
         priority: tier === 'HEAVY' ? 1 : tier === 'MEDIUM' ? 3 : 5,
@@ -155,15 +167,29 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
         }
       };
     } else {
+      // Record failed queue operation for monitoring
+      recordQueueOperation('submit', 'failure');
+
       logError(correlationId, new Error(`Queue submission failed: ${queueResult.error}`), {
         stage: 'queue_submission',
         queue_error: queueResult.error
       });
 
-      // Fallback to direct execution if queue submission fails
-      getLogger().info('Queue submission failed, falling back to direct execution', {
+      // Fallback to direct execution if queue submission fails (unless in test mode)
+      const isTestMode = process.env.EIP_TEST_MODE === "steel_thread";
+      if (isTestMode) {
+        // In test mode, return failure instead of falling back to direct execution
+        endCorrelation(correlationId);
+        return {
+          success: false,
+          error: `Queue submission failed: ${queueResult.error}`,
+          queue_job_id: undefined
+        };
+      }
+      
+      getLogger().info("Queue submission failed, falling back to direct execution", {
         correlationId,
-        event: 'fallback_to_direct'
+        event: "fallback_to_direct"
       });
 
       endCorrelation(correlationId);
@@ -176,11 +202,22 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
       error_type: error instanceof Error ? error.constructor.name : 'Unknown'
     });
 
-    // Fallback to direct execution on queue processing exceptions
-    getLogger().info('Queue processing failed, falling back to direct execution', {
+    // Fallback to direct execution on queue processing exceptions (unless in test mode)
+    const isTestMode = process.env.EIP_TEST_MODE === "steel_thread";
+    if (isTestMode) {
+      // In test mode, return failure instead of falling back to direct execution
+      endCorrelation(correlationId);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown queue processing error",
+        queue_job_id: undefined
+      };
+    }
+    
+    getLogger().info("Queue processing failed, falling back to direct execution", {
       correlationId,
-      event: 'fallback_to_direct',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      event: "fallback_to_direct",
+      error: error instanceof Error ? error.message : "Unknown error"
     });
 
     endCorrelation(correlationId);
@@ -196,7 +233,7 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
  * - Fallback when queue system is unavailable
  * - Local development and testing
  */
-async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?: any; error?: string }> {
+async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?: any; error?: string; dlq?: any; correlation_id?: string }> {
   // Initialize budget enforcement and database (optional)
   const tier = input.tier || 'MEDIUM';
   const budget = new BudgetEnforcer(tier);
@@ -211,6 +248,9 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
     userId: undefined,
     startTime: Date.now()
   });
+
+  // Record pipeline start for monitoring
+  recordPipelineStart(tier, 'direct_execution');
 
   try {
     db = new OrchestratorDB();
@@ -413,7 +453,7 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
       tokensUsed: 30,
       budgetRemaining: budget.getBudget().auditor ? budget.getBudget().auditor! - 30 : 0,
       auditTags: audit.tags?.length || 0,
-      auditScore: audit.score
+      auditScore: audit.overall_score
     });
 
     const auditBudgetCheck = budget.checkStageBudget('auditor');
@@ -490,11 +530,11 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
       tokensUsed: 0, // Final audit doesn't consume additional budget
       budgetRemaining: budget.getBudget().review || 0,
       finalAuditTags: finalAudit.tags?.length || 0,
-      finalAuditScore: finalAudit.score
+      finalAuditScore: finalAudit.overall_score
     });
     
     // Stage 7: Publishing
-    logStageStart(correlationId, 'publisher', {
+    logStageStart(correlationId, 'review', {
       artifact_length: repaired.length,
       final_audit_tags: finalAudit.tags?.length || 0
     });
@@ -516,7 +556,7 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
     });
 
     const publishDuration = Date.now() - publishStartTime;
-    logStageComplete(correlationId, 'publisher', {
+    logStageComplete(correlationId, 'review', {
       stageDuration: publishDuration,
       tokensUsed: 0, // Publishing doesn't consume additional budget
       budgetRemaining: 0,
@@ -647,6 +687,9 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
       }
     };
 
+    // Record successful pipeline completion for monitoring
+    recordPipelineCompletion(tier, 'direct_execution', 'success', totalDuration, tracker.tokens_used);
+
   } catch (error) {
     const errorObj = error instanceof Error ? error : new Error('Unknown error');
     logError(correlationId, errorObj, {
@@ -659,6 +702,13 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
     // Check if this is a budget breach
     if (budget.shouldFailToDLQ()) {
       const dlqRecord = budget.createDLQRecord();
+
+      // Record budget violation for monitoring
+      const breaches = budget.getBreaches();
+      breaches.forEach((breach: any) => {
+        recordBudgetViolation(tier, breach.stage || 'unknown', breach.type || 'unknown');
+      });
+
       logDLQRouting(correlationId, dlqRecord);
       logCircuitBreaker(correlationId, 'triggered', 'Budget breach detected');
 
@@ -724,6 +774,12 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
       processing_mode: 'direct_execution',
       event: 'job_failure'
     });
+
+    // Record failed pipeline completion for monitoring
+    const errorDuration = Date.now() - budget.getTracker().start_time;
+    const errorTokens = budget.getTracker().tokens_used;
+    recordPipelineCompletion(tier, 'direct_execution', 'failure', errorDuration, errorTokens);
+    updateErrorRate('pipeline_execution', 1); // Record error rate spike
 
     endCorrelation(correlationId);
 

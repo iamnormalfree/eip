@@ -1,0 +1,48 @@
+# ABOUTME: Singapore Mortgage Calculator Educational IP
+# ABOUTME: Generates comprehensive educational content about Singapore mortgage calculations and MAS guidelines
+
+ip_id: calculator@1.0.0
+ip_type: Calculator
+ip_name: Singapore Mortgage Calculator Explained
+purpose: Generate comprehensive educational content about Singapore mortgage calculations, TDSR, MSR, and MAS guidelines
+
+operators:
+  - FinancialConceptExplainer
+  - StepByStepGuide
+  - ExampleCalculator
+  - ComplianceHighlighter
+  - RiskAssessmentFramework
+  - ComparisonAnalysis
+
+invariants:
+  required:
+    - MAS compliance references
+    - Calculation methodology explanation
+    - Step-by-step examples
+    - Risk warnings and disclaimers
+    - Interactive calculator demonstration
+  recommended:
+    - Comparison of loan types
+    - Real case studies
+    - FAQ section
+    - Additional resources
+
+sections:
+  - Overview & Purpose
+  - Key Singapore Mortgage Regulations
+  - Calculation Methods Step-by-Step
+  - Interactive Examples
+  - Risk Assessment & Considerations
+  - Frequently Asked Questions
+  - Resources & Tools
+
+repair_moves:
+  add_mas_reference:
+    description: "Add MAS regulatory reference with source link"
+    template: "Source: MAS [{regulation}](https://www.mas.gov.sg/{path})"
+  include_disclaimer:
+    description: "Add financial advice disclaimer"
+    template: "Disclaimer: This content is for educational purposes only and does not constitute financial advice"
+  add_example_calculation:
+    description: "Add step-by-step calculation example"
+    template: "Example: Property Price $X → Maximum Loan $Y (LTV Z%) → Monthly Payment $A"
