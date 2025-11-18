@@ -337,7 +337,7 @@ Approval or denial notification.`;
       autoFixes.forEach(fix => {
         expect(fix).toHaveProperty('type');
         expect(fix).toHaveProperty('suggestion');
-        expect(['NO_STRUCTURE', 'NO_EXAMPLES', 'TOKEN_PADDING', 'INSUFFICIENT_CONTENT']).toContain(fix.type);
+        expect(['NO_STRUCTURE', 'NO_EXAMPLES', 'NO_MECHANISM', 'NO_COUNTEREXAMPLE', 'NO_TRANSFER', 'SCHEMA_MISSING', 'TOKEN_PADDING', 'INSUFFICIENT_CONTENT']).toContain(fix.type);
       });
     });
   });
