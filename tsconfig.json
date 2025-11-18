@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2015",
-    "lib": ["dom", "dom.iterable", "es2015"],
+    "target": "es2018",
+    "lib": ["dom", "dom.iterable", "es2018"],
     "allowJs": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
@@ -23,8 +23,36 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "forceConsistentCasingInFileNames": true,
+    "moduleDetection": "force"
   },
-  "include": ["next-env.d.ts", "db/sql-executor.ts", "db/setup.ts", "db/seed.ts", "db/schema.sql", "db/seed_registries.sql", "lib_supabase/db/types/database.types.ts", "lib_supabase/db/supabase-client.ts", "ip-validation/schemas.ts", ".next/types/**/*.ts", "types/global.d.ts"],
-  "exclude": ["node_modules", "scripts/**/*.ts", "scripts/**/*.mjs", "test-*.ts", "*.test.ts", "**/*.test.tsx", "**/__tests__/**/*", "tests/**/*", "components/forms/archive/**/*", "plugins.disabled/**/*", "components/archive/**/*", "lib_supabase/integrations/**/*"]
+  "include": [
+    "next-env.d.ts", 
+    "db/sql-executor.ts", 
+    "db/setup.ts", 
+    "db/seed.ts", 
+    "db/schema.sql", 
+    "db/seed_registries.sql", 
+    "lib_supabase/db/types/database.types.ts", 
+    "lib_supabase/db/supabase-client.ts", 
+    "ip-validation/schemas.ts", 
+    ".next/types/**/*.ts", 
+    "types/global.d.ts",
+    "types/jest.d.ts"
+  ],
+  "exclude": [
+    "node_modules", 
+    "scripts/**/*.ts", 
+    "scripts/**/*.mjs", 
+    "test-*.ts", 
+    "*.test.ts", 
+    "**/*.test.tsx", 
+    "**/__tests__/**/*", 
+    "tests/**/*", 
+    "components/forms/archive/**/*", 
+    "plugins.disabled/**/*", 
+    "components/archive/**/*", 
+    "lib_supabase/integrations/**/*"
+  ]
 }

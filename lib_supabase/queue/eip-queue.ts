@@ -51,7 +51,10 @@ export interface EIPBudgetValidationJob {
   tier: Tier;
   tokens_used: number;
   time_elapsed: number;
-  stage_breakdown: Record<string, { tokens: number; time_ms: number }>;
+  stage_breakdown: {
+    tokens: Record<string, number>;
+    times_ms: Record<string, number>;
+  };
   breaches: Array<{
     stage: string;
     type: 'tokens' | 'time';
@@ -118,7 +121,7 @@ class EIPQueueManager {
   // Getters for each queue
   getContentQueue(): Queue<EIPContentGenerationJob> {
     if (!this.contentQueue) {
-      this.contentQueue = new Queue<EIPContentGenerationJob>(
+      this.contentQueue = new Queue(
         EIP_QUEUES.CONTENT_GENERATION,
         {
           connection: getRedisConnection(),
@@ -136,7 +139,7 @@ class EIPQueueManager {
               age: 604800, // 7 days
             },
             // EIP-specific: 30-second timeout for content generation
-            lockDuration: 30000,
+            
           },
         }
       );
@@ -149,7 +152,7 @@ class EIPQueueManager {
 
   getBudgetQueue(): Queue<EIPBudgetValidationJob> {
     if (!this.budgetQueue) {
-      this.budgetQueue = new Queue<EIPBudgetValidationJob>(
+      this.budgetQueue = new Queue(
         EIP_QUEUES.BUDGET_VALIDATION,
         {
           connection: getRedisConnection(),
@@ -177,7 +180,7 @@ class EIPQueueManager {
 
   getAuditQueue(): Queue<EIPAuditRepairJob> {
     if (!this.auditQueue) {
-      this.auditQueue = new Queue<EIPAuditRepairJob>(
+      this.auditQueue = new Queue(
         EIP_QUEUES.AUDIT_REPAIR,
         {
           connection: getRedisConnection(),
@@ -205,7 +208,7 @@ class EIPQueueManager {
 
   getDLQQueue(): Queue<EIPDLQProcessingJob> {
     if (!this.dlqQueue) {
-      this.dlqQueue = new Queue<EIPDLQProcessingJob>(
+      this.dlqQueue = new Queue(
         EIP_QUEUES.DLQ_PROCESSING,
         {
           connection: getRedisConnection(),

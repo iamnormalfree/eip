@@ -162,9 +162,8 @@ export class PerformanceTester {
       metrics.push({
         duration,
         memoryUsage: endMemory.heapUsed - startMemory.heapUsed,
-        success,
-        error
-      });
+        success
+      } as any); // Type assertion for test utility
     }
 
     const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
@@ -425,7 +424,7 @@ ${testResults.filter(r => !r.success).map(r => `- ${r.error || 'Unknown error'}`
 export const setupEipTestEnvironment = () => {
   // Set test environment variables
   process.env.EIP_TEST_MODE = 'steel_thread';
-  process.env.NODE_ENV = 'test';
+  (process.env as any).NODE_ENV = 'test';
   
   // Mock console methods to reduce noise
   const originalConsole = global.console;

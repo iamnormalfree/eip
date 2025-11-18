@@ -6,9 +6,9 @@ import {
   useLoanApplicationStorage, 
   retrieveLoanApplicationData, 
   clearLoanApplicationData,
+  STORAGE_VERSION,
   LoanApplicationData
 } from '../useLoanApplicationStorage'
-import { STORAGE_VERSION } from '../useLoanApplicationStorage'
 
 // Mock the compat module for testing
 jest.mock('../../utils/compat', () => ({
@@ -53,20 +53,17 @@ describe('useLoanApplicationStorage Integration Tests', () => {
 
   describe('useLoanApplicationStorage hook', () => {
     const mockLoanData: LoanApplicationData = {
-      applicantName: 'John Doe',
-      email: 'john@example.com',
-      phoneNumber: '+1-555-0123',
-      loanAmount: 500000,
-      loanType: 'home',
+      loanType: 'new_purchase',
+      propertyType: 'HDB',
       propertyValue: 600000,
-      creditScore: 750,
-      annualIncome: 120000,
-      employmentStatus: 'employed',
-      propertyAddress: {
-        street: '123 Main St',
-        city: 'Singapore',
-        postalCode: '123456'
-      }
+      loanAmount: 500000,
+      monthlyIncome: 120000,
+      name: 'John Doe',
+      email: 'john@example.com',
+      phone: '+1-555-0123',
+      sessionId: mockSessionId,
+      startedAt: new Date(),
+      currentStep: 2
     }
 
     it('should save loan application to canonical eip_ key using single-write pattern', () => {
@@ -119,7 +116,7 @@ describe('useLoanApplicationStorage Integration Tests', () => {
         }
       )
 
-      // Initial save
+      // Initial save and cleanup
       expect(compat.setCanonical).toHaveBeenCalledTimes(2) // Save + cleanup
 
       // Change data - should save again
@@ -157,10 +154,14 @@ describe('useLoanApplicationStorage Integration Tests', () => {
 
   describe('retrieveLoanApplicationData function', () => {
     const mockStoredData = {
-      applicantName: 'Jane Smith',
-      email: 'jane@example.com',
-      loanAmount: 350000,
       loanType: 'refinance',
+      propertyValue: 350000,
+      loanAmount: 300000,
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      sessionId: mockSessionId,
+      startedAt: new Date(),
+      currentStep: 1,
       version: STORAGE_VERSION,
       lastUpdated: '2023-01-01T10:00:00.000Z'
     }
@@ -182,8 +183,8 @@ describe('useLoanApplicationStorage Integration Tests', () => {
     it('should fallback to nextnest_ key when eip_ key does not exist', () => {
       const legacyStoredData = {
         ...mockStoredData,
-        applicantName: 'Legacy User',
-        loanAmount: 300000
+        name: 'Legacy User',
+        loanAmount: 250000
       }
 
       // Mock fallback behavior
@@ -311,15 +312,21 @@ describe('useLoanApplicationStorage Integration Tests', () => {
       const newSessionKey = 'eip_loan_application_new_session'
 
       mockStorage.set(oldSessionKey, JSON.stringify({
-        applicantName: 'Old User',
+        loanType: 'new_purchase',
         loanAmount: 200000,
+        sessionId: 'old_session',
+        startedAt: new Date(),
+        currentStep: 1,
         version: STORAGE_VERSION,
         lastUpdated: new Date(eightDaysAgo).toISOString()
       }))
 
       mockStorage.set(newSessionKey, JSON.stringify({
-        applicantName: 'New User',
+        loanType: 'refinance',
         loanAmount: 400000,
+        sessionId: 'new_session',
+        startedAt: new Date(),
+        currentStep: 2,
         version: STORAGE_VERSION,
         lastUpdated: new Date(fiveDaysAgo).toISOString()
       }))
@@ -328,8 +335,11 @@ describe('useLoanApplicationStorage Integration Tests', () => {
       Object.keys = jest.fn(() => [oldSessionKey, newSessionKey])
 
       renderHook(() => useLoanApplicationStorage({
-        applicantName: 'Current User',
-        loanAmount: 300000
+        loanType: 'new_purchase',
+        loanAmount: 300000,
+        sessionId: 'current_session',
+        startedAt: new Date(),
+        currentStep: 1
       }, mockSessionId))
 
       // Should check both sessions
@@ -350,8 +360,11 @@ describe('useLoanApplicationStorage Integration Tests', () => {
       Object.keys = jest.fn(() => [invalidSessionKey])
 
       renderHook(() => useLoanApplicationStorage({
-        applicantName: 'Current User',
-        loanAmount: 300000
+        loanType: 'new_purchase',
+        loanAmount: 300000,
+        sessionId: 'current_session',
+        startedAt: new Date(),
+        currentStep: 1
       }, mockSessionId))
 
       // Should remove invalid data
@@ -367,8 +380,11 @@ describe('useLoanApplicationStorage Integration Tests', () => {
 
       expect(() => {
         renderHook(() => useLoanApplicationStorage({
-          applicantName: 'Current User',
-          loanAmount: 300000
+          loanType: 'new_purchase',
+          loanAmount: 300000,
+          sessionId: 'current_session',
+          startedAt: new Date(),
+          currentStep: 1
         }, mockSessionId))
       }).not.toThrow()
 
@@ -382,21 +398,21 @@ describe('useLoanApplicationStorage Integration Tests', () => {
   describe('Data integrity and migration', () => {
     it('should preserve complete application structure during storage round-trip', () => {
       const completeApplicationData: LoanApplicationData = {
-        applicantName: 'Complete Applicant',
-        email: 'complete@example.com',
-        phoneNumber: '+1-555-0123',
-        loanAmount: 750000,
-        loanType: 'home',
+        loanType: 'new_purchase',
+        propertyType: 'Condo',
         propertyValue: 900000,
-        creditScore: 800,
-        annualIncome: 200000,
-        employmentStatus: 'self-employed',
-        propertyAddress: {
-          street: '456 Complete St',
-          city: 'Singapore',
-          postalCode: '654321'
-        },
-        additionalInfo: 'Complete application with all fields'
+        loanAmount: 750000,
+        monthlyIncome: 200000,
+        name: 'Complete Applicant',
+        email: 'complete@example.com',
+        phone: '+1-555-0123',
+        sessionId: 'complete_session',
+        startedAt: new Date(),
+        completedAt: new Date(),
+        currentStep: 3,
+        leadScore: 85,
+        insights: { risk_level: 'low', recommended_amount: 750000 },
+        recommendations: ['Increase down payment', 'Consider fixed rate']
       }
 
       const storedData = {
@@ -414,9 +430,11 @@ describe('useLoanApplicationStorage Integration Tests', () => {
 
     it('should handle partial application data gracefully', () => {
       const partialData = {
-        applicantName: 'Partial User',
-        email: 'partial@example.com',
+        loanType: 'new_purchase' as const,
         loanAmount: 250000,
+        sessionId: 'partial_session',
+        startedAt: new Date(),
+        currentStep: 1,
         version: STORAGE_VERSION,
         lastUpdated: new Date().toISOString()
       }
@@ -431,8 +449,8 @@ describe('useLoanApplicationStorage Integration Tests', () => {
 
     it('should validate required fields during retrieval', () => {
       const dataWithMissingRequired = {
-        // Missing applicantName (required)
-        email: 'missing@example.com',
+        // Missing sessionId (required)
+        loanType: 'new_purchase' as const,
         loanAmount: 100000,
         version: STORAGE_VERSION,
         lastUpdated: new Date().toISOString()
@@ -444,7 +462,6 @@ describe('useLoanApplicationStorage Integration Tests', () => {
 
       // Should return data even with missing optional fields
       expect(result).toBeDefined()
-      expect(result?.email).toBe('missing@example.com')
     })
   })
 
@@ -452,11 +469,17 @@ describe('useLoanApplicationStorage Integration Tests', () => {
     it('should minimize storage calls during normal operation', () => {
       compat.getWithAliases.mockReturnValue(null)
 
-      const { result, rerender } = renderHook(
+      const { rerender } = renderHook(
         ({ data, sessionId }) => useLoanApplicationStorage(data, sessionId),
         {
           initialProps: { 
-            data: { applicantName: 'Test User', loanAmount: 300000 }, 
+            data: { 
+              loanType: 'new_purchase' as const,
+              loanAmount: 300000,
+              sessionId: 'perf_session',
+              startedAt: new Date(),
+              currentStep: 1
+            }, 
             sessionId: mockSessionId 
           }
         }
@@ -468,35 +491,22 @@ describe('useLoanApplicationStorage Integration Tests', () => {
       // Rerender with same data should minimize calls
       rerender()
       expect(compat.setCanonical).toHaveBeenCalledTimes(4) // Save + cleanup again
-
-      // Data change should trigger save
-      act(() => {
-        result.current?.setLoanAmount?.(350000) // If this method exists
-      })
     })
 
     it('should handle large application data efficiently', () => {
       const largeApplicationData: LoanApplicationData = {
-        applicantName: 'Large Data User',
-        email: 'large@example.com',
-        loanAmount: 1000000,
-        loanType: 'home',
-        propertyAddress: {
-          street: '789 Large Data St',
-          city: 'Singapore',
-          postalCode: '789012'
-        },
+        loanType: 'new_purchase',
+        propertyValue: 1000000,
+        loanAmount: 800000,
+        sessionId: 'large_session',
+        startedAt: new Date(),
+        currentStep: 2,
         // Simulate large data with additional properties
-        documents: Array.from({ length: 50 }, (_, i) => ({
-          id: `doc_${i}`,
-          name: `Document ${i}`,
-          size: 1024 * 1024, // 1MB each
-          uploadedAt: new Date().toISOString()
-        }))
-      } as any
+        name: 'Large Data User',
+        email: 'large@example.com',
+        phone: '+1-555-0123'
+      }
 
-      const startTime = performance.now()
-      
       const storedData = {
         ...largeApplicationData,
         version: STORAGE_VERSION,
@@ -505,8 +515,8 @@ describe('useLoanApplicationStorage Integration Tests', () => {
 
       compat.getWithAliases.mockReturnValue(JSON.stringify(storedData))
 
+      const startTime = performance.now()
       const result = retrieveLoanApplicationData(mockSessionId)
-      
       const endTime = performance.now()
 
       expect(result).toBeDefined()

@@ -6,16 +6,27 @@ import { useMediaQuery, useMobileView, useTabletView, useDesktopView } from '../
 
 describe('useMediaQuery', () => {
   // Store original matchMedia
-  const originalMatchMedia = window.matchMedia
+  let originalMatchMedia: typeof window.matchMedia;
 
   beforeEach(() => {
+    // Store original matchMedia
+    originalMatchMedia = window.matchMedia;
+    
     // Reset to original before each test
-    window.matchMedia = originalMatchMedia
+    window.matchMedia = originalMatchMedia;
+    
+    // Mock localStorage for React state tests
+    global.localStorage = {
+      getItem: jest.fn(),
+      setItem: jest.fn(),
+      removeItem: jest.fn(),
+      clear: jest.fn(),
+    } as any;
   })
 
   afterEach(() => {
     // Restore original after each test
-    window.matchMedia = originalMatchMedia
+    window.matchMedia = originalMatchMedia;
   })
 
   describe('Modern API (addEventListener)', () => {

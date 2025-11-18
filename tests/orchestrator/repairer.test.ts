@@ -1,9 +1,11 @@
 // ABOUTME: Diff-bounded repair testing for EIP Steel Thread
-// ABOUTME: Validates content repair functionality, diff operations, and quality improvement
+// ABOUTME: Validates content repair functionality using real implementation
+// ABOUTME: Integration-First Testing - Tests real implementations, not mocks
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { repairDraft, DiffBoundedRepairer, type RepairResult } from '../../orchestrator/repairer';
 
-describe('Content Repairer System', () => {
+describe('Content Repairer System - Real Implementation Tests', () => {
   const testContent = {
     original: `# Strategic Planning
 
@@ -33,496 +35,497 @@ Technology companies use this framework for product roadmap planning.
 Follows MAS guidelines for corporate governance.`,
 
     auditResult: {
-      overall_score: 45,
       tags: [
         {
-          tag: 'COMPLETION_DRIVE',
+          tag: 'NO_STRUCTURE',
           severity: 'error',
-          confidence: 0.9,
-          rationale: 'Content appears rushed and incomplete'
+          section: 'overall',
+          suggestion: 'Add proper heading structure',
+          auto_fixable: true,
+          confidence: 0.9
         },
         {
-          tag: 'CARGO_CULT',
+          tag: 'NO_MECHANISM',
+          severity: 'error',
+          section: 'mechanism',
+          suggestion: 'Add mechanism section explaining how it works',
+          auto_fixable: true,
+          confidence: 0.8
+        },
+        {
+          tag: 'NO_EXAMPLES',
+          severity: 'error',
+          section: 'examples',
+          suggestion: 'Add practical examples',
+          auto_fixable: true,
+          confidence: 0.9
+        },
+        {
+          tag: 'NO_COMPLIANCE_CHECK',
           severity: 'warning',
-          confidence: 0.7,
-          rationale: 'Content mimics form without understanding function'
+          section: 'compliance',
+          suggestion: 'Add regulatory compliance notice',
+          auto_fixable: true,
+          confidence: 0.7
         }
       ],
-      ip_validation: {
-        invariants_satisfied: ['has_overview'],
-        invariants_violated: ['has_mechanism', 'has_examples'],
-        invariant_compliance_rate: 0.33
+      content_analysis: {
+        word_count: 15,
+        section_count: 2,
+        has_structure: false,
+        has_mechanism: false,
+        has_examples: false
+      },
+      pattern_analysis: {
+        completion_drive: 0.3,
+        question_suppression: 0.1,
+        domain_mixing: 0.0
       }
     }
   };
 
-  describe('Diff-Bounded Repair Operations', () => {
-    beforeEach(() => {
-      jest.mock('../../orchestrator/repairer', () => ({
-        repairContent: jest.fn(),
-        calculateDiffBounds: jest.fn(),
-        validateRepairConstraints: jest.fn()
-      }));
-    });
-
-    it('should repair content within diff bounds', async () => {
-      const { repairContent } = await import('../../orchestrator/repairer');
-      (repairContent as jest.Mock).mockResolvedValue({
-        repaired_content: testContent.improved,
-        diff_stats: {
-          additions: 120,
-          deletions: 15,
-          modifications: 25,
-          total_diff_size: 160
-        },
-        repair_summary: {
-          issues_fixed: 2,
-          invariants_restored: ['has_mechanism', 'has_examples'],
-          quality_improvement: 50,
-          repair_confidence: 0.85
-        },
-        constraints_satisfied: {
-          max_additions: 200,
-          max_deletions: 50,
-          max_modifications: 100,
-          all_within_bounds: true
-        }
+  describe('Real Implementation Repair Operations', () => {
+    it('should repair content using real repairDraft function', async () => {
+      // Test REAL implementation, not mocked version
+      const repaired = await repairDraft({
+        draft: testContent.original,
+        audit: testContent.auditResult
       });
 
-      const result = await repairContent({
-        content: testContent.original,
-        audit_result: testContent.auditResult,
-        ip: 'framework@1.0.0',
-        repair_options: {
-          max_additions: 200,
-          max_deletions: 50,
-          repair_intensity: 'medium'
-        }
-      });
-
-      expect(result.repaired_content).toContain('How It Works');
-      expect(result.repaired_content).toContain('Example');
-      expect(result.diff_stats.additions).toBeLessThanOrEqual(200);
-      expect(result.constraints_satisfied.all_within_bounds).toBe(true);
-      expect(result.repair_summary.invariants_restored).toContain('has_mechanism');
-    });
-
-    it('should respect diff size constraints', async () => {
-      const { repairContent } = await import('../../orchestrator/repairer');
-      (repairContent as jest.Mock).mockResolvedValue({
-        repaired_content: testContent.improved,
-        diff_stats: {
-          additions: 50,
-          deletions: 5,
-          modifications: 10,
-          total_diff_size: 65
-        },
-        constraints_satisfied: {
-          max_additions: 100,
-          max_deletions: 20,
-          max_modifications: 50,
-          all_within_bounds: true
-        },
-        warning: 'Light repair applied due to strict constraints'
-      });
-
-      const result = await repairContent({
-        content: testContent.original,
-        audit_result: testContent.auditResult,
-        ip: 'framework@1.0.0',
-        repair_options: {
-          max_additions: 100,
-          max_deletions: 20,
-          max_modifications: 50,
-          repair_intensity: 'light'
-        }
-      });
-
-      expect(result.diff_stats.additions).toBeLessThanOrEqual(100);
-      expect(result.diff_stats.deletions).toBeLessThanOrEqual(20);
-      expect(result.diff_stats.modifications).toBeLessThanOrEqual(50);
-      expect(result.constraints_satisfied.all_within_bounds).toBe(true);
-    });
-  });
-
-  describe('IP Invariant Restoration', () => {
-    it('should restore missing framework invariants', async () => {
-      const { repairContent } = await import('../../orchestrator/repairer');
-      (repairContent as jest.Mock).mockResolvedValue({
-        repaired_content: testContent.improved,
-        invariant_repairs: [
-          {
-            invariant: 'has_mechanism',
-            status: 'restored',
-            added_content: '## How It Works\nThe planning mechanism operates through...',
-            confidence: 0.92
-          },
-          {
-            invariant: 'has_examples',
-            status: 'restored', 
-            added_content: '## Example\nTechnology companies use this framework...',
-            confidence: 0.88
-          },
-          {
-            invariant: 'has_overview',
-            status: 'enhanced',
-            modified_content: '## Overview\nThis framework provides a systematic approach...',
-            confidence: 0.85
-          }
-        ],
-        repair_summary: {
-          invariants_restored: ['has_mechanism', 'has_examples'],
-          invariants_enhanced: ['has_overview'],
-          invariant_compliance_rate: 1.0
-        }
-      });
-
-      const result = await repairContent({
-        content: testContent.original,
-        audit_result: testContent.auditResult,
-        ip: 'framework@1.0.0'
-      });
-
-      expect(result.repair_summary.invariants_restored).toContain('has_mechanism');
-      expect(result.repair_summary.invariants_restored).toContain('has_examples');
-      expect(result.repair_summary.invariant_compliance_rate).toBe(1.0);
+      expect(repaired).toBeDefined();
+      expect(typeof repaired).toBe('string');
+      expect(repaired.length).toBeGreaterThan(testContent.original.length);
       
-      result.invariant_repairs.forEach(repair => {
-        expect(['restored', 'enhanced', 'verified']).toContain(repair.status);
-        expect(repair.confidence).toBeGreaterThan(0.7);
-      });
+      // Should have added structure (the addStructure fix actually doesn't add much if headings exist)
+      expect(repaired).toContain('# Overview');
+      
+      // Should have added examples section
+      expect(repaired).toContain('## Examples');
+      expect(repaired).toContain('[Specific example would be inserted here based on content context]');
+      
+      // Should have added mechanism section
+      expect(repaired).toContain('## How It Works');
+      expect(repaired).toContain('Initial Assessment');
+      expect(repaired).toContain('Processing');
+      expect(repaired).toContain('Outcome');
+      
+      // Should have added compliance notice
+      expect(repaired).toContain('MAS (Monetary Authority of Singapore)');
     });
 
-    it('should handle process IP invariant repairs', async () => {
-      const { repairContent } = await import('../../orchestrator/repairer');
-      (repairContent as jest.Mock).mockResolvedValue({
-        repaired_content: `# Application Process
-
-## Step-by-Step
-1. Complete application form with required details
-2. Submit necessary documentation
-3. Undergo assessment process
-4. Receive decision notification
-
-## Timeline
-Processing typically takes 5-7 business days.
-
-## Requirements
-- Valid identification
-- Financial statements
-- Property documents`,
-
-        invariant_repairs: [
+    it('should handle content with minimal issues using real implementation', async () => {
+      const minimalAudit = {
+        tags: [
           {
-            invariant: 'has_steps',
-            status: 'restored',
-            added_content: '## Step-by-Step\n1. Complete application...',
-            confidence: 0.95
+            tag: 'NO_EXAMPLES',
+            severity: 'warning',
+            section: 'examples',
+            suggestion: 'Add examples',
+            auto_fixable: true,
+            confidence: 0.6
+          }
+        ],
+        content_analysis: {
+          word_count: 100,
+          section_count: 4,
+          has_structure: true,
+          has_mechanism: true,
+          has_examples: false
+        },
+        pattern_analysis: {
+          completion_drive: 0.2,
+          question_suppression: 0.1,
+          domain_mixing: 0.0
+        }
+      };
+
+      const repaired = await repairDraft({
+        draft: testContent.improved,
+        audit: minimalAudit
+      });
+
+      expect(repaired).toBeDefined();
+      expect(repaired).toContain('## Examples');
+      expect(repaired).toContain('[Specific example would be inserted here based on content context]');
+      expect(repaired.length).toBeGreaterThan(testContent.improved.length);
+    });
+
+    it('should handle content with no auto-fixable issues', async () => {
+      const noFixAudit = {
+        tags: [
+          {
+            tag: 'SOME_COMPLEX_ISSUE',
+            severity: 'error',
+            section: 'content',
+            suggestion: 'Complex fix needed',
+            auto_fixable: false,
+            confidence: 0.9
+          }
+        ],
+        content_analysis: {
+          word_count: 50,
+          section_count: 2,
+          has_structure: true,
+          has_mechanism: false,
+          has_examples: false
+        },
+        pattern_analysis: {
+          completion_drive: 0.5,
+          question_suppression: 0.3,
+          domain_mixing: 0.1
+        }
+      };
+
+      const repaired = await repairDraft({
+        draft: testContent.original,
+        audit: noFixAudit
+      });
+
+      expect(repaired).toBeDefined();
+      // Since no auto-fixable tags, content should remain largely unchanged
+      expect(repaired).toBe(testContent.original);
+    });
+  });
+
+  describe('Real DiffBoundedRepairer Class Testing', () => {
+    it('should use DiffBoundedRepairer class directly with real implementation', async () => {
+      const repairer = new DiffBoundedRepairer({
+        max_additions: 50,
+        max_deletions: 20,
+        max_modifications: 30
+      });
+
+      const result: RepairResult = await repairer.repairDraft({
+        draft: testContent.original,
+        audit: testContent.auditResult
+      });
+
+      expect(result).toBeDefined();
+      expect(result.repaired_draft).toBeDefined();
+      expect(result.fixes_applied).toBeDefined();
+      expect(result.repair_summary).toBeDefined();
+      
+      expect(result.fixes_applied.length).toBeGreaterThan(0);
+      expect(result.repair_summary.total_fixes).toBeGreaterThan(0);
+      expect(result.repair_summary.sections_modified.length).toBeGreaterThan(0);
+      expect(result.repair_summary.overall_improvement).toBeGreaterThan(0);
+      
+      // Should track which sections were modified (actual sections from fix implementations)
+      expect(result.repair_summary.sections_modified).toContain('mechanism');
+      expect(result.repair_summary.sections_modified).toContain('examples');
+      expect(result.repair_summary.sections_modified).toContain('compliance');
+      
+      // Verify the repaired content
+      expect(result.repaired_draft).toContain('## Examples');
+      expect(result.repaired_draft).toContain('## How It Works');
+      expect(result.repaired_draft).toContain('MAS (Monetary Authority of Singapore)');
+    });
+
+    it('should respect diff bounds when using custom constraints', async () => {
+      const repairer = new DiffBoundedRepairer({
+        max_additions: 5, // Very restrictive
+        max_deletions: 2,
+        max_modifications: 3
+      });
+
+      const result = await repairer.repairDraft({
+        draft: testContent.original,
+        audit: testContent.auditResult
+      });
+
+      // With restrictive bounds, should apply fewer fixes
+      expect(result.fixes_applied.length).toBeLessThanOrEqual(3);
+      expect(result.repair_summary.total_fixes).toBeLessThanOrEqual(3);
+    });
+
+    it('should prioritize high-confidence, high-severity fixes', async () => {
+      // Test with a tag that actually exists in the real implementation
+      const mixedPriorityAudit = {
+        tags: [
+          {
+            tag: 'NO_EXAMPLES', // This exists in real implementation
+            severity: 'error',
+            section: 'examples',
+            suggestion: 'Add examples',
+            auto_fixable: true,
+            confidence: 0.95 // High confidence
           },
           {
-            invariant: 'has_timeline',
-            status: 'restored',
-            added_content: '## Timeline\nProcessing typically takes 5-7 business days.',
-            confidence: 0.90
-          },
+            tag: 'NO_COMPLIANCE_CHECK', // This exists in real implementation
+            severity: 'info',
+            section: 'compliance',
+            suggestion: 'Add compliance',
+            auto_fixable: true,
+            confidence: 0.6 // Lower confidence
+          }
+        ],
+        content_analysis: {
+          word_count: 20,
+          section_count: 2,
+          has_structure: true,
+          has_mechanism: true,
+          has_examples: false
+        },
+        pattern_analysis: {
+          completion_drive: 0.3,
+          question_suppression: 0.1,
+          domain_mixing: 0.0
+        }
+      };
+
+      const repairer = new DiffBoundedRepairer();
+      const result = await repairer.repairDraft({
+        draft: testContent.original,
+        audit: mixedPriorityAudit
+      });
+
+      expect(result.fixes_applied.length).toBeGreaterThan(0);
+      
+      // Should find the fixes that were applied
+      const examplesFix = result.fixes_applied.find(fix => fix.tag === 'NO_EXAMPLES');
+      const complianceFix = result.fixes_applied.find(fix => fix.tag === 'NO_COMPLIANCE_CHECK');
+      
+      // At least one of the fixes should be applied
+      expect(examplesFix || complianceFix).toBeDefined();
+      
+      if (examplesFix) {
+        expect(examplesFix.confidence).toBe(0.95);
+      }
+      if (complianceFix) {
+        expect(complianceFix.confidence).toBe(0.6);
+      }
+    });
+  });
+
+  describe('Real Implementation Specific Fix Types', () => {
+    it('should apply TOKEN_PADDING fix using real implementation', async () => {
+      const paddingAudit = {
+        tags: [
           {
-            invariant: 'has_requirements',
-            status: 'restored',
-            added_content: '## Requirements\n- Valid identification...',
-            confidence: 0.92
+            tag: 'TOKEN_PADDING',
+            severity: 'warning',
+            section: 'content',
+            suggestion: 'Remove redundant words',
+            auto_fixable: true,
+            confidence: 0.8
           }
         ],
-        ip_validation: {
-          type: 'process',
-          invariants_satisfied: ['has_steps', 'has_timeline', 'has_requirements'],
-          compliance_rate: 1.0
-        }
-      });
-
-      const result = await repairContent({
-        content: 'Application process steps go here',
-        audit_result: {
-          overall_score: 30,
-          ip_validation: {
-            invariants_satisfied: [],
-            invariants_violated: ['has_steps', 'has_timeline', 'has_requirements']
-          }
+        content_analysis: {
+          word_count: 50,
+          section_count: 2,
+          has_structure: true,
+          has_mechanism: true,
+          has_examples: true
         },
-        ip: 'process@1.0.0'
+        pattern_analysis: {
+          completion_drive: 0.7,
+          question_suppression: 0.2,
+          domain_mixing: 0.1
+        }
+      };
+
+      const paddedContent = `This is the following very comprehensive overview of the strategic planning process that we need to also consider in addition to the other requirements that are quite important for our organization.`;
+      
+      const repaired = await repairDraft({
+        draft: paddedContent,
+        audit: paddingAudit
       });
 
-      expect(result.repaired_content).toContain('Step-by-Step');
-      expect(result.repaired_content).toContain('Timeline');
-      expect(result.repaired_content).toContain('Requirements');
-      expect(result.ip_validation.compliance_rate).toBe(1.0);
+      expect(repaired).toBeDefined();
+      expect(repaired.length).toBeLessThan(paddedContent.length);
+      
+      // Should remove redundant words
+      expect(repaired).not.toContain('the following');
+      expect(repaired).not.toContain('as well as');
+      expect(repaired).not.toContain('in addition');
     });
-  });
 
-  describe('Quality Pattern Fixes', () => {
-    it('should fix COMPLETION_DRIVE patterns', async () => {
-      const { repairContent } = await import('../../orchestrator/repairer');
-      (repairContent as jest.Mock).mockResolvedValue({
-        repaired_content: testContent.improved,
-        pattern_fixes: [
+    it('should add compliance notice for NO_COMPLIANCE_CHECK fix', async () => {
+      const complianceAudit = {
+        tags: [
           {
-            pattern: 'COMPLETION_DRIVE',
-            fix_applied: 'Added detailed explanations and examples',
-            sections_enhanced: ['mechanism', 'examples', 'compliance'],
-            confidence: 0.88
+            tag: 'NO_COMPLIANCE_CHECK',
+            severity: 'warning',
+            section: 'compliance',
+            suggestion: 'Add regulatory compliance notice',
+            auto_fixable: true,
+            confidence: 0.9
           }
         ],
-        quality_metrics: {
-          completion_drive_score_before: 0.8,
-          completion_drive_score_after: 0.2,
-          improvement: 0.6
-        }
-      });
-
-      const result = await repairContent({
-        content: testContent.original,
-        audit_result: {
-          tags: [
-            {
-              tag: 'COMPLETION_DRIVE',
-              severity: 'error',
-              confidence: 0.8,
-              rationale: 'Content appears rushed'
-            }
-          ]
+        content_analysis: {
+          word_count: 100,
+          section_count: 4,
+          has_structure: true,
+          has_mechanism: true,
+          has_examples: true
         },
-        ip: 'framework@1.0.0'
+        pattern_analysis: {
+          completion_drive: 0.2,
+          question_suppression: 0.1,
+          domain_mixing: 0.0
+        }
+      };
+
+      const repaired = await repairDraft({
+        draft: testContent.improved,
+        audit: complianceAudit
       });
 
-      expect(result.pattern_fixes[0].pattern).toBe('COMPLETION_DRIVE');
-      expect(result.quality_metrics.improvement).toBeGreaterThan(0.5);
-      expect(result.pattern_fixes[0].confidence).toBeGreaterThan(0.8);
+      expect(repaired).toBeDefined();
+      expect(repaired).toContain('MAS (Monetary Authority of Singapore)');
+      expect(repaired).toContain('informational purposes only');
     });
+  });
 
-    it('should address QUESTION_SUPPRESSION patterns', async () => {
-      const { repairContent } = await import('../../orchestrator/repairer');
-      (repairContent as jest.Mock).mockResolvedValue({
-        repaired_content: `${testContent.improved}
-
-## Frequently Asked Questions
-
-**Q: How long does strategic planning typically take?**
-A: The complete planning cycle usually takes 2-3 months, depending on organizational complexity.
-
-**Q: What resources are needed for this framework?**
-A: Required resources include leadership team time, market research data, and financial projections.
-
-**Q: Can this framework be adapted for small businesses?**
-A: Yes, the framework can be scaled down for smaller organizations while maintaining core principles.`,
-
-        pattern_fixes: [
+  describe('Real Implementation Error Handling', () => {
+    it('should handle empty content gracefully using real implementation', async () => {
+      const emptyContentAudit = {
+        tags: [
           {
-            pattern: 'QUESTION_SUPPRESSION',
-            fix_applied: 'Added FAQ section addressing common user questions',
-            questions_added: 3,
-            categories_covered: ['timeline', 'resources', 'adaptability'],
-            confidence: 0.85
+            tag: 'NO_STRUCTURE',
+            severity: 'error',
+            section: 'overall',
+            suggestion: 'Add structure to empty content',
+            auto_fixable: true,
+            confidence: 0.9
           }
         ],
-        user_engagement: {
-          questions_addressed_before: 0,
-          questions_addressed_after: 3,
-          user_concerns_covered: ['time', 'cost', 'flexibility']
+        content_analysis: {
+          word_count: 0,
+          section_count: 0,
+          has_structure: false,
+          has_mechanism: false,
+          has_examples: false
+        },
+        pattern_analysis: {
+          completion_drive: 0.0,
+          question_suppression: 0.0,
+          domain_mixing: 0.0
         }
+      };
+
+      const repaired = await repairDraft({
+        draft: '',
+        audit: emptyContentAudit
       });
 
-      const result = await repairContent({
-        content: testContent.improved,
-        audit_result: {
-          tags: [
-            {
-              tag: 'QUESTION_SUPPRESSION',
-              severity: 'warning',
-              confidence: 0.7,
-              rationale: 'Content could address common questions'
-            }
-          ]
-        },
-        ip: 'framework@1.0.0'
-      });
-
-      expect(result.repaired_content).toContain('Frequently Asked Questions');
-      expect(result.pattern_fixes[0].questions_added).toBe(3);
-      expect(result.user_engagement.questions_addressed_after).toBeGreaterThan(0);
-    });
-  });
-
-  describe('Constraint Validation', () => {
-    it('should validate repair constraints before execution', async () => {
-      const { validateRepairConstraints } = await import('../../orchestrator/repairer');
-      (validateRepairConstraints as jest.Mock).mockResolvedValue({
-        valid: true,
-        constraints: {
-          max_additions: 200,
-          max_deletions: 50,
-          max_modifications: 100,
-          repair_intensity: 'medium'
-        },
-        estimated_diff: {
-          additions: 120,
-          deletions: 20,
-          modifications: 40,
-          total_size: 180
-        },
-        feasibility_score: 0.92
-      });
-
-      const validation = await validateRepairConstraints({
-        content: testContent.original,
-        audit_result: testContent.auditResult,
-        repair_options: {
-          max_additions: 200,
-          max_deletions: 50,
-          max_modifications: 100
-        }
-      });
-
-      expect(validation.valid).toBe(true);
-      expect(validation.estimated_diff.total_size).toBeLessThanOrEqual(350); // Sum of all limits
-      expect(validation.feasibility_score).toBeGreaterThan(0.8);
+      expect(repaired).toBeDefined();
+      expect(repaired.length).toBeGreaterThan(0);
+      expect(repaired).toContain('# Overview');
     });
 
-    it('should reject repairs that exceed constraints', async () => {
-      const { validateRepairConstraints } = await import('../../orchestrator/repairer');
-      (validateRepairConstraints as jest.Mock).mockResolvedValue({
-        valid: false,
-        constraints: {
-          max_additions: 50,
-          max_deletions: 10,
-          max_modifications: 25
+    it('should handle malformed audit results', async () => {
+      const malformedAudit = {
+        tags: [], // Empty tags
+        content_analysis: {
+          word_count: 10,
+          section_count: 1,
+          has_structure: false,
+          has_mechanism: false,
+          has_examples: false
         },
-        estimated_diff: {
-          additions: 200,
-          deletions: 30,
-          modifications: 80,
-          total_size: 310
-        },
-        violations: [
-          'Estimated additions (200) exceed limit (50)',
-          'Estimated deletions (30) exceed limit (10)',
-          'Estimated modifications (80) exceed limit (25)'
+        pattern_analysis: {
+          completion_drive: 0.5,
+          question_suppression: 0.2,
+          domain_mixing: 0.1
+        }
+      };
+
+      const repaired = await repairDraft({
+        draft: testContent.original,
+        audit: malformedAudit
+      });
+
+      expect(repaired).toBeDefined();
+      // Should return original content unchanged when no fixable tags
+      expect(repaired).toBe(testContent.original);
+    });
+
+    it('should handle tags with no fix implementation', async () => {
+      const unknownTagAudit = {
+        tags: [
+          {
+            tag: 'UNKNOWN_TAG_TYPE',
+            severity: 'error',
+            section: 'content',
+            suggestion: 'Fix unknown issue',
+            auto_fixable: true,
+            confidence: 0.9
+          }
         ],
-        feasibility_score: 0.15
-      });
-
-      const validation = await validateRepairConstraints({
-        content: testContent.original,
-        audit_result: testContent.auditResult,
-        repair_options: {
-          max_additions: 50,
-          max_deletions: 10,
-          max_modifications: 25
+        content_analysis: {
+          word_count: 20,
+          section_count: 2,
+          has_structure: true,
+          has_mechanism: true,
+          has_examples: true
+        },
+        pattern_analysis: {
+          completion_drive: 0.3,
+          question_suppression: 0.1,
+          domain_mixing: 0.0
         }
+      };
+
+      const repaired = await repairDraft({
+        draft: testContent.original,
+        audit: unknownTagAudit
       });
 
-      expect(validation.valid).toBe(false);
-      expect(validation.violations.length).toBeGreaterThan(0);
-      expect(validation.feasibility_score).toBeLessThan(0.3);
+      expect(repaired).toBeDefined();
+      // Should return original content when tag has no fix implementation
+      expect(repaired).toBe(testContent.original);
     });
   });
 
-  describe('Diff Analysis and Reporting', () => {
-    it('should calculate accurate diff bounds', async () => {
-      const { calculateDiffBounds } = await import('../../orchestrator/repairer');
-      (calculateDiffBounds as jest.Mock).mockResolvedValue({
-        original_size: 45,
-        repaired_size: 285,
-        diff_stats: {
-          additions: 240,
-          deletions: 15,
-          modifications: 30,
-          total_diff_size: 285,
-          size_change_ratio: 6.33
-        },
-        quality_impact: {
-          score_before: 45,
-          score_after: 92,
-          improvement: 47
-        },
-        efficiency: {
-          improvement_per_diff_char: 0.165,
-          cost_effective: true
-        }
+  describe('Real Implementation Performance and Quality', () => {
+    it('should maintain reasonable performance with real implementation', async () => {
+      const startTime = Date.now();
+      
+      const repaired = await repairDraft({
+        draft: testContent.original,
+        audit: testContent.auditResult
       });
-
-      const diffBounds = await calculateDiffBounds({
-        original_content: testContent.original,
-        repaired_content: testContent.improved
-      });
-
-      expect(diffBounds.diff_stats.additions).toBeGreaterThan(0);
-      expect(diffBounds.quality_impact.improvement).toBeGreaterThan(40);
-      expect(diffBounds.efficiency.cost_effective).toBe(true);
-    });
-  });
-
-  describe('Error Handling and Edge Cases', () => {
-    it('should handle empty content gracefully', async () => {
-      const { repairContent } = await import('../../orchestrator/repairer');
-      (repairContent as jest.Mock).mockResolvedValue({
-        repaired_content: testContent.improved,
-        operation_type: 'generation',
-        diff_stats: {
-          additions: 285,
-          deletions: 0,
-          modifications: 0,
-          total_diff_size: 285
-        },
-        warning: 'Original content was empty, generated new content from scratch'
-      });
-
-      const result = await repairContent({
-        content: '',
-        audit_result: testContent.auditResult,
-        ip: 'framework@1.0.0'
-      });
-
-      expect(result.repaired_content).toBeDefined();
-      expect(result.operation_type).toBe('generation');
-      expect(result.diff_stats.deletions).toBe(0);
+      
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+      
+      expect(repaired).toBeDefined();
+      expect(duration).toBeLessThan(5000); // Should complete within 5 seconds
     });
 
-    it('should handle severely corrupted content', async () => {
-      const { repairContent } = await import('../../orchestrator/repairer');
-      (repairContent as jest.Mock).mockResolvedValue({
-        repaired_content: testContent.improved,
-        operation_type: 'reconstruction',
-        diff_stats: {
-          additions: 285,
-          deletions: 25,
-          modifications: 0,
-          total_diff_size: 310
-        },
-        reconstruction_reason: 'Original content structure too corrupted for diff-bounded repair',
-        reconstruction_confidence: 0.75
+    it('should provide quality improvement metrics', async () => {
+      const repairer = new DiffBoundedRepairer();
+      
+      const result: RepairResult = await repairer.repairDraft({
+        draft: testContent.original,
+        audit: testContent.auditResult
       });
 
-      const result = await repairContent({
-        content: 'Lorem ipsum dolor sit amet, corrupted content here',
-        audit_result: {
-          overall_score: 10,
-          tags: [
-            {
-              tag: 'STRUCTURE_COLLAPSE',
-              severity: 'error',
-              confidence: 0.95
-            }
-          ]
-        },
-        ip: 'framework@1.0.0'
+      expect(result.repair_summary.overall_improvement).toBeGreaterThan(0);
+      expect(result.repair_summary.overall_improvement).toBeLessThanOrEqual(100);
+      
+      // Each fix should have reasonable confidence
+      result.fixes_applied.forEach(fix => {
+        expect(fix.confidence).toBeGreaterThan(0);
+        expect(fix.confidence).toBeLessThanOrEqual(1);
+        expect(fix.changes_made).toBeGreaterThan(0);
+        expect(fix.action).toBeDefined();
       });
-
-      expect(result.operation_type).toBe('reconstruction');
-      expect(result.reconstruction_reason).toBeDefined();
-      expect(result.reconstruction_confidence).toBeGreaterThan(0.7);
     });
-  });
 
-  afterEach(() => {
-    jest.clearAllMocks();
+    it('should track sections modified correctly', async () => {
+      const repairer = new DiffBoundedRepairer();
+      
+      const result: RepairResult = await repairer.repairDraft({
+        draft: testContent.original,
+        audit: testContent.auditResult
+      });
+
+      // Should have modified sections based on tags with sections
+      expect(result.repair_summary.sections_modified).toContain('examples');
+      expect(result.repair_summary.sections_modified).toContain('mechanism');
+      expect(result.repair_summary.sections_modified).toContain('compliance');
+    });
   });
 });

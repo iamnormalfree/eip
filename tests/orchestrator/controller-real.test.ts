@@ -30,7 +30,7 @@ describe('Orchestrator Controller - Real Production Code', () => {
         brief: 'financial planning for retirement',
         persona: 'individual',
         funnel: 'retirement',
-        tier: 'LIGHT'
+        tier: 'LIGHT' as const
       };
 
       try {
@@ -70,7 +70,7 @@ describe('Orchestrator Controller - Real Production Code', () => {
 
       const emptyBrief = {
         brief: '',
-        tier: 'LIGHT'
+        tier: 'LIGHT' as const
       };
 
       try {

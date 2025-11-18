@@ -1,0 +1,795 @@
+// ABOUTME: Comprehensive Publisher Testing for EIP Orchestrator
+// ABOUTME: Validates content publishing, distribution, and external system integration
+
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+
+// Type definitions for publisher testing
+interface PublisherContent {
+  id: string;
+  title: string;
+  body: string;
+  metadata?: {
+    ip_type?: string;
+    author?: string;
+    tags?: string[];
+    [key: string]: any;
+  };
+}
+
+interface PublishingOptions {
+  channels: string[];
+  immediate?: boolean;
+  endpoint?: string;
+  recipients?: string[];
+}
+
+interface PublicationResult {
+  id: string;
+  contentId: string;
+  status: string;
+  publishedAt: string;
+  channels: string[];
+  metadata: {
+    [key: string]: any;
+    publicationId: string;
+  };
+  apiResponse?: {
+    status: string;
+    endpoint: string;
+  };
+  emailResponse?: {
+    status: string;
+    recipients: string[];
+    messageId: string;
+  };
+}
+
+interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+  score: number;
+}
+
+interface FormattedContent {
+  id: string;
+  title: string;
+  body: string;
+  metadata: {
+    [key: string]: any;
+  };
+  formattedContent: string;
+  format: string;
+}
+
+interface TrackingResult {
+  publicationId: string;
+  metrics: {
+    views: number;
+    shares: number;
+    downloads: number;
+    engagement: number;
+    performance?: {
+      [key: string]: any;
+    };
+    userFeedback?: Array<{
+      rating: number;
+      comment: string;
+    }>;
+    [key: string]: any;
+  };
+  trackedAt: string;
+  analytics: {
+    performance: {
+      [key: string]: any;
+    };
+    userFeedback: Array<{
+      rating: number;
+      comment: string;
+    }>;
+  };
+}
+
+interface ScheduleOptions {
+  datetime: string;
+  channels: string[];
+  recurrence?: {
+    frequency: string;
+    interval: number;
+  };
+}
+
+interface ScheduledPublication {
+  id: string;
+  contentId: string;
+  scheduledFor: string;
+  status: string;
+  channels: string[];
+  recurrence?: {
+    frequency: string;
+    interval: number;
+  };
+  createdAt: string;
+}
+
+interface RollbackResult {
+  publicationId: string;
+  status: string;
+  reason: string;
+  rolledBackAt: string;
+  affectedChannels: string[];
+  success: boolean;
+}
+
+interface MockPublisher {
+  publishContent: jest.Mock;
+  validateContent: jest.Mock;
+  formatForChannel: jest.Mock;
+  trackPublication: jest.Mock;
+  schedulePublication: jest.Mock;
+  rollbackPublication: jest.Mock;
+}
+
+describe('Comprehensive Publisher Tests', () => {
+  // Mock publisher functionality
+  const mockPublisher: MockPublisher = {
+    publishContent: jest.fn().mockImplementation(async (content: PublisherContent, options: PublishingOptions) => {
+      const publication: PublicationResult = {
+        id: `pub-${Date.now()}`,
+        contentId: content.id,
+        status: 'published',
+        publishedAt: new Date().toISOString(),
+        channels: options.channels || ['web'],
+        metadata: {
+          ...content.metadata,
+          publicationId: `pub-${Date.now()}`
+        }
+      };
+
+      if (options.channels?.includes('api')) {
+        publication.apiResponse = { status: 'success', endpoint: options.endpoint };
+      }
+
+      if (options.channels?.includes('email')) {
+        publication.emailResponse = {
+          status: 'sent',
+          recipients: options.recipients || [],
+          messageId: `email-${Date.now()}`
+        };
+      }
+
+      return publication;
+    }),
+
+    validateContent: jest.fn().mockImplementation((content: PublisherContent): ValidationResult => {
+      const errors = [];
+      const warnings = [];
+
+      if (!content.title || content.title.trim().length === 0) {
+        errors.push('Content title is required');
+      }
+
+      if (!content.body || content.body.trim().length < 10) {
+        errors.push('Content body must be at least 10 characters');
+      }
+
+      if (content.body && content.body.length > 10000) {
+        warnings.push('Content body is very long, consider splitting');
+      }
+
+      if (!content.metadata?.ip_type) {
+        warnings.push('IP type metadata is recommended');
+      }
+
+      
+        return {
+        valid: errors.length === 0,
+        errors,
+        warnings,
+        score: Math.max(0, 100 - (errors.length * 20) - (warnings.length * 5))
+      };
+    }),
+
+    formatForChannel: jest.fn().mockImplementation((content: PublisherContent, channel: string): FormattedContent => {
+      switch (channel) {
+        case 'web':
+          
+        return {
+            id: content.id,
+            title: content.title,
+            body: content.body,
+            metadata: content.metadata,
+            formattedContent: `<article><h1>${content.title}</h1><div>${content.body}</div></article>`,
+            format: 'html'
+          };
+        case 'api':
+          
+        return {
+            id: content.id,
+            title: content.title,
+            body: content.body,
+            metadata: content.metadata,
+            formattedContent: JSON.stringify({
+              id: content.id,
+              title: content.title,
+              body: content.body,
+              metadata: content.metadata
+            }),
+            format: 'json'
+          };
+        case 'email':
+          
+        return {
+            id: content.id,
+            title: content.title,
+            body: content.body,
+            metadata: content.metadata,
+            formattedContent: `
+Subject: ${content.title}
+
+${content.body}
+
+---
+Generated by EIP Orchestrator
+            `.trim(),
+            format: 'text'
+          };
+        case 'mobile':
+          
+        return {
+            id: content.id,
+            title: content.title,
+            body: content.body,
+            metadata: content.metadata,
+            formattedContent: `📱 ${content.title}\n\n${content.body}`,
+            format: 'mobile'
+          };
+        default:
+          return {
+            id: content.id,
+            title: content.title,
+            body: content.body,
+            metadata: content.metadata,
+            formattedContent: content.body,
+            format: 'plain'
+          };
+      }
+    }),
+
+    trackPublication: jest.fn().mockImplementation(async (publicationId: string, metrics: any): Promise<TrackingResult> => {
+      const tracking = {
+        publicationId,
+        metrics: {
+          views: metrics.views || 0,
+          shares: metrics.shares || 0,
+          downloads: metrics.downloads || 0,
+          engagement: metrics.engagement || 0,
+          ...metrics
+        },
+        trackedAt: new Date().toISOString(),
+        analytics: {
+          performance: metrics.performance || {},
+          userFeedback: metrics.userFeedback || []
+        }
+      };
+
+      return tracking;
+    }),
+
+    schedulePublication: jest.fn().mockImplementation(async (content: PublisherContent, schedule: ScheduleOptions): Promise<ScheduledPublication> => {
+      const scheduledPub = {
+        id: `sched-${Date.now()}`,
+        contentId: content.id,
+        scheduledFor: schedule.datetime,
+        status: 'scheduled',
+        channels: schedule.channels || ['web'],
+        recurrence: schedule.recurrence,
+        createdAt: new Date().toISOString()
+      };
+
+      return scheduledPub;
+    }),
+
+    rollbackPublication: jest.fn().mockImplementation(async (publicationId: string, reason?: string): Promise<RollbackResult> => {
+      const rollback = {
+        publicationId,
+        status: 'rolled_back',
+        reason: reason || 'Manual rollback',
+        rolledBackAt: new Date().toISOString(),
+        affectedChannels: ['web', 'api', 'email'],
+        success: true
+      };
+
+      return rollback;
+    })
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  describe('Content Publishing', () => {
+    it('should publish content to web channel successfully', async () => {
+      const content = {
+        id: 'content-123',
+        title: 'Test Article',
+        body: 'This is a test article for publishing.',
+        metadata: {
+          ip_type: 'framework',
+          author: 'Test Author',
+          tags: ['test', 'article']
+        }
+      };
+
+      const options = {
+        channels: ['web'],
+        immediate: true
+      };
+
+      const result = await mockPublisher.publishContent(content, options) as PublicationResult;
+
+      expect(result.status).toBe('published');
+      expect(result.contentId).toBe('content-123');
+      expect(result.channels).toContain('web');
+      expect(result.publishedAt).toBeDefined();
+    });
+
+    it('should publish content to multiple channels', async () => {
+      const content = {
+        id: 'content-multi-123',
+        title: 'Multi-channel Content',
+        body: 'Content for multiple publishing channels.',
+        metadata: { ip_type: 'process' }
+      };
+
+      const options = {
+        channels: ['web', 'api', 'email'],
+        recipients: ['test@example.com'],
+        endpoint: 'https://api.example.com/publish'
+      };
+
+      const result = await mockPublisher.publishContent(content, options);
+
+      expect(result.channels).toEqual(['web', 'api', 'email']);
+      expect(result.apiResponse).toBeDefined();
+      expect(result.emailResponse).toBeDefined();
+      expect(result.emailResponse.status).toBe('sent');
+    });
+
+    it('should handle publishing failures gracefully', async () => {
+      const failingPublisher = {
+        ...mockPublisher,
+        publishContent: jest.fn().mockRejectedValue(new Error('Publishing service unavailable'))
+      };
+
+      const content = {
+        id: 'content-fail-123',
+        title: 'Failing Content',
+        body: 'This content should fail to publish.'
+      };
+
+      try {
+        await failingPublisher.publishContent(content, { channels: ['web'] });
+        fail('Expected publishing to fail');
+      } catch (error) {
+        expect(error.message).toBe('Publishing service unavailable');
+      }
+    });
+
+    it('should support scheduled publishing', async () => {
+      const content = {
+        id: 'content-sched-123',
+        title: 'Scheduled Content',
+        body: 'Content scheduled for future publication.'
+      };
+
+      const schedule = {
+        datetime: '2025-12-01T10:00:00Z',
+        channels: ['web', 'email'],
+        recurrence: {
+          frequency: 'weekly',
+          interval: 1
+        }
+      };
+
+      const result = await mockPublisher.schedulePublication(content, schedule);
+
+      expect(result.status).toBe('scheduled');
+      expect(result.scheduledFor).toBe('2025-12-01T10:00:00Z');
+      expect(result.recurrence.frequency).toBe('weekly');
+    });
+  });
+
+  describe('Content Validation', () => {
+    it('should validate content with all required fields', () => {
+      const validContent = {
+        id: 'content-1',
+        title: 'Valid Article Title',
+        body: 'This is a comprehensive article body that meets the minimum length requirement.',
+        metadata: {
+          ip_type: 'framework',
+          author: 'Valid Author',
+          tags: ['valid', 'content']
+        }
+      };
+
+      const validation = mockPublisher.validateContent(validContent);
+
+      expect(validation.valid).toBe(true);
+      expect(validation.errors).toHaveLength(0);
+      expect(validation.score).toBe(100);
+    });
+
+    it('should detect missing required fields', () => {
+      const invalidContent = {
+        id: 'content-2',
+        title: '',  // Empty title
+        body: 'Too short'  // Too short body
+      };
+
+      const validation = mockPublisher.validateContent(invalidContent);
+
+      expect(validation.valid).toBe(false);
+      expect(validation.errors.length).toBeGreaterThan(1);
+      expect(validation.errors).toContain('Content title is required');
+      expect(validation.errors).toContain('Content body must be at least 10 characters');
+    });
+
+    it('should generate warnings for recommended but optional fields', () => {
+      const contentWithWarnings = {
+        id: 'content-3',
+        title: 'Content with Warnings',
+        body: 'This is a valid article body that meets all the minimum requirements for validation.',
+        metadata: {}  // Missing ip_type
+      };
+
+      const validation = mockPublisher.validateContent(contentWithWarnings);
+
+      expect(validation.valid).toBe(true);  // Still valid, but with warnings
+      expect(validation.warnings.length).toBeGreaterThan(0);
+      expect(validation.warnings).toContain('IP type metadata is recommended');
+      expect(validation.score).toBeLessThan(100);
+    });
+
+    it('should calculate validation scores correctly', () => {
+      const contentWithWarnings = {
+        id: 'content-4',
+        title: 'Article Score Test',
+        body: 'A'.repeat(10001),  // Very long content
+        metadata: {}
+      };
+
+      const validation = mockPublisher.validateContent(contentWithWarnings);
+
+      expect(validation.score).toBe(90);  // 100 - 5 (warning for ip_type) - 5 (warning for long content)
+    });
+  });
+
+  describe('Content Formatting', () => {
+    it('should format content for web channel', () => {
+      const content = {
+        id: 'content-web-123',
+        title: 'Web Article',
+        body: 'This is web content.',
+        metadata: {}
+      };
+
+      const formatted = mockPublisher.formatForChannel(content, 'web');
+
+      expect(formatted.format).toBe('html');
+      expect(formatted.formattedContent).toContain('<h1>Web Article</h1>');
+      expect(formatted.formattedContent).toContain('<div>This is web content.</div>');
+    });
+
+    it('should format content for API channel', () => {
+      const content = {
+        id: 'content-api-123',
+        title: 'API Content',
+        body: 'API response content.',
+        metadata: { version: '1.0' }
+      };
+
+      const formatted = mockPublisher.formatForChannel(content, 'api');
+
+      expect(formatted.format).toBe('json');
+      const parsed = JSON.parse(formatted.formattedContent);
+      expect(parsed.id).toBe('content-api-123');
+      expect(parsed.title).toBe('API Content');
+      expect(parsed.metadata.version).toBe('1.0');
+    });
+
+    it('should format content for email channel', () => {
+      const content = {
+        id: 'content-email-123',
+        title: 'Email Subject',
+        body: 'Email body content.',
+        metadata: {}
+      };
+
+      const formatted = mockPublisher.formatForChannel(content, 'email');
+
+      expect(formatted.format).toBe('text');
+      expect(formatted.formattedContent).toContain('Subject: Email Subject');
+      expect(formatted.formattedContent).toContain('Email body content.');
+      expect(formatted.formattedContent).toContain('Generated by EIP Orchestrator');
+    });
+
+    it('should format content for mobile channel', () => {
+      const content = {
+        id: 'content-mobile-123',
+        title: 'Mobile Content',
+        body: 'Mobile optimized content.',
+        metadata: {}
+      };
+
+      const formatted = mockPublisher.formatForChannel(content, 'mobile');
+
+      expect(formatted.format).toBe('mobile');
+      expect(formatted.formattedContent).toContain('📱 Mobile Content');
+      expect(formatted.formattedContent).toContain('Mobile optimized content.');
+    });
+
+    it('should handle unknown channel formatting', () => {
+      const content = {
+        id: 'content-unknown-123',
+        title: 'Unknown Channel',
+        body: 'Content for unknown channel.',
+        metadata: {}
+      };
+
+      const formatted = mockPublisher.formatForChannel(content, 'unknown');
+
+      expect(formatted).toEqual(content);  // Should return unchanged
+    });
+  });
+
+  describe('Publication Tracking', () => {
+    it('should track publication metrics', async () => {
+      const publicationId = 'pub-tracking-123';
+      const metrics = {
+        views: 150,
+        shares: 25,
+        downloads: 10,
+        engagement: 85,
+        performance: {
+          loadTime: 1.2,
+          renderTime: 0.8
+        },
+        userFeedback: [
+          { rating: 5, comment: 'Excellent content!' },
+          { rating: 4, comment: 'Good article' }
+        ]
+      };
+
+      const tracking = await mockPublisher.trackPublication(publicationId, metrics);
+
+      expect(tracking.publicationId).toBe(publicationId);
+      expect(tracking.metrics.views).toBe(150);
+      expect(tracking.metrics.shares).toBe(25);
+      expect(tracking.metrics.performance.loadTime).toBe(1.2);
+      expect(tracking.metrics.userFeedback).toHaveLength(2);
+      expect(tracking.trackedAt).toBeDefined();
+    });
+
+    it('should handle tracking with minimal metrics', async () => {
+      const publicationId = 'pub-minimal-123';
+      const minimalMetrics = {};
+
+      const tracking = await mockPublisher.trackPublication(publicationId, minimalMetrics);
+
+      expect(tracking.publicationId).toBe(publicationId);
+      expect(tracking.metrics.views).toBe(0);
+      expect(tracking.metrics.shares).toBe(0);
+      expect(tracking.metrics.downloads).toBe(0);
+      expect(tracking.metrics.engagement).toBe(0);
+    });
+
+    it('should aggregate multiple tracking events', async () => {
+      const publicationId = 'pub-aggregate-123';
+      const metrics1 = { views: 100, shares: 20 };
+      const metrics2 = { views: 50, downloads: 5 };
+
+      const tracking1 = await mockPublisher.trackPublication(publicationId, metrics1);
+      const tracking2 = await mockPublisher.trackPublication(publicationId, metrics2);
+
+      expect(tracking1.metrics.views).toBe(100);
+      expect(tracking1.metrics.shares).toBe(20);
+      expect(tracking2.metrics.views).toBe(50);
+      expect(tracking2.metrics.downloads).toBe(5);
+    });
+  });
+
+  describe('Publication Rollback', () => {
+    it('should rollback published content successfully', async () => {
+      const publicationId = 'pub-rollback-123';
+      const reason = 'Content update required';
+
+      const rollback = await mockPublisher.rollbackPublication(publicationId, reason);
+
+      expect(rollback.publicationId).toBe(publicationId);
+      expect(rollback.status).toBe('rolled_back');
+      expect(rollback.reason).toBe(reason);
+      expect(rollback.rolledBackAt).toBeDefined();
+      expect(rollback.success).toBe(true);
+      expect(rollback.affectedChannels).toContain('web');
+    });
+
+    it('should handle rollback with default reason', async () => {
+      const publicationId = 'pub-default-rollback';
+
+      const rollback = await mockPublisher.rollbackPublication(publicationId);
+
+      expect(rollback.reason).toBe('Manual rollback');
+      expect(rollback.success).toBe(true);
+    });
+
+    it('should handle rollback failures gracefully', async () => {
+      const failingRollbackPublisher = {
+        ...mockPublisher,
+        rollbackPublication: jest.fn().mockRejectedValue(new Error('Rollback service unavailable'))
+      };
+
+      try {
+        await failingRollbackPublisher.rollbackPublication('pub-fail-123');
+        fail('Expected rollback to fail');
+      } catch (error) {
+        expect(error.message).toBe('Rollback service unavailable');
+      }
+    });
+  });
+
+  describe('Performance Testing', () => {
+    it('should handle bulk publishing efficiently', async () => {
+      const bulkContent = Array.from({ length: 50 }, (_, i) => ({
+        id: `bulk-content-${i}`,
+        title: `Bulk Content ${i}`,
+        body: `This is bulk content item ${i}.`.repeat(10),
+        metadata: { bulk: true, index: i }
+      }));
+
+      const startTime = Date.now();
+      const publishPromises = bulkContent.map(content =>
+        mockPublisher.publishContent(content, { channels: ['web'] })
+      );
+      const results = await Promise.all(publishPromises);
+      const endTime = Date.now();
+
+      expect(results).toHaveLength(50);
+      results.forEach((result, index) => {
+        expect(result.contentId).toBe(`bulk-content-${index}`);
+        expect(result.status).toBe('published');
+      });
+      expect(endTime - startTime).toBeLessThan(1000);  // Should complete in <1 second
+    });
+
+    it('should handle concurrent validation efficiently', async () => {
+      const validationContent = Array.from({ length: 100 }, (_, i) => ({
+        title: `Validation Test ${i}`,
+        body: `This is validation content ${i} that meets minimum length requirements.`,
+        metadata: { test: true, index: i }
+      }));
+
+      const startTime = Date.now();
+      const validationPromises = validationContent.map(content =>
+        Promise.resolve(mockPublisher.validateContent(content))
+      );
+      const results = await Promise.all(validationPromises);
+      const endTime = Date.now();
+
+      expect(results).toHaveLength(100);
+      results.forEach(result => {
+        expect(result.valid).toBe(true);
+        expect(result.score).toBeGreaterThanOrEqual(95);
+      });
+      expect(endTime - startTime).toBeLessThan(500);  // Should complete in <500ms
+    });
+
+    it('should handle large content formatting', async () => {
+      const largeContent = {
+        id: 'large-content-123',
+        title: 'Large Content Test',
+        body: 'Large content body. '.repeat(1000),  // ~20KB of content
+        metadata: { large: true }
+      };
+
+      const startTime = Date.now();
+      const formatted = mockPublisher.formatForChannel(largeContent, 'web');
+      const endTime = Date.now();
+
+      expect(formatted.format).toBe('html');
+      expect(formatted.formattedContent.length).toBeGreaterThan(20000);
+      expect(endTime - startTime).toBeLessThan(100);  // Should complete in <100ms
+    });
+  });
+
+  describe('Integration Testing', () => {
+    it('should handle complete publishing workflow', async () => {
+      const content = {
+        id: 'workflow-content-123',
+        title: 'Complete Workflow Test',
+        body: 'This is content for testing the complete publishing workflow.',
+        metadata: {
+          ip_type: 'framework',
+          author: 'Workflow Test',
+          workflow: 'complete'
+        }
+      };
+
+      // Step 1: Validate content
+      const validation = mockPublisher.validateContent(content);
+      expect(validation.valid).toBe(true);
+
+      // Step 2: Format for different channels
+      const webFormatted = mockPublisher.formatForChannel(content, 'web');
+      const apiFormatted = mockPublisher.formatForChannel(content, 'api');
+
+      expect(webFormatted.format).toBe('html');
+      expect(apiFormatted.format).toBe('json');
+
+      // Step 3: Publish to multiple channels
+      const publication = await mockPublisher.publishContent(content, {
+        channels: ['web', 'api']
+      });
+      expect(publication.status).toBe('published');
+      expect(publication.channels).toContain('web');
+      expect(publication.channels).toContain('api');
+
+      // Step 4: Track initial metrics
+      const initialMetrics = await mockPublisher.trackPublication(publication.id, {
+        views: 10,
+        shares: 2
+      });
+      expect(initialMetrics.metrics.views).toBe(10);
+      expect(initialMetrics.metrics.shares).toBe(2);
+
+      // Step 5: Schedule follow-up publication
+      const schedule = await mockPublisher.schedulePublication(content, {
+        datetime: '2025-12-01T10:00:00Z',
+        channels: ['email']
+      });
+      expect(schedule.status).toBe('scheduled');
+    });
+
+    it('should handle error recovery in publishing workflow', async () => {
+      const content = {
+        id: 'error-recovery-123',
+        title: 'Error Recovery Test',
+        body: 'Content for testing error recovery mechanisms.',
+        metadata: {}
+      };
+
+      // Step 1: Content with warnings (missing ip_type)
+      const validation = mockPublisher.validateContent(content);
+      expect(validation.valid).toBe(true);
+      expect(validation.warnings.length).toBeGreaterThan(0);
+
+      // Step 2: Attempt publishing with retry simulation
+      let attempts = 0;
+      const maxAttempts = 3;
+
+      while (attempts < maxAttempts) {
+        try {
+          const publication = await mockPublisher.publishContent(content, {
+            channels: ['web']
+          });
+
+          expect(publication.status).toBe('published');
+          break;  // Success
+        } catch (error) {
+          attempts++;
+          if (attempts >= maxAttempts) {
+            fail('Publishing should succeed within retry attempts');
+          }
+          // Simulate retry delay
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+      }
+
+      expect(attempts).toBeLessThan(maxAttempts);
+    });
+  });
+});

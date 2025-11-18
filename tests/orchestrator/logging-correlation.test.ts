@@ -28,9 +28,9 @@ describe('Structured Logging System', () => {
     jest.spyOn(logger, 'info').mockClear();
     jest.spyOn(logger, 'warn').mockClear();
     jest.spyOn(logger, 'error').mockClear();
-    jest.spyOn(logger, 'info').mockImplementation();
-    jest.spyOn(logger, 'warn').mockImplementation();
-    jest.spyOn(logger, 'error').mockImplementation();
+    jest.spyOn(logger, 'info').mockImplementation(() => {});
+    jest.spyOn(logger, 'warn').mockImplementation(() => {});
+    jest.spyOn(logger, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -105,7 +105,7 @@ describe('Structured Logging System', () => {
       const nonExistentId = 'non-existent-123';
 
       expect(() => {
-        updateCorrelation(nonExistentId, { stage: 'test' });
+        updateCorrelation(nonExistentId, { stage: 'retrieval' });
       }).not.toThrow();
 
       expect(() => {
@@ -462,13 +462,13 @@ describe('Structured Logging System', () => {
     it('should handle non-Error objects', () => {
       const nonError = 'String error';
 
-      logError(correlationId, nonError, { stage: 'test' });
+      logError(correlationId, new Error(nonError), { stage: 'retrieval' });
 
       expect(logger.error).toHaveBeenCalledWith(
         expect.stringContaining(`Error occurred: ${nonError}`),
         expect.objectContaining({
           correlationId,
-          stage: 'test',
+          stage: 'retrieval',
           errorName: 'Error',
           errorMessage: nonError
         })
@@ -545,8 +545,8 @@ describe('Structured Logging System', () => {
       logger.error.mockClear();
 
       // Test all log types for consistent structure
-      logStageStart(correlationId, 'test-stage');
-      logStageComplete(correlationId, 'test-stage', { stageDuration: 100 });
+      logStageStart(correlationId, 'retrieval');
+      logStageComplete(correlationId, 'retrieval', { stageDuration: 100 });
       logBudgetEnforcement(correlationId, 'test-action', { test: true });
       logPerformance(correlationId, { testMetric: 123 });
 
@@ -574,8 +574,8 @@ describe('Structured Logging System', () => {
 
     it('should handle undefined/null metadata gracefully', () => {
       expect(() => {
-        logStageStart(correlationId, 'test-stage', undefined as any);
-        logStageComplete(correlationId, 'test-stage', null as any);
+        logStageStart(correlationId, 'retrieval', undefined as any);
+        logStageComplete(correlationId, 'retrieval', null as any);
       }).not.toThrow();
     });
   });

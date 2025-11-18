@@ -397,13 +397,8 @@ describe('Controller Integration Tests', () => {
     it('should provide comprehensive error information', async () => {
       mockRunOnce.mockResolvedValue({
         success: false,
-        error: 'Simulated processing error',
-        error_details: {
-          stage: 'router',
-          error_type: 'selection_failed',
-          context: { input: 'test data' }
-        }
-      });
+        error: 'Simulated processing error'
+      } as any);
 
       const brief = {
         brief: 'Error contract test',

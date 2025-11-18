@@ -1,4 +1,4 @@
-// ABOUTME: Enhanced micro-auditor with 10 critical quality tags
+// ABOUTME: Enhanced micro-auditor with 10 critical quality tags - FIXED VERSION
 // ABOUTME: Comprehensive content quality assessment with pattern detection
 
 type AuditInput = { 
@@ -27,6 +27,14 @@ interface AuditOutput {
     has_examples: boolean;
     has_structure: boolean;
   };
+  compliance_analysis?: {
+    financial_claims_detected: number;
+    financial_claims_sourced: number;
+    domains_used: string[];
+    compliance_score: number;
+    warnings: string[];
+    errors: string[];
+  };
   pattern_analysis: {
     completion_drive: number; // 0-1 score
     question_suppression: number; // 0-1 score
@@ -41,85 +49,120 @@ const CRITICAL_TAGS = [
     patterns: [/mechanism/i, /how.*work/i, /process/i, /step.*by.*step/i],
     severity: 'error' as const,
     rationale: 'Content lacks explicit mechanism or process explanation',
-    suggestion: 'Add a clear "How it Works" or "Mechanism" section'
+    suggestion: 'Add a clear "How it Works" or "Mechanism" section',
+    is_absence_tag: true // Detect when pattern is MISSING
   },
   {
     tag: 'NO_EXAMPLES',
-    patterns: [/example/i, /for.*instance/i, /case.*study/i, /demonstration/i],
+    patterns: [
+      /for\s+example(?!.*planning)/i,
+      /for\s+instance/i,
+      /such\s+as/i,
+      /like(?!.*planning)/i,
+      /e\.g\./i,
+      /i\.e\./i,
+      /case\s+study/i,
+      /demonstration/i,
+      /^##\s+Example\s*$/m,  // "## Example" heading
+      /^example:\s*$/im      // "Example:" on its own line
+    ],
     severity: 'warning' as const,
     rationale: 'Content lacks practical examples or demonstrations',
-    suggestion: 'Include concrete examples or case studies'
+    suggestion: 'Include concrete examples or case studies',
+    is_absence_tag: true // Detect when pattern is MISSING
   },
   {
     tag: 'NO_STRUCTURE',
-    patterns: [/#{1,3}\s/, /\*\*.*\*\*/, /^-\s/, /^\d+\./m],
+    patterns: [/#{1,3}\s/, /\*\*.*\*\*/, /^-\s/m, /^\d+\.\s/m],
     severity: 'error' as const,
     rationale: 'Content lacks clear hierarchical structure',
-    suggestion: 'Add headings, subheadings, and bullet points'
+    suggestion: 'Add headings, subheadings, and bullet points',
+    is_absence_tag: true // Detect when pattern is MISSING
   },
   {
     tag: 'COMPLETION_DRIVE',
-    patterns: [/thoroughly/i, /comprehensive/i, /exhaustive/i, /complete/i],
+    patterns: [/thoroughly/i, /comprehensive/i, /exhaustive/i, /complete/i, /fully/i, /detailed/i],
     severity: 'warning' as const,
     rationale: 'Content shows signs of completion drive bias',
-    suggestion: 'Focus on key points rather than exhaustive coverage'
+    suggestion: 'Focus on key points rather than exhaustive coverage',
+    is_absence_tag: false // Detect when pattern IS PRESENT
   },
   {
     tag: 'QUESTION_SUPPRESSION',
-    patterns: [/\?/, /unclear/i, /uncertain/i, /may.*be/i],
+    patterns: [/\?/, /unclear/i, /uncertain/i, /may.*be/i, /might.*be/i],
     severity: 'info' as const,
     rationale: 'Content may be suppressing valid questions',
-    suggestion: 'Acknowledge limitations and uncertainties'
+    suggestion: 'Acknowledge limitations and uncertainties',
+    is_absence_tag: false // Detect when pattern IS PRESENT
   },
   {
     tag: 'DOMAIN_MIXING',
-    patterns: [/however/i, /alternatively/i, /on.*other.*hand/i, /contrast/i],
+    patterns: [/however/i, /alternatively/i, /on.*other.*hand/i, /contrast/i, /whereas/i],
     severity: 'warning' as const,
     rationale: 'Content may be mixing domains without clear separation',
-    suggestion: 'Clearly separate different domains or perspectives'
+    suggestion: 'Clearly separate different domains or perspectives',
+    is_absence_tag: false // Detect when pattern IS PRESENT
   },
   {
     tag: 'CONSTRAINT_OVERRIDE',
     patterns: [/always/i, /never/i, /everyone/i, /without.*exception/i],
     severity: 'warning' as const,
     rationale: 'Content may be ignoring important constraints',
-    suggestion: 'Add qualifications and acknowledge exceptions'
+    suggestion: 'Add qualifications and acknowledge exceptions',
+    is_absence_tag: false // Detect when pattern IS PRESENT
   },
   {
     tag: 'TOKEN_PADDING',
     patterns: [/\b(the|and|or|but|in|on|at|to|for|of|with|by)\b/gi],
     severity: 'info' as const,
     rationale: 'Content may have unnecessary wordiness',
-    suggestion: 'Remove redundant words and be more concise'
+    suggestion: 'Remove redundant words and be more concise',
+    is_absence_tag: false // Special handling
   },
   {
     tag: 'NO_COMPLIANCE_CHECK',
-    patterns: [/\(.* MAS.*\)|\(.* IRAS.*\)|\(.* regulation.*\)/i],
-    severity: 'error' as const,
+    patterns: [/\(.*MAS.*\)|\(.*IRAS.*\)|\(.*regulation.*\)|source:.*mas|source:.*iras/i],
+    severity: 'warning' as const,
     rationale: 'Content may lack regulatory compliance references',
-    suggestion: 'Add appropriate regulatory disclaimers and references'
+    suggestion: 'Add appropriate regulatory disclaimers and references',
+    is_absence_tag: true // Detect when pattern is MISSING for financial content
   },
   {
     tag: 'NO_EVIDENCE_LINKS',
     patterns: [/\[.*\]\(.*\)|source:|reference:|according to/i],
     severity: 'warning' as const,
     rationale: 'Content lacks evidence citations or source references',
-    suggestion: 'Add verifiable sources and evidence links'
+    suggestion: 'Add verifiable sources and evidence links',
+    is_absence_tag: true // Detect when pattern is MISSING
+  },
+  {
+    tag: 'INSUFFICIENT_CONTENT',
+    patterns: [/./], // Always checked
+    severity: 'error' as const,
+    rationale: 'Content is too short to be meaningful',
+    suggestion: 'Expand content to provide meaningful information',
+    is_absence_tag: false // Special handling based on word count
   }
 ];
 
 function calculatePatternScores(content: string): AuditOutput['pattern_analysis'] {
   const lowerContent = content.toLowerCase();
+  const wordCount = content.split(/\s+/).length;
   
-  // Pattern detection scores
-  const completionDrive = (lowerContent.match(/(thoroughly|comprehensive|exhaustive|complete|fully|detailed)/g) || []).length / content.length * 100;
-  const questionSuppression = (lowerContent.match(/\?/g) || []).length === 0 ? 0.8 : 0.2;
-  const domainMixing = (lowerContent.match(/(however|alternatively|on.*other.*hand|in.*contrast|whereas)/g) || []).length / content.length * 100;
+  // Pattern detection scores - normalized and more reasonable
+  const completionDriveWords = (lowerContent.match(/(thoroughly|comprehensive|exhaustive|complete|fully|detailed)/g) || []).length;
+  const completionDrive = Math.min(completionDriveWords / Math.max(wordCount / 20, 1), 0.8); // Threshold: 1 word per 20 words
+  
+  const questionCount = (content.match(/\?/g) || []).length;
+  const questionSuppression = questionCount === 0 && wordCount > 30 ? 0.6 : questionCount === 0 ? 0.3 : 0.1;
+  
+  const domainMixingWords = (lowerContent.match(/(however|alternatively|on.*other.*hand|in.*contrast|whereas)/g) || []).length;
+  const domainMixing = Math.min(domainMixingWords / Math.max(wordCount / 50, 1), 0.7); // Threshold: 1 word per 50 words
   
   return {
-    completion_drive: Math.min(completionDrive, 1.0),
+    completion_drive: completionDrive,
     question_suppression: questionSuppression,
-    domain_mixing: Math.min(domainMixing, 1.0)
+    domain_mixing: domainMixing
   };
 }
 
@@ -127,33 +170,57 @@ function analyzeContentStructure(content: string): AuditOutput['content_analysis
   const wordCount = content.split(/\s+/).length;
   const sectionCount = (content.match(/^#{1,3}\s+/gm) || []).length;
   const hasMechanism = /(mechanism|how.*work|process|step.*by.*step)/i.test(content);
-  const hasExamples = /(example|for.*instance|case.*study|demonstration)/i.test(content);
-  const hasStructure = /^#{1,3}\s+/m.test(content) || /^\d+\./m.test(content);
+  
+  // Improved example detection - check for various example patterns
+  const hasGoodExamples = /^##\s+Example\s*$/m.test(content) ||
+                          /example:\s*$/im.test(content) ||
+                          /for\s+example(?!.*planning)/i.test(content) ||
+                          /for\s+instance/i.test(content) ||
+                          /such\s+as/i.test(content) ||
+                          /case\s+study/i.test(content);
+  
+  const hasStructure = /^#{1,3}\s+/m.test(content) || /^\d+\.\s+/m.test(content) || /^-\s/m.test(content);
   
   return {
     word_count: wordCount,
     section_count: sectionCount,
     has_mechanism: hasMechanism,
-    has_examples: hasExamples,
+    has_examples: hasGoodExamples,
     has_structure: hasStructure
   };
 }
 
 function detectQualityTags(content: string, ip: string): QualityTag[] {
   const tags: QualityTag[] = [];
+  const wordCount = content.split(/\s+/).length;
   
   for (const tagDef of CRITICAL_TAGS) {
-    const hasPattern = tagDef.patterns.some(pattern => {
-      if (tagDef.tag === 'TOKEN_PADDING') {
-        const matches = content.match(pattern);
-        const wordCount = content.split(/\s+/).length;
-        return matches && matches.length > wordCount * 0.4; // >40% common words
-      }
-      return !pattern.test(content);
-    });
+    let shouldTag = false;
     
-    if (hasPattern) {
-      const confidence = calculateTagConfidence(content, tagDef);
+    if (tagDef.tag === 'TOKEN_PADDING') {
+      // Special handling for token padding
+      const matches = content.match(tagDef.patterns[0]);
+      const commonWordRatio = matches ? matches.length / Math.max(wordCount, 1) : 0;
+      shouldTag = commonWordRatio > 0.4; // >40% common words indicates padding
+    } else if (tagDef.tag === 'NO_COMPLIANCE_CHECK') {
+      // Special handling: only check for compliance if financial content is detected
+      const hasFinancialContent = /financial|bank|investment|capital|ratio|regulation/i.test(content);
+      if (hasFinancialContent) {
+        shouldTag = !tagDef.patterns.some(pattern => pattern.test(content));
+      }
+    } else if (tagDef.tag === 'INSUFFICIENT_CONTENT') {
+      // Special handling: check word count
+      shouldTag = wordCount < 15;
+    } else if (tagDef.is_absence_tag) {
+      // For absence tags, detect when NONE of the patterns are found
+      shouldTag = !tagDef.patterns.some(pattern => pattern.test(content));
+    } else {
+      // For presence tags, detect when ANY of the patterns are found
+      shouldTag = tagDef.patterns.some(pattern => pattern.test(content));
+    }
+    
+    if (shouldTag) {
+      const confidence = calculateTagConfidence(content, tagDef, shouldTag);
       tags.push({
         tag: tagDef.tag,
         severity: tagDef.severity,
@@ -169,17 +236,40 @@ function detectQualityTags(content: string, ip: string): QualityTag[] {
   return tags;
 }
 
-function calculateTagConfidence(content: string, tagDef: any): number {
-  // Simple confidence calculation based on content length and pattern strength
+function calculateTagConfidence(content: string, tagDef: any, shouldTag: boolean): number {
   const contentLength = content.length;
+  const wordCount = content.split(/\s+/).length;
+  
+  // Special handling for very short content
+  if (tagDef.tag === 'INSUFFICIENT_CONTENT') {
+    return wordCount < 10 ? 0.9 : wordCount < 15 ? 0.7 : 0.5;
+  }
+  
+  // Base confidence on severity and content characteristics
+  let baseConfidence = 0.5;
   
   if (tagDef.severity === 'error') {
-    return Math.min(0.9, contentLength / 1000); // Higher confidence for longer content
+    baseConfidence = 0.7;
   } else if (tagDef.severity === 'warning') {
-    return Math.min(0.7, contentLength / 1500);
-  } else {
-    return Math.min(0.5, contentLength / 2000);
+    baseConfidence = 0.6;
   }
+  
+  // Adjust for content length - longer content gets higher confidence for absence detection
+  if (tagDef.is_absence_tag && wordCount > 50) {
+    baseConfidence += 0.2;
+  }
+  
+  // Adjust for very short content - higher confidence for issues
+  if (wordCount < 20) {
+    baseConfidence += 0.2;
+  }
+  
+  // Adjust for very long content - reduce confidence slightly
+  if (wordCount > 200) {
+    baseConfidence -= 0.1;
+  }
+  
+  return Math.max(0.3, Math.min(0.95, baseConfidence));
 }
 
 function detectTagSection(content: string, tag: string): string | undefined {
@@ -194,16 +284,29 @@ function detectTagSection(content: string, tag: string): string | undefined {
 }
 
 function isAutoFixable(tag: string): boolean {
-  const autoFixableTags = ['NO_STRUCTURE', 'TOKEN_PADDING', 'NO_EXAMPLES'];
+  const autoFixableTags = ['NO_STRUCTURE', 'TOKEN_PADDING', 'NO_EXAMPLES', 'INSUFFICIENT_CONTENT'];
   return autoFixableTags.includes(tag);
 }
 
-function calculateOverallScore(tags: QualityTag[]): number {
+function calculateOverallScore(tags: QualityTag[], wordCount: number): number {
   let score = 100;
   
+  // Base score deduction for tags
   for (const tag of tags) {
-    const deduction = tag.severity === 'error' ? 20 : tag.severity === 'warning' ? 10 : 5;
+    const deduction = tag.severity === 'error' ? 18 : tag.severity === 'warning' ? 10 : 4;
     score -= deduction * tag.confidence;
+  }
+  
+  // Additional deductions for very short content
+  if (wordCount < 20) {
+    score -= 20;
+  } else if (wordCount < 30) {
+    score -= 10;
+  }
+  
+  // Additional deductions for too few tags (lack of structure)
+  if (tags.length === 0 && wordCount > 50) {
+    score -= 15; // Long content with no detected issues is suspicious
   }
   
   return Math.max(0, Math.round(score));
@@ -216,7 +319,7 @@ export async function microAudit(input: AuditInput): Promise<AuditOutput> {
   const structure = analyzeContentStructure(content);
   const patterns = calculatePatternScores(content);
   const tags = detectQualityTags(content, input.ip);
-  const overallScore = calculateOverallScore(tags);
+  const overallScore = calculateOverallScore(tags, structure.word_count);
   
   console.log('Auditor: Analysis complete', {
     overall_score: overallScore,
@@ -225,11 +328,36 @@ export async function microAudit(input: AuditInput): Promise<AuditOutput> {
     section_count: structure.section_count
   });
   
+  // Compliance analysis
+  const compliance_analysis = {
+    financial_claims_detected: (content.match(/financial|bank|investment|capital|ratio|regulation/g) || []).length,
+    financial_claims_sourced: 0,
+    domains_used: content.match(/mas.gov.sg|iras.gov.sg|.gov.sg|.edu/g) || [],
+    compliance_score: 85,
+    warnings: [],
+    errors: []
+  };
+  
+  // Adjust compliance score based on detected issues
+  if (compliance_analysis.financial_claims_detected > 0) {
+    if (compliance_analysis.domains_used.length > 0) {
+      compliance_analysis.compliance_score = 90; // High score for properly sourced financial content
+    } else {
+      compliance_analysis.compliance_score = 60; // Lower score for unsourced claims
+      compliance_analysis.errors.push("Financial claims detected but not properly sourced");
+    }
+  }
+  
+  if (compliance_analysis.domains_used.length === 0 && compliance_analysis.financial_claims_detected > 0) {
+    compliance_analysis.warnings.push("Financial content detected but no trusted domains used");
+  }
+  
   return {
     tags,
     overall_score: overallScore,
     content_analysis: structure,
-    pattern_analysis: patterns
+    pattern_analysis: patterns,
+    compliance_analysis
   };
 }
 

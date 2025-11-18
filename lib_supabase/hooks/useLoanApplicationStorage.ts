@@ -5,12 +5,15 @@ import { LoanApplicationData } from './useLoanApplicationContext'
 import { compat } from '../utils/compat'
 
 const STORAGE_KEY = 'eip_loan_application'
-const STORAGE_VERSION = '1.0'
+export const STORAGE_VERSION = '1.0'
 
 export interface StoredApplicationData extends LoanApplicationData {
   version: string
   lastUpdated: string
 }
+
+// Re-export LoanApplicationData for test imports
+export type { LoanApplicationData }
 
 /**
  * Persists loan application data to localStorage using single-write pattern
@@ -19,7 +22,7 @@ export interface StoredApplicationData extends LoanApplicationData {
 export function useLoanApplicationStorage(
   data: LoanApplicationData,
   sessionId: string
-) {
+): void {
   // Save to localStorage whenever data changes using single-write pattern
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -104,7 +107,7 @@ export function retrieveLoanApplicationData(
 /**
  * Clears loan application data from localStorage using single-write pattern
  */
-export function clearLoanApplicationData(sessionId: string) {
+export function clearLoanApplicationData(sessionId: string): void {
   if (typeof window === 'undefined') return
 
   try {

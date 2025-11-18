@@ -109,7 +109,7 @@ Follows MAS guidelines for corporate governance and strategic risk management.`,
       if (result.pattern_analysis.completion_drive > 0.1) {
         const completionTag = result.tags.find(t => t.tag === 'COMPLETION_DRIVE');
         expect(completionTag).toBeDefined();
-        expect(completionTag?.severity).toBe('warning' || 'error');
+        expect(completionTag?.severity).toBe('warning');
       }
     });
 
@@ -202,7 +202,7 @@ Approval or denial notification.`;
       expect(result.content_analysis.has_structure).toBe(true);
       
       // Should detect numbered steps
-      expect(processContent).toMatch(/\d+\./);
+      expect(processContent).toMatch(/Step \d+:/);
     });
   });
 
@@ -337,7 +337,7 @@ Approval or denial notification.`;
       autoFixes.forEach(fix => {
         expect(fix).toHaveProperty('type');
         expect(fix).toHaveProperty('suggestion');
-        expect(['NO_STRUCTURE', 'NO_EXAMPLES', 'TOKEN_PADDING']).toContain(fix.type);
+        expect(['NO_STRUCTURE', 'NO_EXAMPLES', 'TOKEN_PADDING', 'INSUFFICIENT_CONTENT']).toContain(fix.type);
       });
     });
   });

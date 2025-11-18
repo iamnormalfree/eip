@@ -76,7 +76,7 @@ async function setupEipDatabase() {
           throw new Error('DATABASE_URL not found in environment variables');
         }
 
-        const { stdout, stderr } = execSync(`npx supabase db push --db-url "${dbUrl}" --include-all`, {
+      const result = execSync(`npx supabase db push --db-url "${dbUrl}" --include-all`, {
           cwd: process.cwd(),
           env: {
             ...process.env,
@@ -86,14 +86,12 @@ async function setupEipDatabase() {
           timeout: 120000 // 2 minute timeout
         });
 
+        const output = result.toString();
         console.log('✅ Supabase CLI migrations applied successfully');
-        if (stdout) console.log('   Output:', stdout.toString());
-        if (stderr) console.log('   Warnings:', stderr.toString());
-
+        console.log('   Output:', output);
       } catch (error: any) {
         console.error('❌ Supabase CLI failed:', error.message);
-        if (error.stderr) console.error('   Error output:', error.stderr.toString());
-        console.log('⚠️  Falling back to manual execution...');
+        if (error.message) console.error('   Error output:', error.message);
         // Fallback to manual execution
         await executeMigrationsManually(supabaseMigrationsPath);
       }

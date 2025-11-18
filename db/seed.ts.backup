@@ -1,9 +1,0 @@
-// ABOUTME: DB seed (skeleton)
-// ABOUTME: Placeholder to insert demo entities/artifacts later.
-
-function main() {
-  console.log('DB seed (skeleton): no-op');
-}
-
-main();
-

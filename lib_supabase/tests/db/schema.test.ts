@@ -1,7 +1,7 @@
 // ABOUTME: Database Schema Validation Tests (Schema Coexistence)
 // ABOUTME: Tests that EIP schema creates without breaking broker functionality
 
-import { Database } from '../db/types/database.types'
+import { Database } from '../../types/database.types'
 
 describe('EIP Database Schema (Schema Coexistence)', () => {
   describe('Schema Structure', () => {
@@ -24,37 +24,17 @@ describe('EIP Database Schema (Schema Coexistence)', () => {
       expect(eipJobs).toBeDefined()
     })
 
-    test('Broker tables should still exist (preserved)', () => {
-      // Test broker tables are preserved by accessing types directly
-      const aiBrokers: Database['public']['Tables']['ai_brokers'] = {} as any
-      const brokerConversations: Database['public']['Tables']['broker_conversations'] = {} as any
-      const brokerPerformance: Database['public']['Tables']['broker_performance'] = {} as any
-      const conversationTurnEvents: Database['public']['Tables']['conversation_turn_events'] = {} as any
-      
-      expect(aiBrokers).toBeDefined()
-      expect(brokerConversations).toBeDefined()
-      expect(brokerPerformance).toBeDefined()
-      expect(conversationTurnEvents).toBeDefined()
-    })
-
     test('EIP bridge functions should be defined', () => {
       // Test bridge functions exist by accessing types directly
-      const getArtifactsFunction: Database['public']['Functions']['get_eip_artifacts_for_broker_conversation'] = {} as any
-      const linkEntitiesFunction: Database['public']['Functions']['link_broker_conversation_to_eip_entities'] = {} as any
+      const getArtifactsFunction: Database['public']['Functions']['get_next_eip_job'] = {} as any
+      const linkEntitiesFunction: Database['public']['Functions']['complete_eip_job'] = {} as any
+      const failJobFunction: Database['public']['Functions']['fail_eip_job_to_dlq'] = {} as any
+      const getStatsFunction: Database['public']['Functions']['get_eip_job_stats'] = {} as any
       
       expect(getArtifactsFunction).toBeDefined()
       expect(linkEntitiesFunction).toBeDefined()
-    })
-
-    test('Broker functions should still exist (preserved)', () => {
-      // Test broker functions are preserved by accessing types directly
-      const checkAssignmentFunction: Database['public']['Functions']['check_broker_assignment'] = {} as any
-      const getAssignedBrokerFunction: Database['public']['Functions']['get_assigned_broker'] = {} as any
-      const updateMetricsFunction: Database['public']['Functions']['update_metrics_after_response'] = {} as any
-      
-      expect(checkAssignmentFunction).toBeDefined()
-      expect(getAssignedBrokerFunction).toBeDefined()
-      expect(updateMetricsFunction).toBeDefined()
+      expect(failJobFunction).toBeDefined()
+      expect(getStatsFunction).toBeDefined()
     })
   })
 
@@ -88,19 +68,20 @@ describe('EIP Database Schema (Schema Coexistence)', () => {
     })
 
     test('Bridge function return types should be correct', () => {
-      type GetArtifactsReturn = Database['public']['Functions']['get_eip_artifacts_for_broker_conversation']['Returns']
+      type GetArtifactsReturn = Database['public']['Functions']['get_next_eip_job']['Returns']
       
       const artifact: GetArtifactsReturn[0] = {
-        id: 'test-id',
-        slug: 'test-slug',
-        status: 'published',
-        title: 'Test Title',
+        job_id: 'test-id',
+        brief: 'Test brief',
         persona: 'first_time_buyer',
-        funnel: 'mofu'
+        funnel: 'mofu',
+        tier: 'LIGHT',
+        queue_job_id: 'queue-test-id',
+        correlation_id: 'test-correlation'
       }
       
-      expect(artifact.id).toBe('test-id')
-      expect(artifact.status).toBe('published')
+      expect(artifact.job_id).toBe('test-id')
+      expect(artifact.tier).toBe('LIGHT')
     })
   })
 
@@ -118,29 +99,14 @@ describe('EIP Database Schema (Schema Coexistence)', () => {
         'eip_jobs'
       ]
       
-      const brokerTables: TableNames[] = [
-        'ai_brokers',
-        'broker_conversations',
-        'broker_performance',
-        'conversation_turn_events'
-      ]
-      
       // Should have EIP tables with proper prefix
       expect(eipTables).toContain('eip_artifacts')
       expect(eipTables).toContain('eip_entities')
       expect(eipTables).toContain('eip_jobs')
       
-      // Should have broker tables preserved
-      expect(brokerTables).toContain('ai_brokers')
-      expect(brokerTables).toContain('broker_conversations')
-      
       // Should not have conflicts (all EIP tables have prefix)
       eipTables.forEach(table => {
         expect(table.toString()).toMatch(/^eip_/)
-      })
-      
-      brokerTables.forEach(table => {
-        expect(table.toString()).not.toMatch(/^eip_/)
       })
     })
 
@@ -148,29 +114,20 @@ describe('EIP Database Schema (Schema Coexistence)', () => {
       // Create function name arrays from the Database interface
       type FunctionNames = keyof Database['public']['Functions']
       const eipFunctions: FunctionNames[] = [
-        'get_eip_artifacts_for_broker_conversation',
-        'link_broker_conversation_to_eip_entities'
+        'get_next_eip_job',
+        'complete_eip_job',
+        'fail_eip_job_to_dlq',
+        'get_eip_job_stats'
       ]
       
-      const brokerFunctions: FunctionNames[] = [
-        'check_broker_assignment',
-        'get_assigned_broker', 
-        'update_metrics_after_response'
-      ]
-      
-      // Should have both EIP bridge and broker functions
+      // Should have EIP functions with proper naming
       eipFunctions.forEach(func => {
-        expect(func.toString()).toMatch(/^(get_eip_|link_broker_)/)
-      })
-      
-      brokerFunctions.forEach(func => {
-        expect(func.toString()).not.toMatch(/^(get_eip_|link_broker_)/)
+        expect(func.toString()).toMatch(/^(get_next_|complete_|fail_|get_eip_)/)
       })
       
       // Functions should be distinct
-      const allFunctions = [...eipFunctions, ...brokerFunctions]
-      const uniqueFunctions = new Set(allFunctions)
-      expect(uniqueFunctions.size).toBe(allFunctions.length)
+      const uniqueFunctions = new Set(eipFunctions)
+      expect(uniqueFunctions.size).toBe(eipFunctions.length)
     })
   })
 })

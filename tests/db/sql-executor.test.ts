@@ -112,7 +112,7 @@ describe('SQL Executor', () => {
   });
 
   describe('Error Handling', () => {
-    it('should handle malformed SQL gracefully', () => {
+    it('should handle malformed SQL gracefully', async () => {
       const malformedSQL = 'CREATE TABLE (invalid sql syntax';
       
       // Mock console.error to avoid test output noise

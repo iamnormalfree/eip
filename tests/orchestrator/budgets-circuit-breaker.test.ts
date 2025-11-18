@@ -4,6 +4,31 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { BudgetEnforcer, BudgetCircuitBreaker, Tier } from '../../orchestrator/budget';
 
+// Extend interfaces for testing purposes
+// Extend interfaces for testing purposes - use type assertion approach
+interface BudgetEnforcerTest {
+  tracker: {
+    start_time: number;
+    tokens_used: number;
+    stage_tokens: Record<string, number>;
+    active_stages: Set<string>;
+    stages_completed: string[];
+    stages_failed: string[];
+    breaches: Array<{
+      type: 'token' | 'time' | 'cost';
+      amount: number;
+      limit: number;
+      timestamp: number;
+      stage?: string;
+    }>;
+  };
+  circuitBreaker?: BudgetCircuitBreaker;
+}
+
+interface BudgetCircuitBreakerTest {
+  state?: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
+  lastFailureTime?: number;
+}
 describe('Budget Circuit Breaker System', () => {
   let budgetEnforcer: BudgetEnforcer;
 
@@ -92,7 +117,8 @@ describe('Budget Circuit Breaker System', () => {
       const originalStartTime = tracker.start_time;
 
       // Simulate that 25 seconds have passed (exceeds 20s limit)
-      (lightEnforcer as any).tracker.start_time = Date.now() - 25000;
+      const testEnforcer = lightEnforcer as unknown as BudgetEnforcerTest;
+      testEnforcer.tracker.start_time = Date.now() - 25000;
 
       const timeCheck = lightEnforcer.checkStageBudget('generator');
       expect(timeCheck.ok).toBe(false);
@@ -158,7 +184,8 @@ describe('Budget Circuit Breaker System', () => {
       circuitBreaker.recordFailure();
 
       // Mock the circuit breaker in BudgetEnforcer
-      (budgetEnforcer as any).circuitBreaker = circuitBreaker;
+      const testEnforcer = budgetEnforcer as unknown as BudgetEnforcerTest;
+      testEnforcer.circuitBreaker = circuitBreaker;
 
       const dlqRecord = budgetEnforcer.createDLQRecord();
 
@@ -181,7 +208,8 @@ describe('Budget Circuit Breaker System', () => {
     it('should provide relevant recovery suggestions for time breaches', () => {
       budgetEnforcer.startStage('generator');
       // Simulate time breach by manipulating start time
-      (budgetEnforcer as any).tracker.start_time = Date.now() - 50000; // 50 seconds ago
+      const testEnforcer = budgetEnforcer as unknown as BudgetEnforcerTest;
+      testEnforcer.tracker.start_time = Date.now() - 50000; // 50 seconds ago
       budgetEnforcer.checkStageBudget('generator'); // Need to call this to record breach
 
       const dlqRecord = budgetEnforcer.createDLQRecord();
@@ -220,7 +248,10 @@ describe('Budget Circuit Breaker System', () => {
         const budgetWithLimits = enforcer.getBudgetWithStageLimits();
 
         Object.entries(expectedLimits).forEach(([stage, limit]) => {
-          expect(budgetWithLimits.stage_limits[stage].tokens).toBeLessThanOrEqual(limit);
+          const stageLimit = budgetWithLimits.stage_limits[stage as keyof typeof budgetWithLimits.stage_limits];
+          if (stageLimit) {
+            expect(stageLimit.tokens).toBeLessThanOrEqual(limit);
+          }
         });
       });
     });
@@ -280,8 +311,9 @@ describe('Budget Circuit Breaker System', () => {
       circuitBreaker.recordFailure();
 
       // Simulate time passing and entering HALF_OPEN
-      (circuitBreaker as any).state = 'HALF_OPEN';
-      (circuitBreaker as any).lastFailureTime = Date.now() - 40000; // 40 seconds ago
+      const testCircuitBreaker = circuitBreaker as unknown as BudgetCircuitBreakerTest;
+      testCircuitBreaker.state = 'HALF_OPEN';
+      testCircuitBreaker.lastFailureTime = Date.now() - 40000; // 40 seconds ago
 
       expect(circuitBreaker.getState()).toBe('HALF_OPEN');
 
@@ -344,13 +376,13 @@ describe('Budget Circuit Breaker System', () => {
 
   describe('Performance and Edge Cases', () => {
     it('should handle rapid token additions efficiently', () => {
-      const start = performance.now();
+      const start = Date.now();
 
       for (let i = 0; i < 1000; i++) {
         budgetEnforcer.addTokens('generator', 1);
       }
 
-      const end = performance.now();
+      const end = Date.now();
       expect(end - start).toBeLessThan(100); // Should complete in < 100ms
 
       expect(budgetEnforcer.getTracker().tokens_used).toBe(1000);
@@ -385,7 +417,7 @@ describe('Budget Circuit Breaker System', () => {
 
     it('should handle invalid stage names gracefully', () => {
       expect(() => {
-        budgetEnforcer.checkStageBudget('invalid_stage' as any);
+        budgetEnforcer.checkStageBudget('invalid_stage' as any); // Testing invalid stage handling
       }).not.toThrow();
 
       expect(budgetEnforcer.canProceed().ok).toBe(true); // Should not affect circuit breaker

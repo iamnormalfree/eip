@@ -3,8 +3,8 @@
 
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Test configuration
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321';
@@ -98,7 +98,7 @@ describe('Database Schema Validation', () => {
         // Fallback: check through information schema if available
         const { data, error } = await supabase
           .rpc('get_table_columns', { table_name: 'content_pieces' })
-          .catch(() => ({ data: [], error: { message: 'Function not available' } }));
+          || { data: [], error: { message: 'Function not available' } };
 
         if (!error || error.message !== 'Function not available') {
           const columnNames = data?.map((col: any) => col.column_name) || [];
@@ -117,10 +117,10 @@ describe('Database Schema Validation', () => {
         expect(schemaSql).toContain('FOREIGN KEY');
         
         // Check for indexes on performance-critical columns
-        expect(schemaSql).toContain('INDEX') || expect(schemaSql).toContain('CREATE INDEX');
+        expect(schemaSql).toContain("INDEX");
         
         // Check for RLS policies
-        expect(schemaSql).toContain('ROW LEVEL SECURITY') || expect(schemaSql).toContain('POLICY');
+        expect(schemaSql).toContain("ROW LEVEL SECURITY");
       }
     });
 
