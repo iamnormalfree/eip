@@ -1,0 +1,112 @@
+# ABOUTME: Domain Authority Patterns for Singapore Compliance
+# ABOUTME: Detailed domain patterns with wildcard support and trust levels
+
+# Domain authority levels and patterns
+domain_authority:
+  # Critical: Singapore government and regulatory bodies
+  critical:
+    patterns:
+      - "*.gov.sg"
+      - "mas.gov.sg"
+      - "iras.gov.sg"
+      - "hdb.gov.sg"
+      - "moe.gov.sg"
+      - "mom.gov.sg"
+      - "spring.gov.sg"
+    trust_level: 100
+    auto_approve: true
+    freshness_requirement: 7
+    
+  # High: Licensed financial institutions and educational bodies
+  high:
+    patterns:
+      - "*.bank"
+      - "*.edu.sg"
+      - "*.edu"
+      - "a_star.edu.sg"
+      - "nus.edu.sg"
+      - "ntu.edu.sg"
+      - "smu.edu.sg"
+      - "sutd.edu.sg"
+      - "sit.edu.sg"
+      - "suss.edu.sg"
+    trust_level: 85
+    auto_approve: false
+    freshness_requirement: 14
+    
+  # Medium: Enterprise research and established business sources
+  medium:
+    patterns:
+      - "gartner.com"
+      - "forrester.com"
+      - "hbr.org"
+      - "mckinsey.com"
+      - "deloitte.com"
+      - "pwc.com"
+      - "ey.com"
+      - "kpmg.com"
+      - "sccci.org.sg"
+      - "sicc.org.sg"
+    trust_level: 70
+    auto_approve: false
+    freshness_requirement: 30
+    
+  # Standard: Technical and academic sources
+  standard:
+    patterns:
+      - "ieee.org"
+      - "acm.org"
+      - "arxiv.org"
+      - "github.com"
+      - "stackoverflow.com"
+      - "w3.org"
+      - "medium.com"
+      - "linkedin.com"
+    trust_level: 60
+    auto_approve: false
+    freshness_requirement: 90
+
+# Singapore-specific domain validation rules
+singapore_rules:
+  government_domains:
+    required_for: ["financial_advice", "regulatory_compliance", "legal_references"]
+    verification_method: "dns_validation"
+    
+  financial_institutions:
+    required_for: ["banking_products", "loan_information", "investment_advice"]
+    license_verification: true
+    mas_registry_check: true
+    
+  educational_institutions:
+    required_for: ["academic_research", "educational_content", "certification_programs"]
+    moe_registration_check: true
+    
+  sme_business_advisors:
+    required_for: ["business_advice", "sme_guidance", "startup_support"]
+    enterprise_sg_partnership: true
+
+# Domain wildcards and exclusion patterns
+wildcard_handling:
+  allowed_wildcards:
+    - "*.gov.sg"      # All Singapore government
+    - "*.edu.sg"      # All Singapore educational
+    - "*.bank"        # All licensed banks
+    - "*.com.sg"      # Singapore commercial entities
+    
+  excluded_patterns:
+    - "*spam*.gov.sg"
+    - "*test*.gov.sg"
+    - "*demo*.bank"
+    - "*phishing*.com.sg"
+
+# Regional context considerations
+regional_context:
+  singapore_focus:
+    language_preferences: ["en-sg", "en"]
+    currency_references: ["SGD", "S$"]
+    regulatory_framework: "MAS guidelines"
+    
+  asean_compatibility:
+    allowed_regional_sources: ["*.asean.org", "*.gov.my", "*.gov.th"]
+    trust_level_modifier: -10
+    additional_validation: true

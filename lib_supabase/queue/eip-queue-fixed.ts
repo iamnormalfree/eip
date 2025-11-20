@@ -12,7 +12,8 @@ export const EIP_QUEUES = {
   CONTENT_GENERATION: 'eip:prod:content-generation:primary:v1',
   BUDGET_VALIDATION: 'eip:prod:budget-enforcement:validation:v1', 
   AUDIT_REPAIR: 'eip:prod:quality:audit-repair:v1',
-  DLQ_PROCESSING: 'eip:prod:dlq:content-generation:v1'
+  DLQ_PROCESSING: 'eip:prod:dlq:content-generation:v1',
+  COMPLIANCE_CHECK: 'eip:prod:compliance-validation:primary:v1'
 } as const;
 
 export type Tier = 'LIGHT' | 'MEDIUM' | 'HEAVY';
@@ -73,14 +74,32 @@ export interface EIPDLQProcessingJob {
   type: 'dlq-processing';
   failed_job: any;
   failure_reason: string;
-  failure_type: 'budget_breach' | 'system_error' | 'timeout' | 'circuit_breaker';
+  failure_type: 'budget_breach' | 'system_error' | 'timeout' | 'circuit_breaker' | 'compliance_violation';
   retry_count: number;
   dlq_timestamp: number;
   recovery_attempts?: number;
   correlation_id?: string;
 }
 
-export type EIPJob = EIPContentGenerationJob | EIPBudgetValidationJob | EIPAuditRepairJob | EIPDLQProcessingJob;
+export interface EIPComplianceValidationJob {
+  type: 'compliance-validation';
+  job_id: string;
+  content: string;
+  context?: {
+    title?: string;
+    target_audience?: string;
+    content_type?: string;
+    geographical_focus?: string;
+    language?: string;
+  };
+  sources: string[];
+  correlation_id?: string;
+  artifact_id?: string;
+  priority?: number;
+  validation_level?: 'standard' | 'enhanced' | 'comprehensive';
+}
+
+export type EIPJob = EIPContentGenerationJob | EIPBudgetValidationJob | EIPAuditRepairJob | EIPDLQProcessingJob | EIPComplianceValidationJob;
 
 // ============================================================================
 // QUEUE OPERATIONS - EXPOSED INTERFACE
@@ -175,32 +194,40 @@ export async function getEIPQueueMetrics() {
       connection: getRedisConnection(),
     });
 
-    const [content, budget, audit, dlq] = await Promise.all([
+    const complianceQueue = new Queue(EIP_QUEUES.COMPLIANCE_CHECK, {
+      connection: getRedisConnection(),
+    });
+
+    const [content, budget, audit, dlq, compliance] = await Promise.all([
       contentQueue.getWaitingCount(),
       budgetQueue.getWaitingCount(),
       auditQueue.getWaitingCount(),
       dlqQueue.getWaitingCount(),
+      complianceQueue.getWaitingCount(),
     ]);
 
-    const [contentActive, budgetActive, auditActive, dlqActive] = await Promise.all([
+    const [contentActive, budgetActive, auditActive, dlqActive, complianceActive] = await Promise.all([
       contentQueue.getActiveCount(),
       budgetQueue.getActiveCount(),
       auditQueue.getActiveCount(),
       dlqQueue.getActiveCount(),
+      complianceQueue.getActiveCount(),
     ]);
 
-    const [contentCompleted, budgetCompleted, auditCompleted, dlqCompleted] = await Promise.all([
+    const [contentCompleted, budgetCompleted, auditCompleted, dlqCompleted, complianceCompleted] = await Promise.all([
       contentQueue.getCompletedCount(),
       budgetQueue.getCompletedCount(),
       auditQueue.getCompletedCount(),
       dlqQueue.getCompletedCount(),
+      complianceQueue.getCompletedCount(),
     ]);
 
-    const [contentFailed, budgetFailed, auditFailed, dlqFailed] = await Promise.all([
+    const [contentFailed, budgetFailed, auditFailed, dlqFailed, complianceFailed] = await Promise.all([
       contentQueue.getFailedCount(),
       budgetQueue.getFailedCount(),
       auditQueue.getFailedCount(),
       dlqQueue.getFailedCount(),
+      complianceQueue.getFailedCount(),
     ]);
 
     return {
@@ -228,15 +255,96 @@ export async function getEIPQueueMetrics() {
         completed: dlqCompleted,
         failed: dlqFailed,
       },
+      compliance_validation: {
+        waiting: compliance,
+        active: complianceActive,
+        completed: complianceCompleted,
+        failed: complianceFailed,
+      },
       totals: {
-        waiting: content + budget + audit + dlq,
-        active: contentActive + budgetActive + auditActive + dlqActive,
-        completed: contentCompleted + budgetCompleted + auditCompleted + dlqCompleted,
-        failed: contentFailed + budgetFailed + auditFailed + dlqFailed,
+        waiting: content + budget + audit + dlq + compliance,
+        active: contentActive + budgetActive + auditActive + dlqActive + complianceActive,
+        completed: contentCompleted + budgetCompleted + auditCompleted + dlqCompleted + complianceCompleted,
+        failed: contentFailed + budgetFailed + auditFailed + dlqFailed + complianceFailed,
       }
     };
   } catch (error) {
     console.error('❌ Failed to get EIP queue metrics:', error);
     return null;
+  }
+}
+
+export async function submitComplianceValidationJob(data: {
+  job_id: string;
+  content: string;
+  context?: {
+    title?: string;
+    target_audience?: string;
+    content_type?: string;
+    geographical_focus?: string;
+    language?: string;
+  };
+  sources: string[];
+  artifact_id?: string;
+  correlation_id?: string;
+  priority?: number;
+  validation_level?: 'standard' | 'enhanced' | 'comprehensive';
+}): Promise<{ jobId: string; success: boolean; error?: string }> {
+  try {
+    const timestamp = Date.now();
+    const jobId = 'compliance-' + timestamp;
+    
+    const priority = data.priority || 5; // Default medium priority
+    
+    const jobData = {
+      type: 'compliance-validation',
+      job_id: data.job_id,
+      content: data.content,
+      context: data.context,
+      sources: data.sources,
+      artifact_id: data.artifact_id,
+      correlation_id: data.correlation_id,
+      priority: priority,
+      validation_level: data.validation_level || 'standard'
+    };
+
+    console.log('📋 Submitting EIP compliance validation job:', {
+      jobId: jobId,
+      artifact_id: data.artifact_id,
+      sources_count: data.sources.length,
+      validation_level: data.validation_level || 'standard'
+    });
+
+    // Create queue instance
+    const queue = new Queue(EIP_QUEUES.COMPLIANCE_CHECK, {
+      connection: getRedisConnection(),
+      defaultJobOptions: {
+        attempts: 2, // Fewer attempts for compliance validation
+        backoff: {
+          type: 'exponential',
+          delay: 3000,
+        },
+      },
+    });
+
+    const job = await queue.add(
+      'compliance-validation',
+      jobData,
+      {
+        jobId: jobId,
+        priority: priority,
+      }
+    );
+
+    console.log('✅ EIP compliance validation job submitted: ' + job.id);
+    return { jobId: job.id!, success: true };
+
+  } catch (error) {
+    console.error('❌ Failed to submit EIP compliance validation job:', error);
+    return {
+      jobId: '',
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
   }
 }

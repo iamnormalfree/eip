@@ -1,0 +1,135 @@
+# ABOUTME: Singapore Compliance Disclaimer Templates for EIP
+# ABOUTME: Template-based disclaimer system with Singapore-specific content
+
+# Template categories and their mappings
+template_categories:
+  educational_context:
+    level: "minimal"
+    use_case: "Purely educational content"
+    singapore_specific: false
+    
+  methodology_disclaimer:
+    level: "low"
+    use_case: "Process and methodology guidance"
+    singapore_specific: true
+    
+  comparative_disclaimer:
+    level: "medium"
+    use_case: "Comparative analysis of options"
+    singapore_specific: true
+    
+  advisory_disclaimer:
+    level: "high"
+    use_case: "Business and general advisory"
+    singapore_specific: true
+    
+  financial_disclaimer:
+    level: "critical"
+    use_case: "Financial and investment advice"
+    singapore_specific: true
+    mas_required: true
+
+# Disclaimer templates with Singapore context
+templates:
+  educational_context:
+    en: "This content is provided for educational purposes only to help you understand the topic better."
+    en-sg: "This content is for learning purposes only and should not be considered professional advice."
+    
+  methodology_disclaimer:
+    en: "The methodology described is for guidance purposes. Adapt it to your specific context and requirements."
+    en-sg: "This framework provides general guidance for Singapore contexts. Consider your specific business needs when applying."
+    
+  comparative_disclaimer:
+    en: "This comparison is based on publicly available information. Research thoroughly before making decisions."
+    en-sg: "This analysis compares options available in Singapore market. Please conduct due diligence for your specific situation."
+    
+  advisory_disclaimer:
+    en: "This guidance is for informational purposes only. Consult with qualified professionals for personalized advice."
+    en-sg: "This advice is general in nature. Please consult with relevant Singapore-based professionals for your specific needs."
+    
+  financial_disclaimer:
+    en: "This is not financial advice. Consult with qualified financial advisors and consider your risk tolerance."
+    en-sg: "This content is not financial advice regulated by MAS. Please consult licensed financial advisors in Singapore for personalized guidance."
+
+# Risk warning templates
+risk_warnings:
+  general:
+    en: "Information may become outdated. Verify current regulations and market conditions."
+    en-sg: "Regulations and market conditions in Singapore may change. Please verify current information."
+    
+  financial:
+    en: "All investments carry risk. Past performance does not guarantee future results."
+    en-sg: "Investment products in Singapore carry risks including potential loss of capital. Please refer to MAS guidelines."
+    
+  business:
+    en: "Business decisions involve risks. Consider market conditions and seek professional advice."
+    en-sg: "Business decisions in Singapore context involve regulatory and market risks. Please consult relevant authorities."
+
+# MAS-specific compliance elements
+mas_compliance:
+  required_elements:
+    - "This is not financial advice"
+    - "Consult licensed financial advisors"
+    - "Investment products carry risks"
+    
+  regulated_activities:
+    "capital_markets": "Capital markets services are regulated by MAS"
+    "financial_advisory": "Financial advisory services require MAS licensing"
+    "insurance": "Insurance products are regulated under Insurance Act"
+    "banking": "Banking products are regulated by Banking Act"
+
+# Template variables and formatting
+template_variables:
+  date: "{{current_date}}"
+  content_type: "{{content_category}}"
+  singapore_context: "{{sg_specific}}"
+  
+  financial_disclaimer:
+    advisor_type: "licensed financial advisor"
+    regulatory_body: "Monetary Authority of Singapore (MAS)"
+    warning_level: "investment risks"
+    
+  business_disclaimer:
+    advisor_type: "business consultant"
+    regulatory_body: "relevant Singapore authorities"
+    warning_level: "business risks"
+
+# Language and cultural adaptations
+singapore_adaptations:
+  language_preferences:
+    primary: "en-sg"
+    secondary: "en"
+    formal_context: "en"
+    
+  cultural_context:
+    formality_level: "medium-high"
+    directness: "moderate"
+    authority_respect: "high"
+    
+  common_phrases:
+    instead_of: ["you should", "we recommend"]
+    prefer: ["consider", "you may wish to"]
+    
+  regulatory_references:
+    full_names: true
+    acronym_usage: "after first mention"
+    website_links: "required for government sources"
+
+# Template validation rules
+validation_rules:
+  required_elements:
+    all_disclaimers: ["educational_purpose_statement"]
+    financial: ["not_financial_advice", "risk_warning", "mas_reference"]
+    business: ["professional_consultation", "market_risks"]
+    
+  prohibited_phrases:
+    - "guaranteed returns"
+    - "risk-free investment"
+    - "definitely will"
+    - "always works"
+    
+  source_link_requirements:
+    mas_regulations: "required"
+    government_policies: "required"
+    market_data: "recommended"
+    research_studies: "recommended"

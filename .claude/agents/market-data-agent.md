@@ -25,14 +25,7 @@ You are a Market Data Specialist deployed by `/response-awareness-trade` during 
 
 ### Exports to Orchestrator (via LCL)
 ```
-#LCL_EXPORT_CRITICAL: data_quality::all_fetched|incomplete|conflict
-#LCL_EXPORT_CRITICAL: btc_price::67500_usd
-#LCL_EXPORT_CRITICAL: eth_price::3200_usd
-#LCL_EXPORT_CRITICAL: btc_dominance::58_pct_declining
-#LCL_EXPORT_CRITICAL: fear_greed_index::72_greedy
-#LCL_EXPORT_FIRM: data_sources::coingecko_tradingview_alternativeme
-#LCL_EXPORT_FIRM: cache_hit_rate::80_pct
-#LCL_EXPORT_CASUAL: fetch_latency_ms::450
+[Data quality metrics and market data exported to orchestrator for processing]
 ```
 
 ## Trading Metacognitive Tags
@@ -187,23 +180,14 @@ UPDATE market-data/cache/metadata.json:
 ### Step 7: Export via LCL
 ```
 IF data_quality == "all_fetched":
-  #LCL_EXPORT_CRITICAL: data_quality::all_fetched
-  #LCL_EXPORT_CRITICAL: btc_price::{btc_price}_usd
-  #LCL_EXPORT_CRITICAL: eth_price::{eth_price}_usd
-  #LCL_EXPORT_CRITICAL: btc_dominance::{btc_d}_pct_{trend}
-  #LCL_EXPORT_CRITICAL: fear_greed_index::{fg_index}_{classification}
-  #LCL_EXPORT_FIRM: data_sources::coingecko_tradingview_alternativeme
-  #LCL_EXPORT_FIRM: cache_hit_rate::{hit_rate}_pct
-  #LCL_EXPORT_CASUAL: fetch_latency_ms::{latency}
+  [Export complete market data metrics to orchestrator]
 
 ELIF data_quality == "incomplete":
-  #LCL_EXPORT_CRITICAL: data_quality::incomplete
-  #LCL_EXPORT_CRITICAL: missing_fields::[list of missing]
+  [Export incomplete data status to orchestrator]
   BLOCK downstream agents
 
 ELIF data_quality == "conflict":
-  #LCL_EXPORT_CRITICAL: data_quality::conflict
-  #LCL_EXPORT_CRITICAL: conflicts::[list of conflicts]
+  [Export data conflict status to orchestrator]
   WARN downstream agents
 ```
 

@@ -1,0 +1,504 @@
+// ABOUTME: Evidence Freshness Checker for EIP Compliance System
+// ABOUTME: Checks URL accessibility, age, and content changes using link-check library
+// ABOUTME: Optimized for batch operations with circuit breaker pattern
+
+import linkCheck from 'link-check';
+import { createHash } from 'node:crypto';
+import { DomainValidator, AuthorityLevel } from './domain-validator';
+import { OrchestratorDB } from '../../orchestrator/database';
+import { getSupabaseAdmin } from '../../lib_supabase/db/supabase-client';
+import { getLogger } from '../../orchestrator/logger';
+
+const logger = getLogger();
+
+export enum FreshnessCategory {
+  REGULATORY = 'regulatory',     // MAS, IRAS - 7 days
+  GOVERNMENT = 'government',     // General gov - 14 days
+  FINANCIAL = 'financial',       // Banks, finance - 30 days
+  EDUCATIONAL = 'educational',   // Educational content - 60 days
+  NEWS = 'news',                // News sources - 7 days
+  DEFAULT = 'default'           // Everything else - 90 days
+}
+
+export interface CheckOptions {
+  timeout?: number;              // Request timeout in ms (default: 10000)
+  retries?: number;              // Number of retries (default: 2)
+  retryDelay?: number;           // Delay between retries in ms (default: 1000)
+  followRedirects?: boolean;     // Follow HTTP redirects (default: true)
+  maxRedirects?: number;         // Maximum redirects (default: 5)
+  userAgent?: string;           // Custom user agent
+  headers?: Record<string, string>; // Custom headers
+}
+
+export interface CheckResult {
+  url: string;
+  canonicalUrl: string;
+  statusCode: number | null;
+  accessible: boolean;
+  responseTime: number;         // Response time in ms
+  contentLength?: number;       // Content length in bytes
+  contentHash?: string;         // SHA-256 hash of content
+  title?: string;              // Extracted page title
+  errorMessage?: string;
+  redirectChain?: string[];     // URLs in redirect chain
+  category: FreshnessCategory;
+  daysSinceLastCheck: number | null;
+  isStale: boolean;
+  needsUpdate: boolean;
+}
+
+export interface BatchCheckResult {
+  results: CheckResult[];
+  summary: {
+    total: number;
+    accessible: number;
+    inaccessible: number;
+    stale: number;
+    needsUpdate: number;
+    avgResponseTime: number;
+    totalProcessingTime: number;
+  };
+}
+
+export interface CircuitBreakerConfig {
+  failureThreshold: number;     // Failures before opening circuit
+  recoveryTimeout: number;      // MS to wait before trying again
+  monitoringPeriod: number;     // MS to monitor failures
+}
+
+export class CircuitBreaker {
+  private failureCount = 0;
+  private lastFailureTime = 0;
+  private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED';
+
+  constructor(private config: CircuitBreakerConfig) {}
+
+  async execute<T>(operation: () => Promise<T>): Promise<T> {
+    if (this.state === 'OPEN') {
+      if (Date.now() - this.lastFailureTime > this.config.recoveryTimeout) {
+        this.state = 'HALF_OPEN';
+        logger.info('Circuit breaker transitioning to HALF_OPEN');
+      } else {
+        throw new Error('Circuit breaker is OPEN');
+      }
+    }
+
+    try {
+      const result = await operation();
+      this.onSuccess();
+      return result;
+    } catch (error) {
+      this.onFailure();
+      throw error;
+    }
+  }
+
+  private onSuccess(): void {
+    this.failureCount = 0;
+    if (this.state === 'HALF_OPEN') {
+      this.state = 'CLOSED';
+      logger.info('Circuit breaker transitioning to CLOSED');
+    }
+  }
+
+  private onFailure(): void {
+    this.failureCount++;
+    this.lastFailureTime = Date.now();
+
+    if (this.failureCount >= this.config.failureThreshold) {
+      this.state = 'OPEN';
+      logger.warn('Circuit breaker transitioning to OPEN', {
+        failureCount: this.failureCount,
+        threshold: this.config.failureThreshold
+      });
+    }
+  }
+
+  getState(): string {
+    return this.state;
+  }
+}
+
+export class EvidenceFreshnessChecker {
+  private domainValidator: DomainValidator;
+  private circuitBreaker: CircuitBreaker;
+  private defaultOptions: CheckOptions;
+
+  constructor(
+    domainValidator: DomainValidator,
+    options: CheckOptions = {}
+  ) {
+    this.domainValidator = domainValidator;
+    this.circuitBreaker = new CircuitBreaker({
+      failureThreshold: 5,
+      recoveryTimeout: 30000, // 30 seconds
+      monitoringPeriod: 60000 // 1 minute
+    });
+
+    this.defaultOptions = {
+      timeout: options.timeout || 10000,
+      retries: options.retries || 2,
+      retryDelay: options.retryDelay || 1000,
+      followRedirects: options.followRedirects !== false,
+      maxRedirects: options.maxRedirects || 5,
+      userAgent: options.userAgent || 'EIP-Content-Checker/1.0',
+      headers: options.headers || {}
+    };
+  }
+
+  /**
+   * Check a single URL for freshness
+   */
+  async checkUrl(url: string, category: FreshnessCategory = FreshnessCategory.DEFAULT): Promise<CheckResult> {
+    const canonicalUrl = this.canonicalizeUrl(url);
+    const domainValidation = this.domainValidator.validateUrl(url);
+    
+    // Determine authority level for domain
+    const authorityLevel = domainValidation.authorityLevel || AuthorityLevel.LOW;
+    
+    // Get last check info from database
+    const lastCheck = await this.getLastCheck(canonicalUrl);
+    const daysSinceLastCheck = lastCheck ? 
+      Math.floor((Date.now() - new Date(lastCheck.last_checked).getTime()) / (1000 * 60 * 60 * 24)) : 
+      null;
+
+    // Determine if URL is stale based on category and authority
+    const maxAgeDays = this.getMaxAgeForCategory(category, authorityLevel);
+    const isStale = daysSinceLastCheck !== null && daysSinceLastCheck > maxAgeDays;
+    const needsUpdate = isStale || !lastCheck || !lastCheck.url_accessible;
+
+    let result: CheckResult = {
+      url,
+      canonicalUrl,
+      statusCode: null,
+      accessible: false,
+      responseTime: 0,
+      category,
+      daysSinceLastCheck,
+      isStale,
+      needsUpdate
+    };
+
+    // Only check if needed or if never checked before
+    if (needsUpdate || !lastCheck) {
+      try {
+        result = await this.circuitBreaker.execute(async () => {
+          return this.performLinkCheck(url, canonicalUrl, category, daysSinceLastCheck);
+        });
+      } catch (error) {
+        logger.error('Link check failed', { url, error: error instanceof Error ? error.message : 'Unknown error' });
+        result.errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      }
+
+      // Store result in database
+      await this.storeCheckResult(result, authorityLevel);
+    } else {
+      // Use cached data
+      result = {
+        ...result,
+        statusCode: lastCheck.http_status_code,
+        accessible: lastCheck.url_accessible,
+        responseTime: lastCheck.response_time_ms || 0,
+        contentLength: lastCheck.content_length_bytes || undefined,
+        contentHash: lastCheck.content_hash || undefined,
+        title: lastCheck.title || undefined
+      };
+    }
+
+    return result;
+  }
+
+  /**
+   * Check multiple URLs in batch
+   */
+  async checkUrls(urls: string[], category: FreshnessCategory = FreshnessCategory.DEFAULT): Promise<BatchCheckResult> {
+    const startTime = Date.now();
+    
+    // Process URLs in parallel with concurrency limit
+    const concurrencyLimit = 10;
+    const results: CheckResult[] = [];
+    
+    for (let i = 0; i < urls.length; i += concurrencyLimit) {
+      const batch = urls.slice(i, i + concurrencyLimit);
+      const batchResults = await Promise.allSettled(
+        batch.map(url => this.checkUrl(url, category))
+      );
+      
+      for (const batchResult of batchResults) {
+        if (batchResult.status === 'fulfilled') {
+          results.push(batchResult.value);
+        } else {
+          logger.error('Batch check failed', { 
+            error: batchResult.reason instanceof Error ? batchResult.reason.message : 'Unknown error' 
+          });
+          
+          // Add a failed result
+          results.push({
+            url: 'unknown',
+            canonicalUrl: 'unknown',
+            statusCode: null,
+            accessible: false,
+            responseTime: 0,
+            category,
+            daysSinceLastCheck: null,
+            isStale: false,
+            needsUpdate: true,
+            errorMessage: batchResult.reason instanceof Error ? batchResult.reason.message : 'Unknown error'
+          });
+        }
+      }
+    }
+
+    const totalProcessingTime = Date.now() - startTime;
+    const accessible = results.filter(r => r.accessible).length;
+    const inaccessible = results.filter(r => !r.accessible).length;
+    const stale = results.filter(r => r.isStale).length;
+    const needsUpdate = results.filter(r => r.needsUpdate).length;
+    const avgResponseTime = results.reduce((sum, r) => sum + r.responseTime, 0) / results.length;
+
+    return {
+      results,
+      summary: {
+        total: results.length,
+        accessible,
+        inaccessible,
+        stale,
+        needsUpdate,
+        avgResponseTime: Math.round(avgResponseTime),
+        totalProcessingTime
+      }
+    };
+  }
+
+  /**
+   * Get freshness statistics
+   */
+  async getFreshnessStats(category?: FreshnessCategory): Promise<any> {
+    try {
+      const { data, error } = await getSupabaseAdmin()
+        .rpc('get_freshness_statistics', { p_category: category });
+
+      if (error) {
+        logger.error('Failed to get freshness statistics', { error });
+        throw error;
+      }
+
+      return data?.[0] || null;
+    } catch (error) {
+      logger.error('Error getting freshness stats', { error });
+      throw error;
+    }
+  }
+
+  /**
+   * Perform the actual link check using link-check library
+   */
+  private async performLinkCheck(
+    url: string, 
+    canonicalUrl: string, 
+    category: FreshnessCategory,
+    daysSinceLastCheck: number | null
+  ): Promise<CheckResult> {
+    return new Promise((resolve, reject) => {
+      const options = {
+        timeout: this.defaultOptions.timeout,
+        retries: this.defaultOptions.retries,
+        retryDelay: this.defaultOptions.retryDelay,
+        followRedirects: this.defaultOptions.followRedirects,
+        maxRedirects: this.defaultOptions.maxRedirects,
+        headers: {
+          'User-Agent': this.defaultOptions.userAgent,
+          ...this.defaultOptions.headers
+        }
+      };
+
+      linkCheck(url, options, (err, result) => {
+        const startTime = Date.now();
+        
+        if (err) {
+          resolve({
+            url,
+            canonicalUrl,
+            statusCode: null,
+            accessible: false,
+            responseTime: Date.now() - startTime,
+            errorMessage: err.message || 'Unknown link check error',
+            category,
+            daysSinceLastCheck,
+            isStale: daysSinceLastCheck !== null && daysSinceLastCheck > this.getMaxAgeForCategory(category),
+            needsUpdate: true
+          });
+          return;
+        }
+
+        const maxAgeDays = this.getMaxAgeForCategory(category);
+        const isStale = daysSinceLastCheck !== null && daysSinceLastCheck > maxAgeDays;
+        const needsUpdate = isStale || result.status !== 'alive';
+
+        resolve({
+          url,
+          canonicalUrl,
+          statusCode: result.statusCode || null,
+          accessible: result.status === 'alive',
+          responseTime: Date.now() - startTime,
+          contentLength: this.extractContentLength(result),
+          title: this.extractTitle(result),
+          redirectChain: result.extras?.chain?.map((link: any) => link.url) || [],
+          category,
+          daysSinceLastCheck,
+          isStale,
+          needsUpdate
+        });
+      });
+    });
+  }
+
+  /**
+   * Canonicalize URL (normalize format)
+   */
+  private canonicalizeUrl(url: string): string {
+    try {
+      const urlObj = new URL(url);
+      // Remove fragment, normalize
+      urlObj.hash = '';
+      return urlObj.toString().toLowerCase().replace(/\/$/, '');
+    } catch {
+      // Fallback to basic normalization
+      return url.toLowerCase().replace(/\/#.*$/, '').replace(/\/$/, '');
+    }
+  }
+
+  /**
+   * Get maximum age for a freshness category
+   */
+  private getMaxAgeForCategory(category: FreshnessCategory, authorityLevel: AuthorityLevel = AuthorityLevel.LOW): number {
+    // Base days for each category
+    const baseDays = {
+      [FreshnessCategory.REGULATORY]: 7,
+      [FreshnessCategory.GOVERNMENT]: 14,
+      [FreshnessCategory.FINANCIAL]: 30,
+      [FreshnessCategory.EDUCATIONAL]: 60,
+      [FreshnessCategory.NEWS]: 7,
+      [FreshnessCategory.DEFAULT]: 90
+    };
+
+    // Adjust based on authority level
+    const authorityMultiplier = {
+      [AuthorityLevel.HIGH]: 1.5,      // Trust high authority sources longer
+      [AuthorityLevel.MEDIUM]: 1.0,    // Normal timeframe
+      [AuthorityLevel.LOW]: 0.7        // Check low authority sources more frequently
+    };
+
+    const base = baseDays[category] || baseDays[FreshnessCategory.DEFAULT];
+    const multiplier = authorityMultiplier[authorityLevel];
+    
+    return Math.floor(base * multiplier);
+  }
+
+  /**
+   * Store check result in database
+   */
+  private async storeCheckResult(result: CheckResult, authorityLevel: AuthorityLevel): Promise<void> {
+    try {
+      const supabase = getSupabaseAdmin();
+      const { error } = await supabase.rpc('upsert_evidence_snapshot', {
+        p_content_hash: result.contentHash,
+        p_title: result.title,
+        p_freshness_category: result.category,
+        p_url_accessible: result.accessible,
+        p_http_status_code: result.statusCode,
+        p_response_time_ms: result.responseTime,
+        p_content_length_bytes: result.contentLength,
+        p_error_message: result.errorMessage,
+        p_metadata: {
+          authority_level: authorityLevel,
+          redirect_chain: result.redirectChain,
+          checked_at: new Date().toISOString()
+        }
+      });
+
+      if (error) {
+        logger.error('Failed to store check result', { url: result.url, error });
+        throw error;
+      }
+
+      logger.debug('Stored check result', {
+        url: result.url,
+        accessible: result.accessible,
+        responseTime: result.responseTime
+      });
+    } catch (error) {
+      logger.error('Error storing check result', { url: result.url, error });
+      throw error;
+    }
+  }
+
+  /**
+   * Get last check information from database
+   */
+  private async getLastCheck(canonicalUrl: string): Promise<any> {
+    try {
+      const { data, error } = await getSupabaseAdmin()
+      const supabase = getSupabaseAdmin();
+      const { data, error } = await supabase
+        .select('*')
+        .eq('canonical_url', canonicalUrl)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // Not found error is OK
+        logger.error('Failed to get last check', { canonicalUrl, error });
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      logger.error('Error getting last check', { canonicalUrl, error });
+      return null;
+    }
+  }
+
+  /**
+   * Extract content length from link-check result
+   */
+  private extractContentLength(result: any): number | undefined {
+    try {
+      const contentLengthHeader = result.extras?.headers?.['content-length'];
+      if (contentLengthHeader) {
+        return parseInt(contentLengthHeader, 10);
+      }
+      return undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  /**
+   * Extract title from HTML content (basic implementation)
+   */
+  private extractTitle(result: any): string | undefined {
+    try {
+      // This is a basic implementation - in production you might want
+      // to use a proper HTML parser
+      const html = result.html;
+      if (html && typeof html === 'string') {
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        if (titleMatch && titleMatch[1]) {
+          return titleMatch[1].trim();
+        }
+      }
+      return undefined;
+    } catch {
+      return undefined;
+    }
+  }
+}
+
+/**
+ * Create freshness checker with Singapore domain validator
+ */
+export function createSingaporeFreshnessChecker(options: CheckOptions = {}): EvidenceFreshnessChecker {
+  const { createSingaporeDomainValidator } = require('./domain-validator');
+  const domainValidator = createSingaporeDomainValidator();
+  
+  return new EvidenceFreshnessChecker(domainValidator, options);
+}

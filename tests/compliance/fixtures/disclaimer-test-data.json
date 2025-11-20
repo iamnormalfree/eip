@@ -1,0 +1,112 @@
+{
+  "intentAnalysisSamples": {
+    "educational": {
+      "intent": "educational",
+      "confidence": 0.9,
+      "disclaimer_level": "minimal",
+      "singapore_context": false,
+      "mas_compliance_required": false,
+      "requires_source_links": false,
+      "risk_warning_required": false,
+      "detected_patterns": ["how to.*", "what is.*"],
+      "detected_keywords": ["tutorial", "guide", "explanation"],
+      "singapore_specific_indicators": []
+    },
+    "methodological": {
+      "intent": "methodological",
+      "confidence": 0.85,
+      "disclaimer_level": "low",
+      "singapore_context": true,
+      "mas_compliance_required": false,
+      "requires_source_links": true,
+      "risk_warning_required": false,
+      "detected_patterns": ["step by step.*", "how to implement.*"],
+      "detected_keywords": ["methodology", "framework", "process"],
+      "singapore_specific_indicators": ["singapore", "sg"]
+    },
+    "comparative": {
+      "intent": "comparative",
+      "confidence": 0.88,
+      "disclaimer_level": "medium",
+      "singapore_context": true,
+      "mas_compliance_required": false,
+      "requires_source_links": true,
+      "risk_warning_required": true,
+      "detected_patterns": ["compare.*", "versus.*", "better than.*"],
+      "detected_keywords": ["comparison", "versus", "better"],
+      "singapore_specific_indicators": ["singapore", "market"]
+    },
+    "advisory": {
+      "intent": "advisory",
+      "confidence": 0.92,
+      "disclaimer_level": "high",
+      "singapore_context": true,
+      "mas_compliance_required": false,
+      "requires_source_links": true,
+      "risk_warning_required": true,
+      "detected_patterns": ["should.*", "recommend.*", "advise.*"],
+      "detected_keywords": ["advice", "recommendation", "guidance"],
+      "singapore_specific_indicators": ["singapore"]
+    },
+    "financialAdvisory": {
+      "intent": "financial_advisory",
+      "confidence": 0.95,
+      "disclaimer_level": "critical",
+      "singapore_context": true,
+      "mas_compliance_required": true,
+      "requires_source_links": true,
+      "risk_warning_required": true,
+      "detected_patterns": ["invest in.*", "buy.*stock", "financial.*advice"],
+      "detected_keywords": ["invest", "stock", "portfolio", "returns", "cpf", "mas"],
+      "singapore_specific_indicators": ["cpf", "mas", "iras", "hdb", "srs"]
+    }
+  },
+  "violationSamples": {
+    "critical": {
+      "type": "unapproved_source",
+      "severity": "critical",
+      "description": "Source from prohibited domain",
+      "affected_element": "spam-site.com",
+      "penalty_points": 50,
+      "suggested_fix": "Remove source and use approved domains only"
+    },
+    "high": {
+      "type": "missing_disclaimer",
+      "severity": "high",
+      "description": "MAS-required disclaimer missing",
+      "affected_element": "financial_content",
+      "penalty_points": 25,
+      "suggested_fix": "Add MAS-compliant financial disclaimer"
+    },
+    "medium": {
+      "type": "stale_evidence",
+      "severity": "medium",
+      "description": "Evidence source is outdated",
+      "affected_element": "old-research.com",
+      "penalty_points": 10,
+      "suggested_fix": "Update with fresh source material"
+    }
+  },
+  "templateVariables": {
+    "basic": {
+      "content_type": "tutorial",
+      "target_audience": "general",
+      "geographical_focus": ["singapore"],
+      "last_updated": "2024-01-15"
+    },
+    "financial": {
+      "content_type": "investment_advice",
+      "target_audience": "retail_investors",
+      "geographical_focus": ["singapore", "malaysia"],
+      "regulatory_authorities": "Monetary Authority of Singapore (MAS)",
+      "compliance_score": "95",
+      "expert_contact": "licensed@advisor.com.sg"
+    }
+  },
+  "performanceBenchmarks": {
+    "simpleRecommendation": 50,
+    "complexRecommendation": 100,
+    "batchRecommendation": 30,
+    "largeVariables": 75
+  }
+}

@@ -1,10 +1,11 @@
 // ABOUTME: EIP Worker Manager - Unified coordination of all EIP queue workers
-// ABOUTME: Manages content generation, budget validation, audit/repair, and DLQ workers
+// ABOUTME: Manages content generation, budget validation, compliance, audit/repair, and DLQ workers
 
 import { getEIPContentWorker } from './eip-content-worker';
 import { getEIPBudgetWorker } from './eip-budget-worker';
 import { getEIPAuditWorker } from './eip-audit-worker';
 import { getEIPDLQWorker } from './eip-dlq-worker';
+import { getEIPComplianceWorker } from './eip-compliance-worker';
 import { getEIPQueueMetrics } from './eip-queue';
 
 // ============================================================================
@@ -43,16 +44,19 @@ class EIPWorkerManager {
       const budgetWorker = getEIPBudgetWorker();
       const auditWorker = getEIPAuditWorker();
       const dlqWorker = getEIPDLQWorker();
+      const complianceWorker = getEIPComplianceWorker();
 
       // Store worker references
       this.workers.set('content', contentWorker);
       this.workers.set('budget', budgetWorker);
       this.workers.set('audit', auditWorker);
+      this.workers.set('compliance', complianceWorker);
       this.workers.set('dlq', dlqWorker);
 
       console.log('✅ All EIP workers initialized successfully');
       console.log(`   Content Worker: ${contentWorker.opts.concurrency} concurrency`);
       console.log(`   Budget Worker: ${budgetWorker.opts.concurrency} concurrency`);
+      console.log(`   Compliance Worker: ${complianceWorker.opts.concurrency} concurrency`);
       console.log(`   Audit Worker: ${auditWorker.opts.concurrency} concurrency`);
       console.log(`   DLQ Worker: ${dlqWorker.opts.concurrency} concurrency`);
 

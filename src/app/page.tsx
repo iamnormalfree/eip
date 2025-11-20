@@ -15,11 +15,17 @@ export default function HomePage() {
               <p className="text-sm text-gray-600">AI-powered content generation with compliance control</p>
             </div>
             <div className="flex items-center space-x-4">
-              <Link 
-                href="/review" 
+              <Link
+                href="/review"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Review Queue
+              </Link>
+              <Link
+                href="/compliance"
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Compliance Dashboard
               </Link>
             </div>
           </div>
@@ -28,8 +34,8 @@ export default function HomePage() {
 
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
           {/* Review Queue Card */}
           <Link href="/review" className="block">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
@@ -45,6 +51,25 @@ export default function HomePage() {
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">Content Review</h3>
                   <p className="text-sm text-gray-600">Review and approve AI-generated content</p>
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          {/* Compliance Dashboard Card */}
+          <Link href="/compliance" className="block">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-medium text-gray-900">Compliance Dashboard</h3>
+                  <p className="text-sm text-gray-600">Real-time compliance monitoring and alerts</p>
                 </div>
               </div>
             </div>

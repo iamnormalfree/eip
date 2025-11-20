@@ -1,0 +1,71 @@
+# ABOUTME: Singapore Compliance Web Policy for EIP
+# ABOUTME: Defines domain allow-lists and freshness rules for Singapore regulatory compliance
+
+# Singapore-specific domain allow-lists with wildcard support
+allow_domains:
+  financial:
+    - "*.gov.sg"           # All Singapore government domains
+    - "mas.gov.sg"         # Monetary Authority of Singapore
+    - "iras.gov.sg"        # Inland Revenue Authority of Singapore
+    - "*.bank"             # Licensed Singapore banks
+    - "*.com.sg"           # Singapore commercial entities
+    - "educa.land"         # Educational platform
+    
+  technology:
+    - "*.edu"              # Educational institutions
+    - "*.edu.sg"           # Singapore educational institutions
+    - "ieee.org"           # IEEE standards and publications
+    - "acm.org"            # ACM digital library
+    - "arxiv.org"          # Academic preprints
+    - "github.com"         # Open source code repositories
+    - "stackoverflow.com"  # Technical Q&A
+    - "w3.org"             # Web standards
+    
+  enterprise:
+    - "gartner.com"        # Enterprise research and advisory
+    - "forrester.com"      # Market research company
+    - "hbr.org"            # Harvard Business Review
+    - "mckinsey.com"       # Management consulting
+    - "deloitte.com"       # Professional services
+    - "pwc.com"            # Professional services
+    - "ey.com"             # Professional services
+    - "kpmg.com"           # Professional services
+    
+  sme_advisory:
+    - "*.gov.sg/sme"       # Singapore government SME resources
+    - "spring.gov.sg"      # Enterprise Singapore
+    - "enterpriseguru.gov.sg"  # SME portal
+    - "sccci.org.sg"       # Singapore Chinese Chamber of Commerce
+    - "sicc.org.sg"        # Singapore Indian Chamber of Commerce
+    - "moe.gov.sg"         # Ministry of Education
+    - "mom.gov.sg"         # Ministry of Manpower
+
+# Freshness rules for different content domains
+freshness_rules:
+  financial_sources: 7    # Days - financial regulations change frequently
+  technology_sources: 30  # Days - tech content has longer shelf life
+  enterprise_research: 90 # Days - research papers valid longer
+  sme_sources: 30        # Days - business policies update monthly
+  government_sources: 7  # Days - government policies change often
+  educational_sources: 180 # Days - educational content changes slowly
+
+# Content validation rules specific to Singapore context
+content_rules:
+  financial_advisory:
+    require_disclaimer: true
+    allowed_sources: ["mas.gov.sg", "*.bank", "*.gov.sg"]
+    risk_level: "high"
+    
+  regulatory_references:
+    require_source_links: true
+    allowed_domains: ["*.gov.sg", "mas.gov.sg", "iras.gov.sg"]
+    validation_required: true
+    
+  educational_content:
+    minimum_freshness: 180
+    preferred_domains: ["*.edu", "*.edu.sg", "gov.sg"]
+    
+  business_advice:
+    require_singapore_context: true
+    sme_focus_required: false
+    allowed_enterprise_sources: true

@@ -1,0 +1,198 @@
+# ABOUTME: Intent Classification Patterns for Singapore Compliance
+# ABOUTME: Intent classification triggers and disclaimer levels for EIP
+
+# Intent classification categories and patterns
+intent_categories:
+  educational:
+    description: "Purely informational content for learning purposes"
+    patterns:
+      - "how to.*"
+      - "understanding.*"
+      - "what is.*"
+      - "learn about.*"
+      - "introduction to.*"
+      - "basics of.*"
+      - "explain.*"
+      - "definition.*"
+    keywords:
+      - "tutorial"
+      - "guide"
+      - "explanation"
+      - "overview"
+      - "fundamentals"
+      - "principles"
+    disclaimer_level: "minimal"
+    singapore_context: false
+    
+  methodological:
+    description: "Step-by-step processes and methodologies"
+    patterns:
+      - "step by step.*"
+      - "process for.*"
+      - "methodology.*"
+      - "framework.*"
+      - "approach to.*"
+      - "technique.*"
+      - "procedure.*"
+    keywords:
+      - "steps"
+      - "process"
+      - "method"
+      - "framework"
+      - "template"
+      - "checklist"
+      - "workflow"
+    disclaimer_level: "low"
+    singapore_context: true
+    
+  comparative:
+    description: "Comparing different options, products, or approaches"
+    patterns:
+      - "compare.*"
+      - "difference between.*"
+      - "versus.*"
+      - "vs.*"
+      - "better than.*"
+      - "advantages of.*"
+      - "disadvantages of.*"
+    keywords:
+      - "comparison"
+      - "versus"
+      - "pros and cons"
+      - "advantages"
+      - "disadvantages"
+      - "alternatives"
+    disclaimer_level: "medium"
+    singapore_context: true
+    
+  advisory:
+    description: "Recommendations and guidance for decision-making"
+    patterns:
+      - "should.*"
+      - "recommend.*"
+      - "advise.*"
+      - "suggest.*"
+      - "consider.*"
+      - "best.*"
+      - "optimal.*"
+    keywords:
+      - "advice"
+      - "recommendation"
+      - "guidance"
+      - "suggestion"
+      - "best practice"
+      - "tip"
+      - "strategy"
+    disclaimer_level: "high"
+    singapore_context: true
+
+# Singapore-specific intent patterns
+singapore_intents:
+  financial_advisory:
+    description: "Financial advice specific to Singapore context"
+    patterns:
+      - "invest in singapore.*"
+      - "singapore property.*"
+      - "cpf.*"
+      - "hdb loan.*"
+      - "mas regulations.*"
+      - "singapore bank.*"
+    keywords:
+      - "cpf"
+      - "hdb"
+      - "mas"
+      - "srs"
+      - "singsaver"
+      - "ocbc"
+      - "dbs"
+      - "uob"
+    disclaimer_level: "critical"
+    mas_compliance: true
+    
+  business_guidance:
+    description: "Business advice for Singapore companies"
+    patterns:
+      - "start business in singapore.*"
+      - "singapore company registration.*"
+      - "enterprise singapore.*"
+      - "sme.*singapore.*"
+    keywords:
+      - "acra"
+      - "enterprise singapore"
+      - "spring singapore"
+      - "sme"
+      - "startup"
+      - "business registration"
+    disclaimer_level: "high"
+    enterprise_sg_compliance: true
+    
+  regulatory_compliance:
+    description: "Information about Singapore regulations"
+    patterns:
+      - "singapore law.*"
+      - "legal requirements.*singapore.*"
+      - "compliance.*singapore.*"
+    keywords:
+      - "compliance"
+      - "regulation"
+      - "legal requirement"
+      - "pdpa"
+      - "employment act"
+    disclaimer_level: "critical"
+    gov_sg_required: true
+
+# Disclaimer level mappings
+disclaimer_levels:
+  minimal:
+    triggers: ["educational", "basic_info"]
+    template: "educational_context"
+    require_source_links: false
+    
+  low:
+    triggers: ["methodological", "process_guidance"]
+    template: "methodology_disclaimer"
+    require_source_links: true
+    
+  medium:
+    triggers: ["comparative", "product_analysis"]
+    template: "comparative_disclaimer"
+    require_source_links: true
+    source_validation: true
+    
+  high:
+    triggers: ["advisory", "business_guidance"]
+    template: "advisory_disclaimer"
+    require_source_links: true
+    source_validation: true
+    risk_warning: true
+    
+  critical:
+    triggers: ["financial_advisory", "regulatory_compliance"]
+    template: "financial_disclaimer"
+    require_source_links: true
+    source_validation: true
+    risk_warning: true
+    mas_compliance: true
+
+# Intent detection rules
+detection_rules:
+  priority_order:
+    - "critical"
+    - "high"
+    - "medium"
+    - "low"
+    - "minimal"
+    
+  conflict_resolution:
+    rule: "highest_disclaimer_level"
+    fallback: "safe_mode"
+    
+  confidence_thresholds:
+    high_confidence: 0.85
+    medium_confidence: 0.70
+    low_confidence: 0.55
+    
+  fallback_behavior:
+    default_intent: "educational"
+    default_disclaimer: "medium"
+    require_review: true

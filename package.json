@@ -36,12 +36,17 @@
     "orchestrator:start": "tsx orchestrator/controller.ts",
     "ip:validate": "npx tsx --no-cache scripts/validate-ips.ts",
     "compliance:check": "tsx scripts/compliance-check.ts",
+    "compliance:interactive": "tsx scripts/compliance-check.ts --mode interactive",
+    "compliance:batch": "tsx scripts/compliance-check.ts --mode batch",
+    "compliance:monitor": "tsx scripts/compliance-check.ts --mode monitor",
+    "compliance:stats": "tsx scripts/compliance-check.ts --mode stats",
     "db:setup": "tsx db/setup.ts",
     "db:seed": "tsx db/seed.ts",
     "db:migrate": "npm run db:setup",
     "db:migration:new": "echo 'Creating new migration - use: supabase migration new <migration_name>'",
     "db:mirror": "tsx scripts/mirror-to-neo4j.ts",
-    "review:validate": "tsx scripts/validate-review-ui.ts"
+    "review:validate": "tsx scripts/validate-review-ui.ts",
+    "test:compliance": "jest tests/compliance --coverage"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.27",
@@ -80,7 +85,11 @@
     "uuid": "^13.0.0",
     "winston": "^3.8.2",
     "yaml": "^2.6.1",
-    "zod": "^4.0.17"
+    "zod": "^4.0.17",
+    "validator": "^13.11.0",
+    "link-check": "^5.2.0",
+    "node-cron": "^3.0.3",
+    "jsonschema": "^1.4.1"
   },
   "devDependencies": {
     "@babel/plugin-syntax-flow": "^7.27.1",
@@ -102,6 +111,8 @@
     "ts-jest": "^29.4.5",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@types/validator": "^13.11.7",
+    "@types/node-cron": "^3.0.11"
   }
 }
