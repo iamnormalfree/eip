@@ -3,7 +3,7 @@
 // ABOUTME: Supports compliance history and detailed violation reporting
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getSupabaseAdmin } from '../../../../lib_supabase/db/supabase-client';
+import { getSupabaseAdmin } from '../../../../../lib_supabase/db/supabase-client';
 
 interface ArtifactComplianceResponse {
   success: boolean;

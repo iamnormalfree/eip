@@ -121,11 +121,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
       const supabase = getSupabaseAdmin();
 
+      // @ts-ignore - Supabase RPC call with dynamic parameters
       const { data, error } = await supabase
         .rpc('get_compliance_validation_statistics', {
           p_hours_back: hoursBack,
           p_processing_tier: processingTier ? processingTier.toUpperCase() : null
-        } as any);
+        });
 
       if (error) {
         console.error('Database error in compliance stats:', error);
@@ -153,11 +154,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         trendData = cachedTrend;
       } else {
         const supabase = getSupabaseAdmin();
+        // @ts-ignore - Supabase RPC call with dynamic parameters
         const { data: trendResult, error: trendError } = await supabase
           .rpc('get_compliance_trend_data', {
             p_days_back: trendDays,
             p_group_by_hour: trendDays <= 3
-          } as any);
+          });
 
         if (!trendError && trendResult) {
           trendData = trendResult;

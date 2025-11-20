@@ -3,7 +3,7 @@
 // ABOUTME: Supports CLI batch operations and dashboard drill-down analysis
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getSupabaseAdmin } from '../../../lib_supabase/db/supabase-client';
+import { getSupabaseAdmin } from '../../../../lib_supabase/db/supabase-client';
 
 interface ViolationsDetailResponse {
   success: boolean;

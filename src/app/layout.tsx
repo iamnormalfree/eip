@@ -1,6 +1,7 @@
 // ABOUTME: Root Layout Component - Provides consistent structure for EIP app
 // ABOUTME: Includes Tailwind CSS styling and Next.js app router setup
 
+import React from 'react';
 import './globals.css';
 
 export const metadata = {
