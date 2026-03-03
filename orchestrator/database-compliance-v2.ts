@@ -40,6 +40,15 @@ export class ComplianceDatabaseExtension {
   private supabase: ReturnType<typeof getSupabaseAdmin>;
   private useRedisFallback: boolean;
 
+  /**
+   * Support both CommonJS and ESM exports from ioredis in test/runtime environments.
+   */
+  private createRedisClient(): any {
+    const redisModule = require('ioredis');
+    const RedisConstructor = redisModule?.default ?? redisModule?.Redis ?? redisModule;
+    return new RedisConstructor(process.env.REDIS_URL || 'redis://localhost:6379');
+  }
+
   constructor() {
     try {
       this.supabase = getSupabaseAdmin();
@@ -146,8 +155,7 @@ export class ComplianceDatabaseExtension {
    */
   private async storeComplianceValidationRedis(data: any, resultId: string, now: string): Promise<{ success: boolean; result_id?: string; error?: string }> {
     try {
-      const Redis = require('ioredis');
-      const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+      const redis = this.createRedisClient();
 
       const complianceResult = {
         id: resultId,
@@ -252,8 +260,7 @@ export class ComplianceDatabaseExtension {
    */
   private async getComplianceValidationRedis(validationId: string): Promise<{ validation: ComplianceValidationRecord | null; error?: string }> {
     try {
-      const Redis = require('ioredis');
-      const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+      const redis = this.createRedisClient();
 
       const key = `compliance-validation:${validationId}`;
       const data = await redis.hgetall(key);
@@ -349,8 +356,7 @@ export class ComplianceDatabaseExtension {
    */
   private async getComplianceValidationsByArtifactRedis(artifactId: string): Promise<{ validations: ComplianceValidationRecord[]; error?: string }> {
     try {
-      const Redis = require('ioredis');
-      const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+      const redis = this.createRedisClient();
 
       const validationIds = await redis.smembers(`compliance-by-artifact:${artifactId}`);
       
@@ -475,8 +481,7 @@ export class ComplianceDatabaseExtension {
     error?: string;
   }> {
     try {
-      const Redis = require('ioredis');
-      const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+      const redis = this.createRedisClient();
 
       // This is a simplified implementation - in practice, you'd want to scan keys
       // and filter by timestamp, which would be more complex

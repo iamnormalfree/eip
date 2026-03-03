@@ -19,11 +19,11 @@
     "test:eip:watch": "jest --config jest.eip.config.js --watch",
     "test:eip:coverage": "jest --config jest.eip.config.js --coverage",
     "test:smoke": "jest --config jest.eip.config.js --testNamePattern=\"smoke\"",
-    "test:retrieval": "jest --config jest.eip.config.js --testNamePattern=\"retrieval\"",
+    "test:retrieval": "jest --config jest.eip.config.js --testPathPatterns=\"tests/orchestrator/retrieval\\.test\\.ts\"",
     "retrieval:test": "npx tsx scripts/test-retrieval.ts",
-    "test:auditor": "jest --config jest.eip.config.js --testNamePattern=\"auditor\"",
+    "test:auditor": "jest --config jest.eip.config.js tests/orchestrator/auditor.test.ts tests/orchestrator/auditor-simple.test.ts tests/orchestrator/plan05-compliance.test.ts tests/orchestrator/plan05-integration.test.ts tests/orchestrator/repairer-plan05.test.ts tests/orchestrator/repairer-updated.test.ts",
     "test:db": "jest --config jest.eip.config.js --testNamePattern=\"database\"",
-    "test:orchestrator": "jest --config jest.eip.config.js --testNamePattern=\"orchestrator\"",
+    "test:orchestrator": "jest --config jest.eip.config.js tests/orchestrator/controller.test.ts tests/orchestrator/controller-real.test.ts tests/orchestrator/controller-queue-integration.test.ts tests/orchestrator/queue-strict.test.ts tests/orchestrator/whelm-contract.test.ts tests/orchestrator/template-im-conformance.test.ts tests/orchestrator/orchestrator-smoke.test.ts tests/orchestrator/router.test.ts tests/orchestrator/pipeline-phase3-e2e.test.ts",
     "test:ui": "jest --config jest.eip.config.js --testNamePattern=\"review\"",
     "test:integration": "npm run test:retrieval && npm run test:auditor && npm run test:orchestrator",
     "test:integration:env": "jest --config jest.integration-env.config.js --runInBand",
@@ -47,7 +47,8 @@
     "db:migration:new": "echo 'Creating new migration - use: supabase migration new <migration_name>'",
     "db:mirror": "tsx scripts/mirror-to-neo4j.ts",
     "review:validate": "tsx scripts/validate-review-ui.ts",
-    "test:compliance": "jest tests/compliance --coverage"
+    "test:compliance": "jest tests/compliance",
+    "test:compliance:coverage": "jest tests/compliance --coverage"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.27",

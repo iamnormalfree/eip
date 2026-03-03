@@ -4,7 +4,7 @@ AI-powered content generation framework with compliance control and human-in-the
 
 ## Status
 
-**Workflow-ready for Fear-on-Paper production**
+**Workflow-readiness in progress for Fear-on-Paper production**
 
 ## Quick Start
 
@@ -64,12 +64,12 @@ See `.env.example` for required variables:
 
 ## Promotion Checklist
 
-- [x] `npm run test:smoke` passes
-- [x] `npm run test:integration` passes
-- [x] `npm run test:compliance` passes
-- [x] `npm run ip:validate` passes
-- [x] Queue strict mode verified
-- [x] Templates pass IM conformance
+- [ ] `npm run test:smoke` passes
+- [ ] `npm run test:integration` passes
+- [ ] `npm run test:compliance` passes
+- [ ] `npm run ip:validate` passes
+- [ ] Queue strict mode verified
+- [ ] Templates pass IM conformance
 
 ## Docs
 

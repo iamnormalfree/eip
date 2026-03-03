@@ -11,6 +11,8 @@ import { publishArtifact } from './publisher';
 import { evaluateHitlGates } from './hitl-gates';
 import { isLegacyCompat } from '../lib_supabase/utils/compat';
 import { submitContentGenerationJob } from '../lib_supabase/queue/eip-queue';
+import { validateWhelmFoPInput, mapToTemplate } from './whelm-contract';
+import type { WhelmFoPBrief } from './whelm-contract';
 import {
   startCorrelation,
   updateCorrelation,
@@ -47,6 +49,10 @@ type Brief = {
   tier?: Tier;
   correlation_id?: string;
   queue_mode?: boolean; // New: force queue processing
+  audience_track?: WhelmFoPBrief['audience_track'];
+  format?: WhelmFoPBrief['format'];
+  imv2_card?: WhelmFoPBrief['imv2_card'];
+  output_template?: string;
 };
 
 interface PipelineContext {
@@ -70,7 +76,35 @@ interface PipelineContext {
  * - sequential_integration: Maintain existing direct execution for compatibility
  * - contract::final::queue_system_to_all_domains
  */
-async function runOnce(input: Brief): Promise<{ success: boolean; artifact?: any; error?: string; queue_job_id?: string; dlq?: any; correlation_id?: string }> {
+const shouldValidateWhelmContract = (input: Brief): boolean => {
+  if (process.env.EIP_REQUIRE_WHELM_CONTRACT === 'true') {
+    return true;
+  }
+  return Boolean(input.audience_track || input.format || input.imv2_card);
+};
+
+async function runOnce(rawInput: Brief): Promise<{ success: boolean; artifact?: any; error?: string; queue_job_id?: string; dlq?: any; correlation_id?: string }> {
+  if (!rawInput || typeof rawInput !== 'object') {
+    return {
+      success: false,
+      error: 'Input payload must be a non-null object'
+    };
+  }
+
+  const input: Brief = { ...rawInput };
+
+  if (shouldValidateWhelmContract(input)) {
+    const validation = validateWhelmFoPInput(input);
+    if (!validation.valid) {
+      return {
+        success: false,
+        error: `Whelm FoP contract validation failed: ${validation.errors.join('; ')}`
+      };
+    }
+
+    input.output_template = mapToTemplate(input.format || 'long_script');
+  }
+
   // Check if queue mode is enabled or forced
   // Explicit false takes precedence over environment variable
   const queueMode = input.queue_mode === false
@@ -136,7 +170,8 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
         submission_source: 'orchestrator_controller',
         queue_mode: true,
         timestamp: new Date().toISOString(),
-        correlation_id: correlationId
+        correlation_id: correlationId,
+        output_template: input.output_template
       }
     });
 
@@ -169,7 +204,8 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
             processing_mode: 'queue_first',
             correlation_id: correlationId,
             queue_job_id: queueResult.jobId,
-            submitted_at: new Date().toISOString()
+            submitted_at: new Date().toISOString(),
+            output_template: input.output_template
           }
         }
       };
@@ -580,7 +616,8 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
         funnel: input.funnel,
         tier: tier,
         correlation_id: correlationId,
-        processing_mode: 'direct_execution'
+        processing_mode: 'direct_execution',
+        output_template: input.output_template
       }
     });
 

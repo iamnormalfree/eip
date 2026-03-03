@@ -125,14 +125,14 @@ describe('EvidenceFreshnessChecker - Simplified Tests', () => {
   });
 
   describe('Freshness Category Determination', () => {
-    test('should auto-categorize Singapore government domains', () => {
+    test('should auto-categorize Singapore regulatory domains', () => {
       const category = freshnessChecker.determineFreshnessCategory('https://mas.gov.sg/regulations');
-      expect(category).toBe(FreshnessCategory.GOVERNMENT);
+      expect(category).toBe(FreshnessCategory.REGULATORY);
     });
 
     test('should categorize financial regulatory domains', () => {
       const category = freshnessChecker.determineFreshnessCategory('https://mas.gov.sg/monetary-policy');
-      expect(category).toBe(FreshnessCategory.GOVERNMENT); // MAS.gov.sg is a government domain
+      expect(category).toBe(FreshnessCategory.REGULATORY);
     });
 
     test('should categorize educational institutions', () => {
@@ -155,7 +155,7 @@ describe('EvidenceFreshnessChecker - Simplified Tests', () => {
     test('should use Singapore-specific freshness rules', () => {
       const singaporeChecker = createSingaporeFreshnessChecker(mockDatabase);
 
-      expect(singaporeChecker.determineFreshnessCategory('https://mas.gov.sg')).toBe(FreshnessCategory.GOVERNMENT);
+      expect(singaporeChecker.determineFreshnessCategory('https://mas.gov.sg')).toBe(FreshnessCategory.REGULATORY);
       expect(singaporeChecker.determineFreshnessCategory('https://channelnewsasia.com')).toBe(FreshnessCategory.NEWS);
     });
 

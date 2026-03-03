@@ -149,8 +149,13 @@ export class EvidenceFreshnessChecker {
       const responseTime = Date.now() - startTime;
 
       // Determine if evidence is fresh
-      const isStale = !linkCheckResult.accessible ||
-                     (existingEvidence && this.isEvidenceStale(existingEvidence.lastChecked, maxAgeDays));
+      const existingLastChecked = existingEvidence?.lastChecked
+        ? new Date(existingEvidence.lastChecked)
+        : null;
+      const hasStaleEvidence = existingLastChecked
+        ? this.isEvidenceStale(existingLastChecked, maxAgeDays)
+        : false;
+      const isStale = !linkCheckResult.accessible || hasStaleEvidence;
 
       const needsUpdate = isStale || linkCheckResult.statusCode !== 200;
 
@@ -476,9 +481,6 @@ export class EvidenceFreshnessChecker {
   determineFreshnessCategory(url: string, domain?: string): FreshnessCategory {
     const urlDomain = domain || new URL(url).hostname;
 
-    // Singapore government domains
-    if (urlDomain.includes('.gov.sg')) return FreshnessCategory.GOVERNMENT;
-
     // Financial regulatory domains
     if (urlDomain.includes('mas.gov.sg') ||
         urlDomain.includes('iras.gov.sg') ||
@@ -486,6 +488,9 @@ export class EvidenceFreshnessChecker {
         urlDomain.includes('finance')) {
       return FreshnessCategory.REGULATORY;
     }
+
+    // Singapore government domains
+    if (urlDomain.includes('.gov.sg')) return FreshnessCategory.GOVERNMENT;
 
     // Educational domains
     if (urlDomain.includes('.edu') ||

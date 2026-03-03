@@ -46,12 +46,16 @@ import { EIP_QUEUES } from '../../lib_supabase/queue/eip-queue';
 const mockSubmitContentGenerationJob = submitContentGenerationJob as jest.MockedFunction<typeof submitContentGenerationJob>;
 
 describe('Controller-Queue Integration Tests', () => {
+  const originalEnv = { ...process.env };
+
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env = { ...originalEnv };
   });
 
   afterEach(() => {
     jest.resetAllMocks();
+    process.env = { ...originalEnv };
   });
 
   describe('Queue Mode Integration', () => {
@@ -89,6 +93,8 @@ describe('Controller-Queue Integration Tests', () => {
     });
 
     it('should handle queue submission failures gracefully', async () => {
+      process.env.EIP_QUEUE_STRICT = 'true';
+
       // Mock failed queue submission
       mockSubmitContentGenerationJob.mockResolvedValue({
         jobId: '',
@@ -104,7 +110,7 @@ describe('Controller-Queue Integration Tests', () => {
       const result = await runOnce(brief);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
+      expect(result.error).toContain('strict mode');
       expect(result.queue_job_id).toBeUndefined();
     });
 
@@ -288,6 +294,8 @@ describe('Controller-Queue Integration Tests', () => {
 
   describe('Error Handling and Edge Cases', () => {
     it('should handle queue submission exceptions', async () => {
+      process.env.EIP_QUEUE_STRICT = 'true';
+
       // Mock queue submission to throw an exception
       mockSubmitContentGenerationJob.mockRejectedValue(new Error('Redis connection timeout'));
 
@@ -299,6 +307,7 @@ describe('Controller-Queue Integration Tests', () => {
       const result = await runOnce(brief);
 
       expect(result.success).toBe(false);
+      expect(result.error).toContain('strict mode');
       expect(result.error).toContain('Redis connection timeout');
     });
 
@@ -444,6 +453,63 @@ describe('Controller-Queue Integration Tests', () => {
 
       expect(mockSubmitContentGenerationJob).not.toHaveBeenCalled();
       expect(result).toBeDefined();
+    });
+  });
+
+  describe('Whelm Contract Runtime Validation', () => {
+    it('should reject invalid Whelm FoP payload before queue submission', async () => {
+      const invalidWhelmPayload = {
+        brief: 'Generate FoP content',
+        audience_track: 'P',
+        format: 'long_script',
+        queue_mode: true,
+        imv2_card: {
+          trigger_context: 'trigger only'
+        }
+      } as any;
+
+      const result = await runOnce(invalidWhelmPayload);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Whelm FoP contract validation failed');
+      expect(mockSubmitContentGenerationJob).not.toHaveBeenCalled();
+    });
+
+    it('should map valid Whelm format to output template metadata', async () => {
+      mockSubmitContentGenerationJob.mockResolvedValue({
+        jobId: 'whelm-valid-job',
+        success: true
+      });
+
+      const validWhelmPayload = {
+        brief: 'Generate FoP content',
+        audience_track: 'P' as const,
+        format: 'email' as const,
+        queue_mode: true,
+        imv2_card: {
+          trigger_context: 'trigger',
+          hidden_protection: 'protection',
+          mechanism_name: 'mechanism',
+          reframe_line: 'reframe',
+          micro_test: 'micro test',
+          boundary_line: 'boundary',
+          evidence_signal: 'evidence',
+          source_capture: 'source',
+          scores: {
+            truth: 8,
+            resonance: 7,
+            distinctiveness: 7,
+            practicality: 8,
+            mechanism_clarity: 8
+          }
+        }
+      };
+
+      const result = await runOnce(validWhelmPayload);
+
+      expect(result.success).toBe(true);
+      const submissionData = mockSubmitContentGenerationJob.mock.calls[0][0];
+      expect(submissionData.metadata.output_template).toBe('fear-on-paper-email');
     });
   });
 });
