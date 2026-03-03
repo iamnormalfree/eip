@@ -27,9 +27,31 @@ module.exports = {
   v7: uuidv7,
   NIL: '00000000-0000-0000-0000-000000000000',
   MAX: 'ffffffff-ffff-ffff-ffff-ffffffffffff',
-  parse: () => ({}),
-  stringify: () => '',
-  validate: () => true,
+  // Parse UUID string to buffer (16 bytes)
+  parse: (uuid) => {
+    if (!uuid || typeof uuid !== 'string') {
+      return Buffer.alloc(16);
+    }
+    const hex = uuid.replace(/-/g, '');
+    const buffer = Buffer.from(hex, 'hex');
+    return buffer;
+  },
+  // Convert buffer to UUID string
+  stringify: (buffer) => {
+    if (!buffer || !(buffer instanceof Buffer) || buffer.length !== 16) {
+      return '00000000-0000-0000-0000-000000000000';
+    }
+    const hex = buffer.toString('hex');
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  },
+  // Validate UUID string format
+  validate: (uuid) => {
+    if (!uuid || typeof uuid !== 'string') {
+      return false;
+    }
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(uuid);
+  },
   version: () => '13.0.0'
 };
 

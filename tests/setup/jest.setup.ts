@@ -46,16 +46,6 @@ beforeAll(() => {
 });
 
 // Mock problematic ES modules - replaced with MockFactory approach
-jest.mock('uuid', () => ({
-  v4: jest.fn(() => 'mock-uuid-v4-1234'),
-  v1: jest.fn(() => 'mock-uuid-v1-1234'),
-  v3: jest.fn(() => 'mock-uuid-v3-1234'),
-  v5: jest.fn(() => 'mock-uuid-v5-1234'),
-  NIL: '00000000-0000-0000-0000-000000000000',
-  validate: jest.fn(() => true),
-  version: jest.fn(() => 4),
-}));
-
 jest.mock('bullmq', () => ({
   Queue: jest.fn(() => ({
     add: jest.fn(),
