@@ -26,6 +26,7 @@
     "test:orchestrator": "jest --config jest.eip.config.js --testNamePattern=\"orchestrator\"",
     "test:ui": "jest --config jest.eip.config.js --testNamePattern=\"review\"",
     "test:integration": "npm run test:retrieval && npm run test:auditor && npm run test:orchestrator",
+    "test:integration:env": "jest --config jest.integration-env.config.js --runInBand",
     "test:performance": "jest --config jest.eip.config.js --testNamePattern=\"Performance\"",
     "test:contracts": "jest --config jest.eip.config.js --testNamePattern=\"Contract\"",
     "test:all": "npm run test:eip && npm run test:integration && npm run test:ui",

@@ -1,5 +1,6 @@
 // ABOUTME: Test suite for EIP compliance database migration and functionality
 // ABOUTME: Validates Redis → Supabase migration, worker compatibility, and data integrity
+// ABOUTME: INTEGRATION-ENV - Requires real Redis and Supabase connections
 
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { ComplianceDatabaseExtension } from '../../orchestrator/database-compliance-v2';
@@ -272,13 +273,13 @@ describe('Compliance Database Migration', () => {
       expect(getResult.validation).toBeDefined();
 
       const retrievedReport = getResult.validation!.compliance_report;
-      
+
       // Validate complex nested data
       expect(retrievedReport.violations).toHaveLength(1);
       expect(retrievedReport.violations[0].type).toBe('source_authority');
       expect(retrievedReport.evidence_summary.source_details).toHaveLength(3);
       expect(retrievedReport.evidence_summary.source_details[0].authority).toBe('high');
-      
+
       // Validate metadata
       expect(getResult.validation!.content_length).toBe(2500);
       expect(getResult.validation!.validation_level).toBe('enhanced');
@@ -286,7 +287,7 @@ describe('Compliance Database Migration', () => {
 
     it('should handle concurrent operations correctly', async () => {
       const concurrentOperations = [];
-      
+
       // Create multiple concurrent storage operations
       for (let i = 0; i < 5; i++) {
         concurrentOperations.push(
@@ -323,7 +324,7 @@ describe('Compliance Database Migration', () => {
     it('should have migration script with required functions', () => {
       // Test that the migration script exports required functions
       const migrationScript = require('../../scripts/migrate-compliance-data-redis-to-supabase.js');
-      
+
       expect(migrationScript.validateComplianceRecord).toBeDefined();
       expect(typeof migrationScript.validateComplianceRecord).toBe('function');
     });
@@ -411,7 +412,7 @@ describe('Compliance Database Migration', () => {
     it('should handle database connection failures gracefully', async () => {
       // Test graceful degradation when database is unavailable
       // This is more of an integration test and might require mocking
-      
+
       // For now, just ensure the extension doesn't crash
       const result = await complianceDb.getComplianceValidation('non-existent-id');
       expect(result).toBeDefined();
