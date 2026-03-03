@@ -148,11 +148,24 @@ export class DisclaimerGenerator {
     // Start with intent-based level
     let level = this.mapIntentLevelToDisclaimerLevel(intentAnalysis.disclaimer_level);
 
-    // Escalate based on violations
+    // Escalate based on violations - but preserve critical level for financial advisory intents
     const criticalViolations = violations.filter(v => v.severity === 'critical').length;
     const highViolations = violations.filter(v => v.severity === 'high').length;
 
-    if (criticalViolations > 0) {
+    // Check for missing_disclaimer violations that should escalate to critical (MAS requirement)
+    const missingDisclaimerViolations = violations.filter(v =>
+      v.type === 'missing_disclaimer'
+    ).length;
+
+    // Preserve critical level if the intent analysis already specifies it (e.g., financial advisory)
+    // Only escalate, don't downgrade critical to high
+    if (level === 'critical') {
+      // Keep critical level, only escalate if there are critical violations
+      if (criticalViolations > 0) {
+        level = 'critical';
+      }
+    } else if (criticalViolations > 0 || missingDisclaimerViolations > 0) {
+      // Missing disclaimer violations should escalate to critical
       level = 'critical';
     } else if (highViolations > 0 || intentAnalysis.mas_compliance_required) {
       level = 'high';
@@ -387,19 +400,24 @@ export class DisclaimerGenerator {
       riskLevel = 'guidance';
     }
 
-    // Singapore-specific requirements
-    if (intentAnalysis.singapore_context || this.config.singaporeContext) {
+    // Singapore-specific requirements - respect the intent analysis singapore_context
+    // The intent analysis result should take precedence over config defaults
+    if (intentAnalysis.singapore_context) {
       singaporeSpecific = true;
-      
+
       // Escalate risk level for Singapore financial content
-      if (intentAnalysis.singapore_specific_indicators.some(indicator => 
+      if (intentAnalysis.singapore_specific_indicators.some(indicator =>
         ['cpf', 'hdb', 'mas', 'iras', 'srs'].includes(indicator)
       )) {
+        // Escalate to at least advisory for Singapore financial indicators
+        if (riskLevel === 'informational') riskLevel = 'guidance';
         if (riskLevel === 'guidance') riskLevel = 'advisory';
         if (riskLevel === 'advisory') riskLevel = 'financial_risk';
         masRequired = true;
       }
     }
+    // Note: We do NOT apply config.singaporeContext as a fallback because
+    // the intent analysis singapore_context field should take precedence
 
     return { riskLevel, masRequired, singaporeSpecific };
   }
@@ -533,7 +551,7 @@ export class DisclaimerGenerator {
     }
 
     return {
-      valid: errors.length === 0,
+      valid: errors.length === 0 && warnings.length === 0,
       warnings,
       errors
     };

@@ -145,9 +145,10 @@ describe('DisclaimerGenerator', () => {
   describe('Initialization', () => {
     test('should initialize with default configuration', () => {
       const defaultGenerator = new DisclaimerGenerator();
-      
+
       expect(defaultGenerator).toBeDefined();
-      expect(mockPolicyLoader.getDisclaimerTemplates).toHaveBeenCalledTimes(1);
+      // getDisclaimerTemplates is called once in beforeEach and once in this test
+      expect(mockPolicyLoader.getDisclaimerTemplates).toHaveBeenCalledTimes(2);
     });
 
     test('should initialize with custom configuration', () => {
@@ -531,7 +532,7 @@ describe('DisclaimerGenerator', () => {
     test('should validate MAS compliance in recommendations', () => {
       const invalidRecommendation: DisclaimerRecommendation = {
         level: 'critical',
-        template: 'Some generic disclaimer without MAS mention',
+        template: 'Generic disclaimer without proper compliance reference',
         placement: ['footer'],
         variables: {},
         singapore_specific: true,
@@ -551,16 +552,16 @@ describe('DisclaimerGenerator', () => {
       const testCases = [
         { level: 'none', expectedPlacement: [] },
         { level: 'minimal', expectedPlacement: ['footer'] },
-        { level: 'low', expectedPlacement: expect.arrayContaining(['footer', 'sidebar']) },
-        { level: 'medium', expectedPlacement: expect.arrayContaining(['footer', 'sidebar']) },
-        { level: 'high', expectedPlacement: expect.arrayContaining(['footer', 'header', 'sidebar']) },
-        { level: 'critical', expectedPlacement: expect.arrayContaining(['footer', 'header', 'inline', 'modal']) }
+        { level: 'low', expectedPlacement: ['footer', 'sidebar'] },
+        { level: 'medium', expectedPlacement: ['footer', 'sidebar'] },
+        { level: 'high', expectedPlacement: ['footer', 'header', 'sidebar'] },
+        { level: 'critical', expectedPlacement: ['footer', 'header', 'inline', 'modal'] }
       ];
 
       for (const testCase of testCases) {
         const analysis = { ...mockIntentAnalysis, disclaimer_level: testCase.level };
         const result = await generator.generateRecommendation(analysis, [], 'medium');
-        
+
         expect(result.placement).toEqual(expect.arrayContaining(testCase.expectedPlacement));
       }
     });
@@ -683,15 +684,14 @@ describe('DisclaimerGenerator', () => {
 
   describe('Error Handling and Resilience', () => {
     test('should generate fallback recommendation on error', async () => {
-      // Mock a scenario that causes an error
-      mockPolicyLoader.getDisclaimerTemplates.mockImplementation(() => {
-        throw new Error('Template loading failed');
-      });
-
+      // Create a valid generator first
       const errorGenerator = new DisclaimerGenerator();
-      
-      // Reset mock for subsequent calls
-      mockPolicyLoader.getDisclaimerTemplates.mockReturnValue(mockDisclaimerTemplates as any);
+
+      // Mock template selection to throw an error for this specific test
+      const originalSelectTemplate = (errorGenerator as any).selectTemplate;
+      (errorGenerator as any).selectTemplate = () => {
+        throw new Error('Template rendering failed');
+      };
 
       const result = await errorGenerator.generateRecommendation(
         mockIntentAnalysis,
@@ -822,7 +822,7 @@ describe('DisclaimerGenerator', () => {
     test('should detect MAS consistency warnings', () => {
       const warningRecommendation: DisclaimerRecommendation = {
         level: 'critical',
-        template: 'Generic disclaimer without MAS mention',
+        template: 'Generic disclaimer without proper compliance reference',
         placement: ['footer'],
         variables: {},
         singapore_specific: true,
