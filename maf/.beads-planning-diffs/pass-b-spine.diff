@@ -1,0 +1,346 @@
+# Pass b: Spine - Structural Completeness
+
+## Git-Diff Changes
+
+### 1. Add Non-Goals Section (After "The Solution")
+
+```diff
+### The Solution
+
+A layered autonomy system:
+- **Constitution** - Rules encoded, not explained
+- **Setup Wizard** - Foolproof configuration
+- **Agent Contract** - Single source of truth (AGENTS.md)
+- **Coordination** - Agent mail + beads for distributed work
+
++### Non-Goals (What We're NOT Doing)
++
++This plan explicitly DOES NOT address:
++
++- **Full Autonomous Operation** - We're not building "agents that do everything"
++  - Agents will still escalate for architectural decisions
++  - Humans remain in control of Level 3 decisions
++  - Target is 80% autonomous, 20% human-guided
++
++- **New Agent Architectures** - We're not inventing new agent types
++  - Building on existing MAF role-based agents (Supervisor, Reviewer, Implementors)
++  - Not creating new cognitive architectures or LLM frameworks
++  - Focus is on governance, not agent capabilities
++
++- **Real-Time Coordination** - We're not building real-time agent orchestration
++  - Agent mail is asynchronous (eventual consistency)
++  - No real-time locking or synchronous coordination
++  - Beads handle dependencies, not live coordination
++
++- **Performance Optimization** - We're not optimizing agent speed
++  - Focus is on safety and governance, not velocity
++  - Performance budgets will be added (see Pass g)
++  - Not optimizing for latency or throughput
++
++- **Multi-Franchise Orchestration** - We're not coordinating across franchises
++  - Each franchise operates independently
++  - No cross-franchise beads or coordination
++  - HQ pushes updates via subtree, not real-time sync
++
++- **Production Infrastructure** - We're not building deployment infrastructure
++  - No CI/CD pipeline changes
++  - No monitoring/alerting systems
++  - No production scaling or failover
++
++### Rationale for Non-Goals
++
++These exclusions are intentional to keep the scope manageable:
++1. **Autonomy is a governance layer** - Not a new agent system
++2. **Safety over speed** - Correctness matters more than performance
++3. **Single-franchise focus** - Multi-franchise is future work
++4. **Build on existing MAF** - Leverage Wave 1 & 2 investments
++
+```
+
+### 2. Add Step-by-Step Workflow for Setup Wizard (Enhance Section 4)
+
+```diff
+## Section 4: Interactive Setup Wizard
+
+### Purpose
+
+A "5 minutes, works first time" setup experience that:
+- Enforces governance rules
+- Creates proper configuration from templates
+- Prevents mistakes (no Roundtable defaults!)
+- Validates everything before completion
+
++### User Workflow: First-Time Setup
++
++#### Prerequisites
++1. MAF subtree added to project:
++   ```bash
++   git subtree add --prefix=maf https://github.com/iamnormalfree/maf main --squash
++   ```
++2. Project has package.json, Cargo.toml, or pyproject.toml
++3. Bash shell available (for setup script)
++
++#### Step 1: Launch Setup Wizard
++```bash
++cd /path/to/project
++bash maf/scripts/setup/setup-maf.sh
++```
++
++#### Step 2: Answer Interactive Prompts
++Wizard will prompt for:
++1. **Project name** (auto-detected from package.json)
++2. **Session name** (default: maf-<project-name>)
++3. **Agent names** (default: Supervisor, Reviewer, Imp-1, Imp-2)
++4. **Escalation contact** (email or Slack handle)
++
++#### Step 3: Review Generated Configuration
++Wizard displays:
++- Agent topology JSON
++- AGENTS.md preview
++- Configuration file paths
++
++#### Step 4: Validate Configuration
++Wizard runs:
++- JSON schema validation
++- Required fields check
++- Session name uniqueness check
++- Subtree health check
++
++#### Step 5: Bootstrap Agent Mail & Beads
++Wizard prompts:
++- "Initialize agent mail? [Y/n]"
++- "Initialize beads database? [Y/n]"
++
++#### Step 6: Spawn Agents (Optional)
++Wizard offers:
++- "Spawn MAF agents now? [Y/n]"
++If yes: Runs `maf/scripts/maf/spawn-agents.sh`
++
++#### Step 7: Confirmation
++Wizard displays:
++- ✅ Setup complete!
++- 📋 Next steps: 1) Review AGENTS.md, 2) Start agents, 3) Create beads
++- 📖 Documentation: maf/docs/AUTONOMY_GUIDE.md
++
++### User Workflow: Update Existing Configuration
++
++#### When to Run Update Mode
++- After subtree pull (MAF version updated)
++- After manual config changes
++- When troubleshooting issues
++
++#### Step 1: Launch Update Mode
++```bash
++bash maf/scripts/setup/setup-maf.sh
++# Choose: "Update existing config"
++```
++
++#### Step 2: Review Current Configuration
++Wizard displays:
++- Current session name
++- Current agent names
++- Current configuration version
++
++#### Step 3: Apply Updates
++Wizard:
++- Preserves agent names
++- Updates configuration schema
++- Merges new fields with existing
++- Validates merged configuration
++
++#### Step 4: Confirm Update
++Wizard prompts:
++- "Update complete. Review changes? [Y/n]"
++- "Spawn agents now? [Y/n]"
++
++### User Workflow: Reset & Reconfigure
++
++#### When to Run Reset Mode
++- Configuration is corrupted
++- Want to start fresh
++- Changing fundamental setup
++
++#### Step 1: Launch Reset Mode
++```bash
++bash maf/scripts/setup/setup-maf.sh --reset
++```
++
++#### Step 2: Confirm Reset
++Wizard warns:
++- "⚠️  This will back up and remove .maf/"
++- "⚠️  Running agents will be stopped!"
++- "Continue? [y/N]"
++
++#### Step 3: Backup & Remove
++Wizard:
++- Stops running tmux session
++- Creates backup: .maf.backup.YYYYMMDD_HHMMSS
++- Removes .maf/ directory
++
++#### Step 4: Re-run Setup
++Wizard restarts from Step 1 of first-time setup
++
+```
+
+### 3. Add Step-by-Step Workflow for Autonomous Agent Operation
+
+```diff
+## Section 2: MAF Constitution - The Autonomy Contract
+
+### Purpose
+
+Define when agents can act independently vs when they must ask humans. This is the core document that enables safe autonomy.
+
++### User Workflow: Autonomous Agent Operation
++
++#### Prerequisites
++1. MAF setup complete (setup wizard run)
++2. Agents spawned (tmux session running)
++3. AGENTS.md reviewed and customized
++4. Agent mail flowing
++
++#### Step 1: Agent Startup & Registration
++1. **Agent reads AGENTS.md**
++   ```bash
++   # Agent automatically reads on startup
++   cat AGENTS.md
++   ```
++
++2. **Agent registers with agent mail**
++   ```bash
++   mcp-agent-mail register <agent-name>
++   ```
++
++3. **Agent checks for assigned beads**
++   ```bash
++   bead list --status=assigned --agent=<agent-name>
++   ```
++
++#### Step 2: Agent Picks Up Bead
++1. **Agent finds next optimal bead**
++   ```bash
++   maf/scripts/beads/find-next-bead.sh <role> <agent-name>
++   ```
++
++2. **Agent checks dependencies**
++   ```bash
++   maf/scripts/beads/check-dependencies.sh <bead-id>
++   ```
++
++3. **Agent marks bead as in-progress**
++   ```bash
++   maf/scripts/beads/mark-progress.sh <bead-id> in-progress
++   ```
++
++4. **Agent announces via agent mail**
++   ```bash
++   mcp-agent-mail send "Starting bead #<bead-id>: <title>"
++   ```
++
++#### Step 3: Agent Executes Work
++1. **Agent classifies change** (Level 1/2/3)
++   - Single file, <50 lines → Level 1 (Full Autopilot)
++   - Multi-file, 2-3 files → Level 2 (Autopilot with Validation)
++   - Architecture changes → Level 3 (Ask Human)
++
++2. **Agent executes according to level**
++   - **Level 1**: Make changes → run tests → commit
++   - **Level 2**: Make changes → run tests → check callers → commit or escalate
++   - **Level 3**: Create proposal → ask human → wait for approval
++
++3. **Agent handles errors**
++   - Retriable error → Retry up to 3 times
++   - Partial failure → Document and continue
++   - Total failure → Escalate immediately
++
++#### Step 4: Agent Completes Bead
++1. **Agent marks bead complete**
++   ```bash
++   maf/scripts/beads/mark-progress.sh <bead-id> complete <evidence>
++   # Evidence: commit hash, PR URL, log snippet
++   ```
++
++2. **Agent notifies dependents**
++   ```bash
++   maf/scripts/beads/notify-dependents.sh <bead-id>
++   ```
++
++3. **Agent sends completion summary**
++   ```bash
++   mcp-agent-mail send "Completed bead #<bead-id>: <title>" \
++     --content="{files_changed, tests_passed, notes}"
++   ```
++
++#### Step 5: Agent Picks Up Next Bead
++Return to Step 2 and repeat.
++
++#### Step 6: Agent Escalates (When Needed)
++1. **Agent creates escalation packet**
++   ```yaml
++   subject: "[LEVEL]: Brief description"
++   severity: info|warning|critical
++   context:
++     what_i_was_doing: "..."
++     what_i_tried: ["...", "..."]
++     error_output: "..."
++     suggested_actions: ["...", "..."]
++   requesting: "approval|guidance|unblocking"
++   ```
++
++2. **Agent sends escalation**
++   ```bash
++   mcp-agent-mail send --escalation <packet.yaml>
++   ```
++
++3. **Agent marks bead as "waiting-for-guidance"**
++   ```bash
++   maf/scripts/beads/mark-progress.sh <bead-id> waiting-for-guidance
++   ```
++
++4. **Agent waits for human response**
++   - Check agent mail every 5 minutes
++   - Do not pick up new beads
++   - Monitor for human reply
++
++#### Step 7: Human Responds to Escalation
++1. **Human receives escalation via agent mail**
++2. **Human reviews escalation packet**
++3. **Human responds with guidance**
++   ```bash
++   mcp-agent-mail reply "Approve option 1: <description>"
++   ```
++
++4. **Agent resumes work**
++   - Mark bead as "in-progress" again
++   - Apply human guidance
++   - Continue execution
++
+```
+
+---
+
+## Pass b Complete: Spine Built
+
+**Changes Made:**
+- Added comprehensive "Non-Goals" section (6 exclusions with rationale)
+- Added step-by-step "User Workflow: Setup Wizard" (3 modes: first-time, update, reset)
+- Added step-by-step "User Workflow: Autonomous Agent Operation" (7 steps from startup to escalation)
+
+**Sections Added:**
+- Non-Goals (what we're NOT doing)
+- Setup Wizard workflows (first-time, update, reset)
+- Autonomous agent operation workflow (startup → work → completion → escalation)
+
+**Quality Improvements:**
+- **Structure**: Now has explicit Non-Goals (was missing)
+- **Workflows**: Now has step-by-step workflows (was high-level)
+- **Clarity**: Users can follow exact commands
+- **Scope**: Clear boundaries prevent scope creep
+
+**Remaining Gaps:**
+- Security invariants still missing (Pass d)
+- Performance budgets still missing (Pass g)
+- Failure modes not comprehensive (Pass f)
+- Threat model missing (Pass d)
+
+**Next:** Pass c (Reality Check) - Align with existing MAF codebase

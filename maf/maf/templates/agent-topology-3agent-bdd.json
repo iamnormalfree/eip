@@ -1,0 +1,88 @@
+{
+  "_comment_bdd_workflow": "BDD WORKFLOW: This topology defines a 3-agent Behavior-Driven Development workflow. Agents communicate via Agent Mail with 10-second polling intervals. Each stage has a 30-minute timeout. TDD is enforced and two-stage review is required.",
+  "$schema": "./agent-config-schema.json",
+  "topology_name": "MAF 3-Agent BDD Workflow",
+  "description": "Three-agent topology for Behavior-Driven Development with supervisor, reviewer, and implementor using Agent Mail communication",
+  "session_name": "maf-bdd-PROJECT",
+  "version": "1.0.0",
+  "pod": {
+    "session": "maf-bdd",
+    "window": "agents",
+    "full_target": "maf-bdd:agents"
+  },
+  "bdd_config": {
+    "tdd_enforced": true,
+    "two_stage_review": true,
+    "escalation_max_attempts": 3,
+    "mail_polling_interval_seconds": 10,
+    "stage_timeout_minutes": 30
+  },
+  "panes": [
+    {
+      "index": 0,
+      "role": "supervisor",
+      "agent_name": "SupervisorAgent",
+      "mail_name": "OrangeDog",
+      "agent_id": 4,
+      "aliases": [
+        "sup",
+        "0"
+      ],
+      "domains": [
+        "coordination",
+        "escalation",
+        "audit",
+        "bv-prioritization"
+      ],
+      "description": "Supervises BDD workflow, coordinates stages, manages escalation and audit trails"
+    },
+    {
+      "index": 1,
+      "role": "reviewer",
+      "agent_name": "ReviewerAgent",
+      "mail_name": "PurpleBear",
+      "agent_id": 7,
+      "aliases": [
+        "rev",
+        "1"
+      ],
+      "domains": [
+        "review",
+        "validation",
+        "qa",
+        "stage-gate"
+      ],
+      "description": "Reviews BDD scenarios, validates behavior, enforces stage-gate quality checks"
+    },
+    {
+      "index": 2,
+      "role": "implementor",
+      "agent_name": "ImplementorAgent",
+      "mail_name": "RedPond",
+      "agent_id": 5,
+      "aliases": [
+        "imp",
+        "2"
+      ],
+      "domains": [
+        "implementation",
+        "tdd",
+        "testing"
+      ],
+      "description": "Implements features following TDD practices, writes tests, delivers working code"
+    }
+  ],
+  "role_to_pane": {
+    "supervisor": 0,
+    "reviewer": 1,
+    "implementor": 2
+  },
+  "alias_to_pane": {
+    "sup": 0,
+    "0": 0,
+    "rev": 1,
+    "1": 1,
+    "imp": 2,
+    "2": 2
+  }
+}

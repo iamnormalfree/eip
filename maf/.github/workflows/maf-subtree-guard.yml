@@ -1,0 +1,29 @@
+name: MAF Subtree Guard
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  guard-subtree:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # CRITICAL: Full history for diff
+      - name: Check maf/ subtree integrity
+        run: |
+          set -euo pipefail
+
+          CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}...HEAD")
+
+          if echo "$CHANGED_FILES" | grep -q '^maf/'; then
+            # Workflows run in bash, not GitHub expressions.
+            # Inspect the PR event payload for labels.
+            if grep -q '"name"[[:space:]]*:[[:space:]]*"maf-upgrade"' "$GITHUB_EVENT_PATH"; then
+              echo "✅ maf/ changed with maf-upgrade label (allowed)"
+            else
+              echo "::error::Cannot modify maf/ without 'maf-upgrade' label"
+              exit 1
+            fi
+          fi
+
+          echo "✅ maf/ subtree is clean"

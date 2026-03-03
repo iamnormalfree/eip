@@ -1,0 +1,92 @@
+{
+  "mcpServers": {
+    "visual-novel-rpg": {
+      "command": "G:\\new-game\\venv_windows\\Scripts\\python.exe",
+      "args": ["G:\\new-game\\mcp_tool_server.py"],
+      "cwd": "G:\\new-game"
+    }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "powershell -NoProfile -Command \"$input = $input | ConvertFrom-Json; Write-Output ($input.model.display_name + ' | ' + (Split-Path -Leaf $input.workspace.current_dir) + ' | ' + (Get-Date -Format 'HH:mm:ss'))\""
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"$input = $input | ConvertFrom-Json; if ($input.prompt -match '^/response-awareness') { $input.prompt += '`n`nOrchestrate only, do not implement. Follow the response awareness framework exactly step by step.'; } Write-Output ($input | ConvertTo-Json -Compress)\""
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/prompt_skill_search.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/orchestrator-firewall.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/assumption-detector.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/question-suppression-detector.py"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/skill_catalog_posttool.py"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/reset_skill_tracking.py"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/reset_skill_tracking.py"
+          }
+        ]
+      }
+    ]
+  }
+}

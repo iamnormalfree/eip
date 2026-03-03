@@ -1,0 +1,24 @@
+#!/bin/bash
+# ABOUTME: CLI entrypoint for syncing and validating MAF skills
+# ABOUTME: Runs update/doctor against the current git project root
+set -euo pipefail
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+case "${1:-}" in
+    update)
+        "$PROJECT_ROOT/scripts/maf/sync-skills.sh"
+        ;;
+    doctor)
+        "$PROJECT_ROOT/scripts/maf/doctor.sh"
+        ;;
+    *)
+        echo "Usage: maf-hq {update|doctor}"
+        echo "  update  - Sync skills from vendor to .claude/"
+        echo "  doctor  - Check skill health"
+        echo
+        echo "Franchisees: run via the MAF subtree:"
+        echo "  bash maf/bin/maf-hq update"
+        echo "  bash maf/bin/maf-hq doctor"
+        exit 1
+        ;;
+esac

@@ -1,0 +1,74 @@
+{
+  "plan_file": "docs/plans/2026-01-09-maf-vendor-subtree-architecture.md",
+  "current_pass": "l",
+  "passes_completed": ["a", "l"],
+  "passes_remaining": [],
+  "status": "steady_state",
+  "ready_for_plan_to_beads": true,
+  "metrics": {
+    "original_word_count": 10052,
+    "current_word_count": 10052,
+    "backup_count": 1
+  },
+  "lcl_context": {
+    "verified_facts": [
+      {
+        "fact": "Plan has Goals/Non-goals sections",
+        "evidence": "Found in lines 22-44",
+        "verified_in": "a"
+      },
+      {
+        "fact": "Plan has Security invariants (MUST NEVER/ALWAYS)",
+        "evidence": "Found in lines 2368-2380",
+        "verified_in": "a"
+      },
+      {
+        "fact": "Plan has Data contracts (JSON schemas)",
+        "evidence": "Found in lines 2410-2515",
+        "verified_in": "a"
+      },
+      {
+        "fact": "Plan has Performance budgets",
+        "evidence": "Found in lines 2537-2546",
+        "verified_in": "a"
+      },
+      {
+        "fact": "Plan has Testing strategy",
+        "evidence": "Found in lines 2178-2218",
+        "verified_in": "a"
+      },
+      {
+        "fact": "Plan has Failure modes documented",
+        "evidence": "Found in Security section and error handling",
+        "verified_in": "a"
+      },
+      {
+        "fact": "Plan has Acceptance criteria",
+        "evidence": "Found in lines 2247-2274",
+        "verified_in": "a"
+      },
+      {
+        "fact": "Plan has step-by-step Workflows",
+        "evidence": "Found throughout all tasks",
+        "verified_in": "a"
+      }
+    ],
+    "active_assumptions": [],
+    "pending_verifications": [],
+    "deferred_clarifications": []
+  },
+  "active_tags": [],
+  "tags_resolved": 0,
+  "tags_created": 0,
+  "resolution_log": [],
+  "created_at": "2026-01-09T15:13:00Z",
+  "updated_at": "2026-01-09T15:17:00Z",
+  "verification_report": {
+    "total_tags": 0,
+    "blocking_tags": 0,
+    "resolved": 0,
+    "documented": 0,
+    "remaining": 0,
+    "resolution_details": []
+  }
+}

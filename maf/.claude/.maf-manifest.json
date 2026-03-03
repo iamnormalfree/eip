@@ -1,0 +1,65 @@
+{
+  "$schema": "./.maf-manifest-schema.json",
+  "version": "1.0",
+  "maf_version": "v0.3.0",
+  "managed_files": [
+    {
+      "path": ".claude/skills/response-awareness-light",
+      "checksum": "sha256:9f705c414ad6d2b3f26ad35d8fcc4d5197007766a1da867a12e1b34773d3fc31",
+      "maf_owned": true,
+      "franchisee_can_modify": false,
+      "merge_strategy": "overwrite"
+    },
+    {
+      "path": ".claude/skills/response-awareness-medium",
+      "checksum": "sha256:75a1c673c717851debee6ddb0b11345103bc60d411461a9eecd9c6e761ec0bff",
+      "maf_owned": true,
+      "franchisee_can_modify": false,
+      "merge_strategy": "overwrite"
+    },
+    {
+      "path": ".claude/skills/response-awareness-heavy",
+      "checksum": "sha256:39ffe779ce979dea51736462e9bc9d62364d47adc961774e97bc796410215dfc",
+      "maf_owned": true,
+      "franchisee_can_modify": false,
+      "merge_strategy": "overwrite"
+    },
+    {
+      "path": ".claude/skills/response-awareness-full",
+      "checksum": "sha256:a5783330e134f4b93da8da0d377f6a9c2365a8eabeef58b9c9e6ab12fd039e62",
+      "maf_owned": true,
+      "franchisee_can_modify": false,
+      "merge_strategy": "overwrite"
+    },
+    {
+      "path": ".claude/skills/sp-brainstorming",
+      "checksum": "sha256:57436c1620e87999d9a6e085c507d06eae47fe938b9cf99090ad4b0e89431995",
+      "maf_owned": true,
+      "franchisee_can_modify": true,
+      "merge_strategy": "merge_if_no_conflict"
+    },
+    {
+      "path": ".claude/skills/sp-systematic-debugging",
+      "checksum": "sha256:fb900e44e3c4504e4e7526dd3d718f2344dc02ab4fc48a430250ce090545751a",
+      "maf_owned": true,
+      "franchisee_can_modify": true,
+      "merge_strategy": "merge_if_no_conflict"
+    },
+    {
+      "path": ".claude/skills/sp-test-driven-development",
+      "checksum": "sha256:2c82c464426b3a2ddc100438d64245f6f2e60d68cc9cfda47dfc5aaeb9d6cb78",
+      "maf_owned": true,
+      "franchisee_can_modify": true,
+      "merge_strategy": "merge_if_no_conflict"
+    },
+    {
+      "path": ".claude/commands/response-awareness.md",
+      "checksum": "sha256:8fb28af5c5d5d2e87e6c396b28455250b4e943248a6e3fc5c34de8e3850bdbf5",
+      "maf_owned": true,
+      "franchisee_can_modify": false,
+      "merge_strategy": "overwrite"
+    }
+  ],
+  "franchisee_files": [],
+  "hq_owned_files": []
+}

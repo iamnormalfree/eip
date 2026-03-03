@@ -1,0 +1,12 @@
+{
+  "session_id": "89ba52d0-2e03-456d-940e-0d7fc49c28e9",
+  "started_at": "2026-01-26T18:21:53.899353",
+  "beads_processed": {},
+  "escalation_context": {},
+  "groups_executed": 0,
+  "progress": {
+    "completed": 0,
+    "failed": 0,
+    "unblocked": 0
+  }
+}

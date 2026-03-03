@@ -1,0 +1,620 @@
+#!/bin/bash
+# custom-workflow-hooks.sh.template - Template for customizing MAF autonomous workflow
+#
+# ABOUT THIS TEMPLATE:
+#   This file provides 8 extension hooks for customizing the MAF autonomous workflow
+#   behavior. Franchisees can copy this template and implement custom logic without
+#   modifying MAF HQ files.
+#
+# USAGE:
+#   1. Copy this template to your project root:
+#      cp maf/templates/custom-workflow-hooks.sh.template custom-workflow-hooks.sh
+#   2. Implement the hooks you need (see examples below)
+#   3. Make the file executable: chmod +x custom-workflow-hooks.sh
+#   4. Run your workflow script with the hooks file:
+#      export MAF_CUSTOM_HOOKS="$(pwd)/custom-workflow-hooks.sh"
+#      bash experiments/autonomous-workflow-nextnest.sh
+#
+# INTEGRATION:
+#   The autonomous workflow script will:
+#   - Check for MAF_CUSTOM_HOOKS environment variable
+#   - Source the hooks file if specified
+#   - Call each hook function at the appropriate point in the workflow
+#   - Gracefully handle missing hooks (use default behavior)
+#
+# DESIGN PRINCIPLES:
+#   - Non-breaking: Missing hooks or hook files don't stop the workflow
+#   - Explicit: Hooks are called at well-defined points in the execution
+#   - Flexible: Each hook can return different status codes to control flow
+#   - Safe: Errors in hooks are caught and logged without crashing the workflow
+#
+# HOOK REFERENCE:
+#   1. HOOK_BEFORE_LOOP    - Initialization before main loop starts
+#   2. HOOK_BEFORE_CHECK   - Before checking agent status each iteration
+#   3. HOOK_BEFORE_ASSIGN  - Before assigning a bead to an agent
+#   4. HOOK_AFTER_ASSIGN   - After successful bead assignment
+#   5. HOOK_CUSTOM_BEAD    - Custom bead type handler (bypasses default assignment)
+#   6. HOOK_AGENT_PROMPT   - Modify commands sent to agents
+#   7. HOOK_AFTER_CHECK    - After checking agent status each iteration
+#   8. HOOK_ERROR_HANDLER  - Global error recovery handler
+#
+# EXIT CODES:
+#   Each hook can return:
+#   0 - Continue with default behavior
+#   1 - Skip current operation (context-dependent)
+#   2 - Abort/exit workflow (use sparingly)
+#
+# BEST PRACTICES:
+#   - Keep hooks fast (avoid long-running operations)
+#   - Use advisory warnings for non-critical issues
+#   - Log all custom actions with clear timestamps
+#   - Test hooks in isolation before production use
+#   - Document what each hook does and why it's needed
+#   - Return quickly (avoid blocking the main loop)
+#
+# SEE ALSO:
+#   - docs/VENDOR_ARCHITECTURE.md - Proper customization channels
+#   - maf/templates/custom-preflight-checks.sh.template - Preflight customizations
+#   - tests/workflow/fixtures/custom-hooks-example.sh - Minimal working examples
+
+set -euo pipefail
+
+# ============================================================================
+# GLOBAL CONFIGURATION
+# ============================================================================
+
+# Optional: Override default workflow settings
+# export MAF_LOOP_INTERVAL="${MAF_LOOP_INTERVAL:-30}"        # Seconds between iterations
+# export MAF_ASSIGNMENT_TIMEOUT="${MAF_ASSIGNMENT_TIMEOUT:-300}" # Seconds before bead reassignment
+# export MAF_MAX_CONCURRENT_AGENTS="${MAF_MAX_CONCURRENT_AGENTS:-4}" # Max agents working simultaneously
+
+# Optional: Custom logging (uncomment to enable)
+# HOOK_LOG_FILE="${PROJECT_ROOT}/.maf/logs/custom-hooks.log"
+# mkdir -p "$(dirname "$HOOK_LOG_FILE")"
+
+# Colors for output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+# Logging helper (uncomment to enable file logging)
+# hook_log() {
+#     local timestamp
+#     timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+#     echo "[$timestamp] $*" >> "$HOOK_LOG_FILE"
+# }
+
+# ============================================================================
+# HOOK 1: BEFORE LOOP - Workflow Initialization
+# ============================================================================
+
+HOOK_BEFORE_LOOP() {
+    # Called once after preflight validation, before the main loop starts
+    #
+    # USE CASES:
+    #   - Initialize custom data structures or caches
+    #   - Validate external system dependencies
+    #   - Send startup notifications to monitoring systems
+    #   - Warm up services or preload data
+    #   - Set up custom environment variables
+    #
+    # PARAMETERS: none
+    # OUTPUT: Initialization messages (logged to stdout)
+    # EXIT CODE:
+    #   0 - Continue with workflow
+    #   2 - Abort workflow before starting
+    #
+    # EXAMPLE: Validate required services are running
+    # if ! pgrep -x "redis-server" >/dev/null; then
+    #     echo -e "${RED}ERROR: Redis is not running${NC}" >&2
+    #     return 2
+    # fi
+
+    # EXAMPLE: Send startup notification
+    # if command -v curl >/dev/null; then
+    #     curl -s -X POST "$SLACK_WEBHOOK_URL" \
+    #         -d '{"text":"MAF workflow starting"}' >/dev/null
+    # fi
+
+    echo -e "${BLUE}HOOK: Before loop initialization${NC}"
+
+    # Add your initialization logic here
+
+    return 0
+}
+
+# ============================================================================
+# HOOK 2: BEFORE CHECK - Pre-Agent-Status Check
+# ============================================================================
+
+HOOK_BEFORE_CHECK() {
+    local iteration="$1"
+    local last_status="$2"
+
+    # Called at the start of each workflow iteration before checking agent status
+    #
+    # USE CASES:
+    #   - Implement dynamic cooldown periods (e.g., skip checks during quiet hours)
+    #   - Check for external stop signals (e.g., a "stop.now" file)
+    #   - Validate system health before proceeding
+    #   - Throttle workflow during high system load
+    #   - Pause workflow for maintenance windows
+    #
+    # PARAMETERS:
+    #   $1 - iteration_number (integer, starting from 1)
+    #   $2 - last_status_code (integer from previous iteration, 0 = success)
+    # OUTPUT: Status messages
+    # EXIT CODE:
+    #   0 - Continue with agent status check
+    #   1 - Skip agent checks this iteration (loop continues)
+    #   2 - Abort workflow entirely
+    #
+    # EXAMPLE: Skip checks during maintenance window (2 AM - 3 AM)
+    # local current_hour
+    # current_hour=$(date '+%H')
+    # if [[ "$current_hour" == "02" ]]; then
+    #     echo -e "${YELLOW}Maintenance window: skipping iteration $iteration${NC}"
+    #     return 1
+    # fi
+
+    # EXAMPLE: Stop workflow if external signal file exists
+    # if [[ -f "${PROJECT_ROOT}/.maf/stop.now" ]]; then
+    #     echo -e "${YELLOW}Stop signal detected: aborting workflow${NC}"
+    #     rm -f "${PROJECT_ROOT}/.maf/stop.now"
+    #     return 2
+    # fi
+
+    # EXAMPLE: Throttle during high system load
+    # local load_avg
+    # load_avg=$(awk '{print $1}' /proc/loadavg 2>/dev/null || echo "0")
+    # if (( $(echo "$load_avg > 4.0" | bc -l) )); then
+    #     echo -e "${YELLOW}High system load ($load_avg): extending sleep${NC}"
+    #     sleep 30
+    # fi
+
+    echo -e "${BLUE}HOOK: Before check (iteration $iteration)${NC}"
+
+    return 0
+}
+
+# ============================================================================
+# HOOK 3: BEFORE ASSIGN - Pre-Bead-Assignment
+# ============================================================================
+
+HOOK_BEFORE_ASSIGN() {
+    local bead_id="$1"
+    local ready_beads="$2"
+
+    # Called before each bead is assigned to an agent
+    #
+    # USE CASES:
+    #   - Filter out beads that shouldn't be assigned yet
+    #   - Implement custom assignment priorities or logic
+    #   - Check agent capacity before assignment
+    #   - Validate bead dependencies are satisfied
+    #   - Prevent assignment of specific bead types during certain conditions
+    #
+    # PARAMETERS:
+    #   $1 - bead_id (string, GitHub issue ID like "123")
+    #   $2 - ready_beads (JSON array of all ready beads)
+    # OUTPUT: Assignment decision messages
+    # EXIT CODE:
+    #   0 - Continue with bead assignment
+    #   1 - Skip this bead (try next ready bead)
+    #   2 - Abort all assignments (stop workflow)
+    #
+    # EXAMPLE: Skip high-risk beads during off-hours
+    # local bead_labels
+    # bead_labels=$(echo "$ready_beads" | jq -r ".[] | select(.id == $bead_id) | .labels")
+    # if echo "$bead_labels" | jq -e '.[] | select(. == "high-risk")' >/dev/null; then
+    #     local hour
+    #     hour=$(date '+%H')
+    #     if (( hour < 9 || hour >= 17 )); then
+    #         echo -e "${YELLOW}Skipping high-risk bead $bead_id during off-hours${NC}"
+    #         return 1
+    #     fi
+    # fi
+
+    # EXAMPLE: Check if bead requires specific agent that's unavailable
+    # local required_agent
+    # required_agent=$(echo "$ready_beads" | jq -r ".[] | select(.id == $bead_id) | .required_agent // empty")
+    # if [[ -n "$required_agent" ]]; then
+    #     if ! pgrep -f "$required_agent" >/dev/null; then
+    #         echo -e "${YELLOW}Bead $bead_id requires $required_agent (not running)${NC}"
+    #         return 1
+    #     fi
+    # fi
+
+    echo -e "${BLUE}HOOK: Before assign (bead $bead_id)${NC}"
+
+    return 0
+}
+
+# ============================================================================
+# HOOK 4: AFTER ASSIGN - Post-Bead-Assignment
+# ============================================================================
+
+HOOK_AFTER_ASSIGN() {
+    local bead_id="$1"
+    local agent_name="$2"
+    local pane="$3"
+    local skill="$4"
+
+    # Called after a bead has been successfully assigned to an agent
+    #
+    # USE CASES:
+    #   - Log assignments to external tracking systems
+    #   - Send notifications about critical bead assignments
+    #   - Update custom dashboards or metrics
+    #   - Trigger downstream workflows or processes
+    #   - Record assignment history for analytics
+    #
+    # PARAMETERS:
+    #   $1 - bead_id (string, GitHub issue ID)
+    #   $2 - agent_name (string, e.g., "LedgerLeap")
+    #   $3 - pane (integer, 0-3 for supervisor and agents)
+    #   $4 - skill (string, skill name invoked on agent)
+    # OUTPUT: Confirmation messages
+    # EXIT CODE:
+    #   0 - Assignment confirmed (continue)
+    #   Non-zero - Trigger assignment rollback (bead returned to ready state)
+    #
+    # EXAMPLE: Log assignment to external system
+    # echo "$(date -Iseconds) | Assigned $bead_id to $agent_name (pane $pane)" \
+    #     >> "${PROJECT_ROOT}/.maf/assignment-log.txt"
+
+    # EXAMPLE: Send notification for critical beads
+    # if [[ "$skill" == *"critical"* ]]; then
+    #     curl -s -X POST "$SLACK_WEBHOOK_URL" \
+    #         -d "{\"text\":\"Critical bead $bead_id assigned to $agent_name\"}" \
+    #         >/dev/null
+    # fi
+
+    # EXAMPLE: Update custom metrics
+    # if command -v prometheus-pushgateway >/dev/null; then
+    #     echo "maf_bead_assignment_total{agent=\"$agent_name\"} 1" | \
+    #         curl --data-binary @- http://pushgateway:9091/metrics/job/maf
+    # fi
+
+    echo -e "${GREEN}HOOK: After assign ($bead_id → $agent_name @ pane $pane)${NC}"
+
+    return 0
+}
+
+# ============================================================================
+# HOOK 5: CUSTOM BEAD - Custom Bead Type Handler
+# ============================================================================
+
+HOOK_CUSTOM_BEAD() {
+    local bead_id="$1"
+    local bead_title="$2"
+    local bead_labels="$3"
+
+    # Called for each ready bead to check if franchisee wants to handle it
+    #
+    # USE CASES:
+    #   - Implement custom assignment logic for specific bead types
+    #   - Route beads to external systems instead of agents
+    #   - Handle special bead types that bypass normal workflow
+    #   - Implement custom bead filtering or transformation
+    #   - Delegate beads to non-agent processes
+    #
+    # PARAMETERS:
+    #   $1 - bead_id (string, GitHub issue ID)
+    #   $2 - bead_title (string, issue title)
+    #   $3 - bead_labels (JSON array of label strings)
+    # OUTPUT: Handling result messages
+    # EXIT CODE:
+    #   0 - Hook handled the bead (skip default assignment)
+    #   1 - Use default assignment logic
+    #   2 - Mark bead as blocked/unassignable
+    #
+    # EXAMPLE: Handle "external" beads via custom API
+    # if echo "$bead_labels" | jq -e '.[] | select(. == "external")' >/dev/null; then
+    #     echo -e "${BLUE}Handling external bead $bead_id via custom API${NC}"
+    #     curl -s -X POST "$EXTERNAL_API_URL/beads/$bead_id/assign" \
+    #         -H "Authorization: Bearer $EXTERNAL_API_KEY" || true
+    #     # Mark bead as in-progress to prevent reassignment
+    #     gh issue edit "$bead_id" --add-label "in-progress"
+    #     return 0  # Bead was handled, skip default assignment
+    # fi
+
+    # EXAMPLE: Skip "blocked" beads entirely
+    # if echo "$bead_labels" | jq -e '.[] | select(. == "blocked")' >/dev/null; then
+    #     echo -e "${YELLOW}Skipping blocked bead $bead_id${NC}"
+    #     return 2  # Mark as unassignable
+    # fi
+
+    # EXAMPLE: Custom routing for "database" beads to DB admin
+    # if echo "$bead_labels" | jq -e '.[] | select(. == "database")' >/dev/null; then
+    #     local db_admin_pane=3
+    #     echo -e "${BLUE}Routing database bead $bead_id to pane $db_admin_pane${NC}"
+    #     # Custom assignment logic here
+    #     return 0  # Bead was handled
+    # fi
+
+    echo -e "${BLUE}HOOK: Custom bead check ($bead_id: $bead_title)${NC}"
+
+    return 1  # Use default assignment
+}
+
+# ============================================================================
+# HOOK 6: AGENT PROMPT - Command Customization
+# ============================================================================
+
+HOOK_AGENT_PROMPT() {
+    local pane="$1"
+    local original_cmd="$2"
+
+    # Called before each command is sent to an agent pane
+    #
+    # USE CASES:
+    #   - Inject custom context or instructions into agent commands
+    #   - Modify commands based on agent type or bead requirements
+    #   - Add custom flags or options to skill invocations
+    #   - Implement command-level filtering or sanitization
+    #   - Route commands to alternate execution environments
+    #
+    # PARAMETERS:
+    #   $1 - pane (integer, destination pane number)
+    #   $2 - original_cmd (string, full command about to be sent)
+    # OUTPUT: Modified command (echo to stdout)
+    # EXIT CODE: (ignored, command string is always used)
+    #
+    # EXAMPLE: Inject project-specific context
+    # if [[ "$original_cmd" == *"/skill:"* ]]; then
+    #     echo "$original_cmd --project-context 'nextnest-production'"
+    #     return
+    # fi
+
+    # EXAMPLE: Add timeout to long-running commands
+    # if [[ "$original_cmd" == *"/superpowers:execute-plan"* ]]; then
+    #     echo "$original_cmd --timeout 600"
+    #     return
+    # fi
+
+    # EXAMPLE: Route supervisor commands to alternate endpoint
+    # if [[ "$pane" == "0" ]]; then
+    #     echo "$original_cmd --endpoint supervisor-production"
+    #     return
+    # fi
+
+    # EXAMPLE: Add debugging for specific agents
+    # if [[ "$pane" == "2" ]]; then
+    #     echo "$original_cmd --debug --verbose"
+    #     return
+    # fi
+
+    # Default: pass command through unchanged
+    echo "$original_cmd"
+}
+
+# ============================================================================
+# HOOK 7: AFTER CHECK - Post-Agent-Status Check
+# ============================================================================
+
+HOOK_AFTER_CHECK() {
+    local iteration="$1"
+    local blocked_agents="$2"
+
+    # Called after checking agent status each iteration
+    #
+    # USE CASES:
+    #   - Implement custom idle timeout handling
+    #   - Trigger alerts when all agents are blocked
+    #   - Collect and report workflow metrics
+    #   - Implement custom iteration throttling
+    #   - Check for workflow termination conditions
+    #
+    # PARAMETERS:
+    #   $1 - iteration_number (integer)
+    #   $2 - blocked_agents (JSON array of blocked pane numbers)
+    # OUTPUT: Status or metrics messages
+    # EXIT CODE:
+    #   0 - Continue workflow
+    #   2 - Abort workflow (e.g., termination condition met)
+    #
+    # EXAMPLE: Abort if all agents blocked for too long
+    # local blocked_count
+    # blocked_count=$(echo "$blocked_agents" | jq 'length')
+    # local total_agents=4
+    # if [[ "$blocked_count" -eq "$total_agents" ]]; then
+    #     # Check how long all agents have been blocked
+    #     local block_file="${PROJECT_ROOT}/.maf/all-blocked-since"
+    #     if [[ ! -f "$block_file" ]]; then
+    #         date '+%s' > "$block_file"
+    #     else
+    #         local block_start
+    #         block_start=$(cat "$block_file")
+    #         local now
+    #         now=$(date '+%s')
+    #         local blocked_seconds=$((now - block_start))
+    #         if [[ "$blocked_seconds" -gt 3600 ]]; then  # 1 hour
+    #             echo -e "${RED}All agents blocked for >1 hour, aborting${NC}" >&2
+    #             rm -f "$block_file"
+    #             return 2
+    #         fi
+    #     fi
+    # else
+    #     rm -f "${PROJECT_ROOT}/.maf/all-blocked-since"
+    # fi
+
+    # EXAMPLE: Log workflow metrics
+    # local ready_count
+    # ready_count=$(bd ls ready 2>/dev/null | jq '. | length' || echo "0")
+    # echo "$(date -Iseconds) | Iteration $iteration | Blocked: $blocked_agents | Ready: $ready_count" \
+    #     >> "${PROJECT_ROOT}/.maf/workflow-metrics.csv"
+
+    echo -e "${BLUE}HOOK: After check (iteration $iteration, blocked: $blocked_agents)${NC}"
+
+    return 0
+}
+
+# ============================================================================
+# HOOK 8: ERROR HANDLER - Global Error Recovery
+# ============================================================================
+
+HOOK_ERROR_HANDLER() {
+    local error_line="$1"
+    local error_message="$2"
+    local context="${3:-unknown}"
+
+    # Called when any error occurs during workflow execution
+    #
+    # USE CASES:
+    #   - Implement custom error logging and alerting
+    #   - Attempt automatic error recovery
+    #   - Send error notifications to monitoring systems
+    #   - Collect diagnostic information for debugging
+    #   - Implement graceful degradation strategies
+    #
+    # PARAMETERS:
+    #   $1 - error_line (integer, line number where error occurred)
+    #   $2 - error_message (string, error description)
+    #   $3 - context (string, additional context like current operation)
+    # OUTPUT: Error handling messages
+    # EXIT CODE:
+    #   0 - Attempt to continue (error recovery)
+    #   1 - Abort workflow (default error handling)
+    #   2 - Restart workflow (clean slate)
+    #
+    # EXAMPLE: Send error notifications
+    # if command -v curl >/dev/null; then
+    #     curl -s -X POST "$SLACK_WEBHOOK_URL" \
+    #         -d "{\"text\":\"MAF Workflow Error at line $error_line: $error_message\"}" \
+    #         >/dev/null
+    # fi
+
+    # EXAMPLE: Log error with full context
+    # {
+    #     echo "========== MAF Workflow Error =========="
+    #     echo "Time: $(date -Iseconds)"
+    #     echo "Line: $error_line"
+    #     echo "Message: $error_message"
+    #     echo "Context: $context"
+    #     echo "========================================"
+    # } >> "${PROJECT_ROOT}/.maf/error-log.txt"
+
+    # EXAMPLE: Attempt recovery for transient errors
+    # if [[ "$error_message" == *"temporarily unavailable"* ]]; then
+    #     echo -e "${YELLOW}Transient error detected, waiting 30s...${NC}"
+    #     sleep 30
+    #     return 0  # Try to continue
+    # fi
+
+    # EXAMPLE: Collect diagnostics
+    # local diagnostics_file="${PROJECT_ROOT}/.maf/diagnostics-$(date +%s).txt"
+    # {
+    #     echo "System load: $(uptime)"
+    #     echo "Disk usage: $(df -h)"
+    #     echo "Memory: $(free -h)"
+    #     echo "Tmux sessions: $(tmux ls 2>/dev/null || echo 'none')"
+    #     echo "Agent status: $(bd status 2>/dev/null || echo 'unavailable')"
+    # } > "$diagnostics_file"
+    # echo -e "${BLUE}Diagnostics saved to $diagnostics_file${NC}"
+
+    echo -e "${RED}HOOK: Error handler (line $error_line: $error_message)${NC}" >&2
+    echo -e "${YELLOW}Context: $context${NC}" >&2
+
+    return 1  # Default: abort on error
+}
+
+# ============================================================================
+# SCRIPT ENTRY POINT - Self-Test
+# ============================================================================
+
+# If executed directly, run comprehensive self-test
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    echo -e "${GREEN}=== Custom Workflow Hooks Self-Test ===${NC}"
+    echo ""
+
+    # Test 1: All hooks are defined and callable
+    echo -e "${BLUE}Test 1: Hook function definitions${NC}"
+    for hook in HOOK_BEFORE_LOOP HOOK_BEFORE_CHECK HOOK_BEFORE_ASSIGN \
+                HOOK_AFTER_ASSIGN HOOK_CUSTOM_BEAD HOOK_AGENT_PROMPT \
+                HOOK_AFTER_CHECK HOOK_ERROR_HANDLER; do
+        if declare -f "$hook" >/dev/null; then
+            echo -e "  ${GREEN}✓${NC} $hook is defined"
+        else
+            echo -e "  ${RED}✗${NC} $hook is missing"
+            exit 1
+        fi
+    done
+    echo ""
+
+    # Test 2: Call each hook with sample arguments
+    echo -e "${BLUE}Test 2: Hook invocations${NC}"
+
+    echo -n "  HOOK_BEFORE_LOOP: "
+    if HOOK_BEFORE_LOOP; then
+        echo -e "${GREEN}✓${NC}"
+    else
+        echo -e "${RED}✗${NC}"
+    fi
+
+    echo -n "  HOOK_BEFORE_CHECK: "
+    if HOOK_BEFORE_CHECK 1 0; then
+        echo -e "${GREEN}✓${NC}"
+    else
+        echo -e "${RED}✗${NC}"
+    fi
+
+    echo -n "  HOOK_BEFORE_ASSIGN: "
+    if HOOK_BEFORE_ASSIGN "123" '[{"id":123}]'; then
+        echo -e "${GREEN}✓${NC}"
+    else
+        echo -e "${RED}✗${NC}"
+    fi
+
+    echo -n "  HOOK_AFTER_ASSIGN: "
+    if HOOK_AFTER_ASSIGN "123" "TestAgent" "2" "test-skill"; then
+        echo -e "${GREEN}✓${NC}"
+    else
+        echo -e "${RED}✗${NC}"
+    fi
+
+    echo -n "  HOOK_CUSTOM_BEAD: "
+    if HOOK_CUSTOM_BEAD "123" "Test Bead" '["test"]'; then
+        echo -e "${YELLOW}!${NC} (hook handled bead)"
+    else
+        exit_code=$?
+        if [[ $exit_code -eq 1 ]]; then
+            echo -e "${GREEN}✓${NC} (uses default assignment)"
+        else
+            echo -e "${RED}✗${NC} (unexpected exit code: $exit_code)"
+        fi
+    fi
+
+    echo -n "  HOOK_AGENT_PROMPT: "
+    modified_cmd=$(HOOK_AGENT_PROMPT 2 "test command")
+    if [[ "$modified_cmd" == "test command" ]]; then
+        echo -e "${GREEN}✓${NC} (passes through by default)"
+    else
+        echo -e "${YELLOW}~${NC} (modified: $modified_cmd)"
+    fi
+
+    echo -n "  HOOK_AFTER_CHECK: "
+    if HOOK_AFTER_CHECK 1 '[1,2]'; then
+        echo -e "${GREEN}✓${NC}"
+    else
+        echo -e "${RED}✗${NC}"
+    fi
+
+    echo -n "  HOOK_ERROR_HANDLER: "
+    if HOOK_ERROR_HANDLER 42 "test error" "test context"; then
+        echo -e "${YELLOW}!${NC} (returned recovery attempt)"
+    else
+        echo -e "${GREEN}✓${NC} (returned abort)"
+    fi
+
+    echo ""
+    echo -e "${GREEN}=== All Self-Tests Passed ===${NC}"
+    echo ""
+    echo -e "${BLUE}This template is ready to customize!${NC}"
+    echo -e "${BLUE}1. Copy to your project root: cp custom-workflow-hooks.sh.template custom-workflow-hooks.sh${NC}"
+    echo -e "${BLUE}2. Implement the hooks you need${NC}"
+    echo -e "${BLUE}3. Set environment variable: export MAF_CUSTOM_HOOKS=\"\$(pwd)/custom-workflow-hooks.sh\"${NC}"
+    echo -e "${BLUE}4. Run your workflow: bash experiments/autonomous-workflow-nextnest.sh${NC}"
+fi
