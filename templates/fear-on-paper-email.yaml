@@ -1,42 +1,53 @@
 id: fear-on-paper-email
-version: 1.0.0
+version: 2.0.0
 name: Fear on Paper Email
-description: Email template for Fear on Paper content
+description: Email template for Fear on Paper content with mechanism-first structure
 type: email
+
+required_blocks:
+  mechanism_clarity: "Explain mechanism in plain language"
+  micro_test: "Include one 10-minute action"
+  evidence_signal: "Include one source/date signal"
+  boundary_line: "State when this does not apply"
 
 structure:
   subject_line:
     options:
-      - "What [TOPIC] companies don't want you to know"
-      - "The [SCARY_ADJECTIVE] truth about [TOPIC]"
-      - "Warning: This article about [TOPIC] might scare you"
+      - "How [TOPIC] actually works: mechanism breakdown"
+      - "The mechanism behind [TOPIC] (and what it means for you)"
+      - "What the research shows about [TOPIC]"
 
   preheader:
-    text: "Most people get this completely wrong..."
+    text: "Here's how the mechanism actually works..."
 
   header:
-    headline: "[FEAR_INDUCING_HEADLINE]"
-    subheadline: "Here's why this matters to you"
+    headline: "Understanding the mechanism behind [TOPIC]"
+    subheadline: "What the evidence shows"
 
   body:
-    - paragraph: "I was skeptical too when I first learned about this..."
-    - paragraph: "Here's what the experts aren't telling you..."
-    - paragraph: "[EVIDENCE_OR_STATISTIC]"
-    - paragraph: "The good news? You can protect yourself by [ACTION]"
+    - paragraph: "The mechanism at work here is [MECHANISM_DESCRIPTION]."
+      block_type: mechanism_clarity
+    - paragraph: "You can test this yourself in 10 minutes: [10_MINUTE_ACTION]"
+      block_type: micro_test
+    - paragraph: "According to [SOURCE_NAME] ([PUBLICATION_DATE]), [EVIDENCE_POINT]."
+      block_type: evidence_signal
+    - paragraph: "Important: This does not apply when [BOUNDARY_CONDITION]."
+      block_type: boundary_line
 
   cta_button:
-    text: "[BUTTON_TEXT]"
-    url: "[LANDING_PAGE_URL]"
+    text: "Learn more (no commitment)"
+    url: "[RESOURCE_PAGE_URL]"
 
   footer:
-    disclaimer: "Not financial advice. Do your own research."
+    disclaimer: "Educational content only. Do your own research."
     unsubscribe: "Unsubscribe from these emails"
 
 variables:
   - TOPIC
-  - SCARY_ADJECTIVE
-  - FEAR_INDUCING_HEADLINE
-  - EVIDENCE_OR_STATISTIC
-  - ACTION
-  - BUTTON_TEXT
-  - LANDING_PAGE_URL
+  - MECHANISM_DESCRIPTION
+  - 10_MINUTE_ACTION
+  - SOURCE_NAME
+  - PUBLICATION_DATE
+  - EVIDENCE_POINT
+  - BOUNDARY_CONDITION
+  - RESOURCE_PAGE_URL

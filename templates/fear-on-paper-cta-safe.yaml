@@ -1,13 +1,35 @@
 id: fear-on-paper-cta-safe
-version: 1.0.0
+version: 2.0.0
 name: Fear on Paper CTA (Safe)
-description: Safe call-to-action template that follows compliance guidelines
+description: Safe call-to-action template with mechanism-first structure and compliance guidelines
 type: cta
+
+required_blocks:
+  mechanism_clarity: "Explain mechanism in plain language"
+  micro_test: "Include one 10-minute action"
+  boundary_line: "State when this does not apply"
+  evidence_signal: "Include one source/date signal"
 
 structure:
   headline:
     text: "What to do next"
     alignment: center
+
+  mechanism_block:
+    text: "The mechanism works like this: [MECHANISM_EXPLANATION]"
+    block_type: mechanism_clarity
+
+  micro_test_block:
+    text: "Test it yourself in 10 minutes: [CONCRETE_ACTION]"
+    block_type: micro_test
+
+  boundary_block:
+    text: "This applies when: [APPLICABLE_CONDITION] | This does NOT apply when: [NON_APPLICABLE_CONDITION]"
+    block_type: boundary_line
+
+  evidence_block:
+    text: "Learn more: [SOURCE_NAME] ([DATE])"
+    block_type: evidence_signal
 
   options:
     - id: learn_more
@@ -31,5 +53,11 @@ structure:
 
 variables:
   - TOPIC
+  - MECHANISM_EXPLANATION
+  - CONCRETE_ACTION
+  - APPLICABLE_CONDITION
+  - NON_APPLICABLE_CONDITION
+  - SOURCE_NAME
+  - DATE
   - BUTTON_TEXT
   - CTA_TYPE

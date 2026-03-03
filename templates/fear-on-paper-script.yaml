@@ -1,36 +1,51 @@
 id: fear-on-paper-script
-version: 1.0.0
+version: 2.0.0
 name: Fear on Paper Script
-description: Video script template for Fear on Paper content
+description: Video script template for Fear on Paper content with mechanism-first structure
 type: script
+
+required_blocks:
+  mechanism_clarity: "Clear explanation of the underlying mechanism"
+  counterexample: "Edge case or boundary condition"
+  micro_test: "One concrete move testable in 10 minutes"
+  boundary_line: "Explicit limitations"
+  evidence_signal: "Source citation within 7 days"
 
 structure:
   intro:
-    hook: "What if everything you believed about [TOPIC] was wrong?"
-    setup: "Most people assume [COMMON_BELIEF], but the reality is completely different."
-    thesis: "Today I'm going to show you why [COUNTER_INTUITIVE_TRUTH]"
+    hook: "What is the underlying mechanism behind [TOPIC]?"
+    setup: "The common assumption is [COMMON_BELIEF], but here's how it actually works."
+    thesis: "Today I'm going to explain the mechanism and show you a testable approach."
 
   body:
-    - section: The Fear Setup
-      content: "Here's what Scary Thing X means for you..."
-      emotional_lever: fear
-    - section: Evidence Build
-      content: "Here's the data that proves it..."
-      emotional_lever: urgency
-    - section: The Alternative
-      content: "But there's a way to protect yourself..."
-      emotional_lever: hope
-    - section: Call to Action
-      content: "Here's what you need to do next..."
-      emotional_lever: agency
+    - section: Mechanism Explanation
+      content: "The underlying mechanism works like this: [MECHANISM_DESCRIPTION]"
+      block_type: mechanism_clarity
+    - section: Edge Case / Counterexample
+      content: "However, this doesn't apply when [EDGE_CASE]"
+      block_type: counterexample
+    - section: Micro Test
+      content: "You can test this in 10 minutes: [CONCRETE_ACTION]"
+      block_type: micro_test
+    - section: Boundary Line
+      content: "This approach has limits: [EXPLICIT_LIMITATIONS]"
+      block_type: boundary_line
+    - section: Evidence Signal
+      content: "Source: [SOURCE_NAME] ([DATE]) - [SOURCE_LINK]"
+      block_type: evidence_signal
 
   outro:
-    summary: "The bottom line: [KEY_TAKEAWAY]"
-    cta: "If you want to learn more about protecting yourself, click the link below."
+    summary: "Key mechanism: [KEY_MECHANISM]"
+    cta: "Test this yourself and draw your own conclusions."
 
 variables:
   - TOPIC
   - COMMON_BELIEF
-  - COUNTER_INTUITIVE_TRUTH
-  - SCARY_THING_X
-  - KEY_TAKEAWAY
+  - MECHANISM_DESCRIPTION
+  - EDGE_CASE
+  - CONCRETE_ACTION
+  - EXPLICIT_LIMITATIONS
+  - SOURCE_NAME
+  - DATE
+  - SOURCE_LINK
+  - KEY_MECHANISM

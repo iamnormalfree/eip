@@ -1,28 +1,37 @@
 id: fear-on-paper-shorts
-version: 1.0.0
+version: 2.0.0
 name: Fear on Paper Shorts
-description: Short-form video template for Fear on Paper content (YouTube Shorts, TikTok)
+description: Short-form video template for Fear on Paper content with mechanism-first structure
 type: shorts
+
+required_blocks:
+  mechanism_clarity: "One sentence mechanism"
+  micro_test: "One concrete action"
+  boundary_line: "One limitation"
+  evidence_signal: "One source/date signal"
 
 structure:
   hook:
-    text: "POV: You just learned [SCARY_FACT] about [TOPIC]"
+    text: "The mechanism behind [TOPIC] explained in 30 seconds"
     duration: "0-3 seconds"
 
   setup:
-    text: "Everyone thinks [COMMON_BELIEF], but actually..."
+    text: "Most assume [COMMON_BELIEF], but the actual mechanism is [MECHANISM]"
     duration: "3-10 seconds"
 
   reveal:
-    text: "[COUNTER_INTUITIVE_TRUTH]"
+    text: "Test it yourself: [CONCRETE_ACTION]"
     duration: "10-25 seconds"
 
   cta:
-    text: "Follow for more [TOPIC] secrets"
+    text: "One limitation to know: [LIMITATION] | Source: [SOURCE] ([DATE])"
     duration: "25-30 seconds"
 
 variables:
   - TOPIC
-  - SCARY_FACT
   - COMMON_BELIEF
-  - COUNTER_INTUITIVE_TRUTH
+  - MECHANISM
+  - CONCRETE_ACTION
+  - LIMITATION
+  - SOURCE
+  - DATE
