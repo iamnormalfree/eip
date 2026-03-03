@@ -1,0 +1,36 @@
+// ABOUTME: CommonJS mock for uuid ESM module for Jest compatibility
+// ABOUTME: Provides v4, v1, v3, v5, v6, v7 functions with simple implementation
+
+const crypto = require('crypto');
+
+function uuidv4() {
+  return crypto.randomUUID();
+}
+
+function uuidv7() {
+  const bytes = crypto.randomBytes(16);
+  // Set version (7) and variant (RFC 4122)
+  bytes[6] = (bytes[6] & 0x0f) | 0x70;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+  const hex = bytes.toString('hex');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+// Minimal implementations - tests don't need real UUID logic
+module.exports = {
+  v1: () => '00000000-0000-1000-8000-000000000000',
+  v3: () => '00000000-0000-3000-8000-000000000000',
+  v4: uuidv4,
+  v5: () => '00000000-0000-5000-8000-000000000000',
+  v6: () => '00000000-0000-6000-8000-000000000000',
+  v7: uuidv7,
+  NIL: '00000000-0000-0000-0000-000000000000',
+  MAX: 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+  parse: () => ({}),
+  stringify: () => '',
+  validate: () => true,
+  version: () => '13.0.0'
+};
+
+module.exports.default = module.exports;

@@ -56,12 +56,13 @@ module.exports = {
     '^@/(.*)lib_supabase(.*)$': '<rootDir>/lib_supabase/$1',
     '^@/(.*)orchestrator(.*)$': '<rootDir>/orchestrator/$1',
     '^@/(.*)src(.*)$': '<rootDir>/src/$1',
-    '^uuid$': '<rootDir>/node_modules/uuid/dist/index.js',
-    '^uuid/(.*)$': '<rootDir>/node_modules/uuid/dist/$1',
-    '^uuid/dist-node/(.*)$': '<rootDir>/node_modules/uuid/dist/$1'
+    '^uuid$': '<rootDir>/__mocks__/uuid.js',
+    '^uuid/(.*)$': '<rootDir>/__mocks__/uuid.js',
+    '^uuid/dist-node/(.*)$': '<rootDir>/__mocks__/uuid.js'
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(winston|js-yaml|uuid|bullmq|msgpackr|ioredis|uuid/dist|uuid/dist-node|msgpackr))'
+    // Allow transformation of ESM packages - simplified pattern
+    'node_modules/(?!(uuid)/)'
   ],
   collectCoverageFrom: [
     'lib_supabase/**/*.{ts,tsx}',
