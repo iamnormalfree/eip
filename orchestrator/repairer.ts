@@ -76,15 +76,23 @@ class Plan05Repairer {
         section: tag.section
       }));
     }
-    
+
     // Fall back to legacy tags - include auto-fixable tags even without span_hint
-    return input.audit.tags
+    // Sort to process SCHEMA_MISSING first (structural fixes should come before content additions)
+    const tags = input.audit.tags
       .filter(tag => this.isAutoFixable(tag.tag))
       .map(tag => ({
         tag: tag.tag,
         span_hint: tag.span_hint || `Lines 1-${this.getLineCount(input.draft)}: Default location`,
         section: tag.section || 'Unknown'
       }));
+
+    // Sort: SCHEMA_MISSING first, then others in order
+    return tags.sort((a, b) => {
+      if (a.tag === 'SCHEMA_MISSING') return -1;
+      if (b.tag === 'SCHEMA_MISSING') return 1;
+      return 0;
+    });
   }
 
   private getLineCount(content: string): number {
@@ -156,8 +164,8 @@ class Plan05Repairer {
   }
 
   private addMechanism(content: string, location: {lineStart: number, lineEnd: number, snippet: string}): string {
-    // Check if mechanism already exists
-    if (/mechanism|how.*work|process/i.test(content)) {
+    // Check if mechanism section already exists (look for actual section header, not just the word)
+    if (/^#{1,3}\s+(mechanism|how.*work|process)/mi.test(content)) {
       console.log('Repairer: Mechanism already exists, skipping');
       return content;
     }
