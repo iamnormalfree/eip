@@ -1,0 +1,985 @@
+What makes for a good markdown plan document for a software development project? What's the difference between a good plan and a great one? I'm always going on and on about how I spend 85%+ of my time and energy on the planning phases. Well what does that entail exactly? It's hard to explain in the abstract; you need a tangible example to really illustrate the nuances. So I thought I would share a good example from today. This also addresses a recent question I've been getting about my approach. People seem to be under the impression that you have to do everything in your project in one shot. And in my approach, that is true, but only for version 1! If you decide you want to add new features or change how things work, you can obviously do that once you have a functioning v1. And the way you do that is the same way you create v1, by creating a super detailed markdown plan first and then turning it into beads. So I'll give you an example from Cass, my Coding Agent Session Search program, which is a pretty elaborate Rust program that automatically detects, parses, stores, and indexes all your previous session logs from just about every coding agent out there. It offers sub 50ms instant "search as you type" across all those logs and has many other nice features. I decided that I'd like to add a feature to Cass that is similar to a feature I already have in MCP Agent Mail and in beads_viewer (bv): the ability to export your setup as a static website that can be served using GitHub Pages. You can see an example for bv for this very project, which is the final result of the planning process I will describe in this post: [https://dicklesworthstone.github.io/beads_for_cass/](https://t.co/iw50xoFBgd) This functionality makes it very quick and easy to generate and deploy the exported site using the gh utility. The site itself usually consists of an sqlite file and a bunch of typescript and wasm that runs entirely in the browser, but with very good performance and nice features and styling, which you can observe in the example just given. Now, sharing MCP Agent Mail messages or a bunch of beads is one thing, but sharing a bunch of coding agent session logs is very different; these things are often full of sensitive information, API keys, curses/invective (at least mine are!), and other material that you definitely wouldn't want to expose to the world. But GitHub Pages, as nice as it is, only works for public repos (btw, my tools also support Cloudflare pages, but GH Pages is better and easier for this use case). So how to handle these problems? The answer is encryption: the user first selects which coding agents to include, which project folders, the time period, etc. and a bundle is generated (note that this bundle is in the canonical format that Cass internally converts all coding agent messages into from their original native formats) and then the user provides a password to use for the encryption of that bundle. So the idea is that although the repo and web page are public, everyone but you and others you tell the password to will simply see a password field and will be unable to read any of the messages. Once the password is entered, it would unlock a beautiful, responsive UI that lets you easily search across the messages nearly as quickly and efficiently as Cass does. And if you really have nothing to hide, you can leave the password off and make it all actually public. Anyway, this is a super complex new feature to add for many reasons. The export wizard alone is extremely intricate and complex. But the additional requirements around encryption and security make this hard to get right. Anyway, I asked Claude Code with Opus 4.5 to first study all the relevant code from my bv project for implementing this feature, and then explained how the corresponding feature in Cass would have to differ. It then created for me an initial cut at a plan. I asked CC to check over the bv code again for more insights and understanding into how the feature was implemented in bv and to then use those insights to expand and improve the plan document in-place. Finally, I moved the plan over to ChatGPT Pro in the browser with GPT 5.2 with Extended Reasoning along with this prompt preamble: "Carefully review this entire plan for me and come up with your best revisions in terms of better architecture, new features, changed features, etc. to make it better, more robust/reliable, more performant, more compelling/useful, etc. For each proposed change, give me your detailed analysis and rationale/justification for why it would make the project better along with the git-diff style change versus the original plan shown below:" I then pasted the outputs into Claude Code like this: OK, now integrate these revisions to the markdown plan in-place; use ultrathink and be meticulous. At the end, you can tell me which changes you wholeheartedly agree with, which you somewhat agree with, and which you disagree with: [Pasted text #1 +995 lines] I then rinsed and repeated this another 2 times. 
+You can see the final ~3,500-line markdown plan here:
+https://github.com/Dicklesworthstone/coding_agent_session_search/blob/main/PLAN_TO_CREATE_GH_PAGES_WEB_EXPORT_APP.md
+
+But what's more interesting is to see the revisions in GitHub, where you can see the massive improvements that are made from v2 to v3, and how the improvements actually continue all the way to the end:
+
+This ended up taking a total of around 3 hours. I suspect this is why most people seem to be unwilling to do this level of planning. It feels like you're not getting much done because no code is being written, but if you do it correctly and then start up enough agents in your swarm with Agent Mail, Beads, and bv, then the code will be written so ridiculously quickly that it more than makes up for this slow part. And what's more, the code will be really good. Returning to the story, I was then ready to turn the plan into beads. I've already explained that process in another recent post, but the essence of it is to use this prompt with Claude Code: "OK so now read ALL of PLAN_TO_CREATE_GH_PAGES_WEB_EXPORT_APP.md; please take ALL of that and elaborate on it and use it to create a comprehensive and granular set of beads for all this with tasks, subtasks, and dependency structure overlaid, with detailed comments so that the whole thing is totally self-contained and self-documenting (including relevant background, reasoning/justification, considerations, etc.-- anything we'd want our "future self" to know about the goals and intentions and thought process and how it serves the over-arching goals of the project.). The beads should be so detailed that we never need to consult back to the original markdown plan document. Remember to ONLY use the bd tool to create and modify the beads and add the dependencies. Use ultrathink." Then I just did round after round of this follow-up prompt in Claude Code: "Reread AGENTS dot md so it's still fresh in your mind. Then read ALL of PLAN_TO_CREATE_GH_PAGES_WEB_EXPORT_APP.md . Use ultrathink. Check over each bead super carefully-- are you sure it makes sense? Is it optimal? Could we change anything to make the system work better for users? If so, revise the beads. It's a lot easier and faster to operate in "plan space" before we start implementing these things! DO NOT OVERSIMPLIFY THINGS! DO NOT LOSE ANY FEATURES OR FUNCTIONALITY! Also make sure that as part of the beads we include comprehensive unit tests and e2e test scripts with great, detailed logging so we can be sure that everything is working perfectly after implementation. It's critical that EVERYTHING from the markdown plan be embedded into the beads so that we never need to refer back to the markdown plan and we don't lose any important context or ideas or insights into the new features planned and why we are making them." After around 8 or 9 rounds, it finally reaches a steady state. I then had Codex with GPT 5.2 high reasoning effort do one final round using that same prompt. The final result can be seen at the link shared above. And that, friends, is what a good plan looks like. And also what a good set of beads based on a plan looks like. Those beads are so polished and detailed that you can mechanically unleash a big swarm of agents to implement it using Agent Mail, Beads, and bv, and it will come out just about perfectly without much fuss.
+
+
+
+
+If you have a markdown plan for a new piece of software that you're getting ready to start implementing with a coding agent such as Claude Code, before starting the actual implementation work, give this a try. Paste your entire markdown plan into the ChatGPT 5.2 Pro web app with extended reasoning enabled and use this prompt; when it's done, paste the complete output from GPT Pro into Claude Code or Codex and tell it to revise the existing plan file in-place using the feedback: --- Carefully review this entire plan for me and come up with your best revisions in terms of better architecture, new features, changed features, etc. to make it better, more robust/reliable, more performant, more compelling/useful, etc. For each proposed change, give me your detailed analysis and rationale/justification for why it would make the project better along with the git-diff style changes relative to the original markdown plan shown below: <PASTE YOUR EXISTING COMPLETE PLAN HERE> --- This has never failed to improve a plan significantly for me. The best part is that you can start a fresh conversation in ChatGPT and do it all again once Claude Code or Codex finishes integrating your last batch of suggested revisions. After four or five rounds of this, you tend to reach a steady-state where the suggestions become very incremental. (Note: I was originally planning to end this post here, but thought it would be helpful for people to see this part in the larger context of the entire workflow I recommend using all my tooling) Then you're ready to turn the plan into beads (think of these as epics/tasks/subtasks and associated dependency structure. The name comes from Steve Yegge's amazing project, which is like Jira or Linear, but optimized for use by coding agents), which I do with this prompt using Claude Code with Opus 4.5: --- OK so please take ALL of that and elaborate on it more and then create a comprehensive and granular set of beads for all this with tasks, subtasks, and dependency structure overlaid, with detailed comments so that the whole thing is totally self-contained and self-documenting (including relevant background, reasoning/justification, considerations, etc.-- anything we'd want our "future self" to know about the goals and intentions and thought process and how it serves the over-arching goals of the project.) Use only the bd tool to create and modify the beads and add the dependencies. Use ultrathink. --- After it finished all of that, I then do a round of this prompt (if CC did a compaction at any point, be sure to tell it to re-read your AGENTS dot md file): --- Check over each bead super carefully-- are you sure it makes sense? Is it optimal? Could we change anything to make the system work better for users? If so, revise the beads. It's a lot easier and faster to operate in "plan space" before we start implementing these things! Use ultrathink. --- Then you're ready to start implementing. The fastest way to do that is to start up a big swarm of agents that coordinate using my MCP Agent Mail project. Then you can simply create a bunch of sessions using Claude Code, Codex, and Gemini-CLI in different windows or panes in tmux (or use my ntm project which tries to abstract and automate some of this) in your project folder at once and give them the following as their marching orders (for this to work well, you need to make sure that your AGENTS dot md file has the right blurbs to explain each of the tools; I'll include a complete example of this in a reply to this post): --- First read ALL of the AGENTS dot md file and README dot md file super carefully and understand ALL of both! Then use your code investigation agent mode to fully understand the code, and technical architecture and purpose of the project. Then register with MCP Agent Mail and introduce yourself to the other agents. Be sure to check your agent mail and to promptly respond if needed to any messages; then proceed meticulously with your next assigned beads, working on the tasks systematically and meticulously and tracking your progress via beads and agent mail messages. Don't get stuck in "communication purgatory" where nothing is getting done; be proactive about starting tasks that need to be done, but inform your fellow agents via messages when you do so and mark beads appropriately. When you're not sure what to do next, use the bv tool mentioned in AGENTS dot md to prioritize the best beads to work on next; pick the next one that you can usefully work on and get started. Make sure to acknowledge all communication requests from other agents and that you are aware of all active agents and their names. Use ultrathink. --- If you've done a good job creating your beads, the agents will be able to get a decent sized chunk of work done in that first pass. Then, before they start moving to the next bead, I have them review all their work with this: --- Great, now I want you to carefully read over all of the new code you just wrote and other existing code you just modified with "fresh eyes" looking super carefully for any obvious bugs, errors, problems, issues, confusion, etc. Carefully fix anything you uncover. Use ultrathink. --- I keep running rounds of that until they stop finding bugs. Eventually they'll need to do a compaction, so if they do that, right after hit them with this (note that I've been typing AGENTS dot md to avoid the annoying preview on X because it thinks it's a website; you can replace that with a period and remove the spaces if you want; the agents don't care either way): --- Reread AGENTS dot md so it's still fresh in your mind. Use ultrathink. --- When the reviews come up clean, have them move on to the next bead: --- Reread AGENTS dot md so it's still fresh in your mind. Use ultrathink. Use bv with the robot flags (see AGENTS dot md for info on this) to find the most impactful bead(s) to work on next and then start on it. Remember to mark the beads appropriately and communicate with your fellow agents. Pick the next bead you can actually do usefully now and start coding on it immediately; communicate what you're working on to your fellow agents and mark beads appropriately as you work. And respond to any agent mail messages you've received. --- When all your beads are completed, you might want to run one of these prompts: --- Do we have full unit test coverage without using mocks/fake stuff? What about complete e2e integration test scripts with great, detailed logging? If not, then create a comprehensive and granular set of beads for all this with tasks, subtasks, and dependency structure overlaid with detailed comments. --- or --- Great, now I want you to super carefully scrutinize every aspect of the application workflow and implementation and look for things that just seem sub-optimal or even wrong/mistaken to you, things that could very obviously be improved from a user-friendliness and intuitiveness standpoint, places where our UI/UX could be improved and polished to be slicker, more visually appealing, and more premium feeling and just ultra high quality, like Stripe-level apps. --- or --- I still think there are strong opportunities to enhance the UI/UX look and feel and to make everything work better and be more intuitive, user-friendly, visually appealing, polished, slick, and world class in terms of following UI/UX best practices like those used by Stripe, don't you agree? And I want you to carefully consider desktop UI/UX and mobile UI/UX separately while doing this and hyper-optimize for both separately to play to the specifics of each modality. I'm looking for true world-class visual appeal, polish, slickness, etc. that makes people gasp at how stunning and perfect it is in every way. Use ultrathink. --- And then start the process again of implementing the beads. When you're done with all that and have solid test coverage, you can then keep doing rounds of these two prompts until they consistently come back clean with no changes made: --- I want you to sort of randomly explore the code files in this project, choosing code files to deeply investigate and understand and trace their functionality and execution flows through the related code files which they import or which they are imported by. Once you understand the purpose of the code in the larger context of the workflows, I want you to do a super careful, methodical, and critical check with "fresh eyes" to find any obvious bugs, problems, errors, issues, silly mistakes, etc. and then systematically and meticulously and intelligently correct them. Be sure to comply with ALL rules in AGENTS dot md and ensure that any code you write or revise conforms to the best practice guides referenced in the AGENTS dot md file. Use ultrathink. --- and --- Ok can you now turn your attention to reviewing the code written by your fellow agents and checking for any issues, bugs, errors, problems, inefficiencies, security problems, reliability issues, etc. and carefully diagnose their underlying root causes using first-principle analysis and then fix or revise them if necessary? Don't restrict yourself to the latest commits, cast a wider net and go super deep! Use ultrathink. --- You should also periodically have one of the agents run this as you're going to commit your work: --- Now, based on your knowledge of the project, commit all changed files now in a series of logically connected groupings with super detailed commit messages for each and then push. Take your time to do it right. Don't edit the code at all. Don't commit obviously ephemeral files. Use ultrathink. --- If you simply use these tools, workflows, and prompts in the way I just described, you can create really incredible software in a just a couple days, sometimes in just one day. I've done it a bunch of times now in the past few weeks and it really does work, as crazy as that may sound. You see my GitHub profile for the proof of this. It looks like the output from a team of 100+ developers. The frontier models and coding agent harnesses really are that good already, they just need this extra level of tooling and prompting and workflows to reach their full potential. To learn more about my system (which is absolutely free and 100% open-source), check out: [https://agent-flywheel.com](https://t.co/22Fy2w73x0) It include a complete tutorial that shows anyone how to get start with this process. You don't even need to know much at all about computers; you just need the desire to learn and some grit and determination. And about $500/month for the Claude Max and GPT Pro subscriptions, plus another $50 or so for the cloud server. If you want to change the entire direction of your life, it has truly never been easier. If you think you might want to do it, I really recommend just immersing yourself. Once you get Claude Code up and running on the cloud server, you basically have an ultra competent friend who can help you with any other problems you encounter.
+
+Here is a sample AGENTS dot md file for a complex project that uses NextJS for a webapp and also has a typescript CLI tool: [https://github.com/Dicklesworthstone/brenner_bot/blob/main/AGENTS.md](https://t.co/MB64e8DRqL) And here is another version I made today for a different project which is a bash script; I simply gave Claude Code the other AGENTS dot md file and told it to adapt it to fit the new project based on the new project's plan document: [https://github.com/Dicklesworthstone/repo_updater/blob/main/AGENTS.md](https://t.co/Qo4bLctT0j)
+
+[
+
+  
+
+
+](https://t.co/Ycys0PMQgQ)
+
+You don't even need to write the initial markdown plan yourself. You can write that with GPT Pro, just explaining what it is you want to make. Claude Opus 4.5 in the webapp is also pretty good for helping to make the initial markdown plan, but I still think GPT Pro is the best for this. I usually also specify the tech stack I want to use. Nowadays, for a web app, it's generally Typescript, Nextjs 16, React 19, Tailwind, Supabase, etc. with anything performance critical being done in rust compiled down to wasm; if it's a CLI tool I usually use Golang or Rust if it's very performance critical. BTW, I forgot to mention it above, but I like to have a best practices guide in the project folder and reference it in the AGENTS dot md file. I have a collection of these that are around 6 months out of date, but you can have Claude Code search the web and update them to the latest versions and ask it to read the latest documentation, articles, blog posts, etc. and make revisions: [https://github.com/Dicklesworthstone/claude_code_agent_farm/tree/main/best_practices_guides](https://t.co/Br4INOoPwo) Also, when prompting the model to create the initial markdown plan version, I spend a lot of time explaining the goals and intent of the project and detailing the workflows. That is, how you want the final software to work from the standpoint of the user's interactions. The more the model understand about what is you're really trying to accomplish and the end goal and why, it can do a better job for you.
+
+"Should a skeleton of frontend+backend come first"; I think you get a better result faster by creating one big comprehensive, detailed, granular plan. That's the only way to get these models to use their big brains to understand the entire system all at the same time. Once you start turning it into actual code, it gets way too big to understand. Finding the flaws and fixing them is the whole point of all the iterations and blending in the feedback from all the frontier models. If you follow the procedure I outlined using those specific models and prompts, after enough rounds, you will have an extremely good plan that will "just work." --- "Before using beads, i let the agent describe the relationships between tasks into the tasks" To me, this is just part of the process of turning the plan into beads. The beads are in a sense a much richer structure than the plan; the beads are supposed to be totally self-contained so that you never need to refer back to the markdown plan once you've converted it into beads. But the beads also contain the dependency structure in an explicit form (at least if you created them correctly using something like the prompt I provided). --- "Which tech stack should be used? Are there existing open source projects that does parts of this?" I view this as all part of the "pre-planning" phase. Usually I already know what tech stack I want based on the type of project, but if I don't, I'll have do a deep research round with GPT Pro or Gemini3 and have them study all the libraries and make a suggestion taking my goals into account. --- "If each bead is a bit complex then I think it makes sense to document design decisions in markdown" I disagree, the beads themselves can and should contain this markdown. You can have long descriptions/comments inside the beads, they don't need to be short bullet point type entries. --- "I do a security review pass when the high level architecture (interfaces and protocols, basic use cases) are done/known" This happens automatically as part of the planning process when you do it the way I described. But after the code is written, when you keep doing those rounds of checks, you can explicitly mention security as a concern and it will find any lingering problems (it generally does that as part of the review process even if you don't even use the word 'security'). --- "How do you divide the tasks to your swarm of agents?" Each agent just uses bv on its own to find the next optimal bead to work on and marks it as being in-progress and communicates about this to the other agents using Agent Mail. It's a distributed, robust system where every agent is fungible and replaceable if they crash or get amnesia. --- "Do they need individual areas of expertise for this to be efficient" No, every agent is fungible and a generalist. They are all using the same base model (or a combination of models if you're mixing CC, Codex, and Gemini, something I do advise doing) and reading the same AGENTS dot md file. Simply telling one that it's a frontend agent doesn't make it better at frontend. --- "Do you have some traceability between git commit/branch and bead" Yes, bv automatically does this analysis and links beads to the relevant git commits by analyzing the stream of data and making logical deductions.
+
+Yeah I would just give it a try using the waterfall approach with these latest models. You will be surprised at how incredible they are. As for the beads being too lumpy and requiring changes, that’s the reason I always talk about the beads being “granular”; if you have too much going on in one bead, the that bead should have been subdivided into multiple beads. And the process of improving the beads after the initial beads creation is helpful for finding those issues before you start implementing. And yes, the review process with 5.2 with extra high effort (and even with Opus 4.5 if you use my exact “fresh eyes” prompt over many iterations) catches all kinds of stuff. And you can add the term “security vulnerabilities” to the list of things you want it to check for and it will do a lot more of that kind of analysis. If you also have a security best practices document in your project that is referenced in your AGENTS dot md, you can go into a lot more detail.
+
+Well, let's be precise here: the GPT Pro web app doesn't need to know anything about beads. Really the question is, how does Codex-cli using GPT 5.2 know about beads. And the answer is that it is totally explained in the AGENTS dot md file, as are all the other tools like agent mail, bv, ubs, cass, etc. If you don't have a good AGENTS dot md file, none of this stuff is going to work well. That's also why I'm so insistent on ensuring that they constantly re-read the AGENTS dot md file; otherwise, they totally forgot what they're doing and how to operatre.
+
+I stopped using CLAUDE dot md files months ago and only use AGENTS dot md now. You can’t rely on them consistently reading any of them automatically anyway, so my first message (and many subsequent messages, especially after a compaction) explicitly tells the agent to read it.
+
+All of that happens in the planning phase. I ask all the frontier models to come up with plans and then show their plans to GPT 5.2 Pro in the web app with a prompt of this form: --- I asked 3 competing LLMs to do the exact same thing and they came up with pretty different plans which you can read below. I want you to REALLY carefully analyze their plans with an open mind and be intellectually honest about what they did that's better than your plan. Then I want you to come up with the best possible revisions to your plan (you should simply update your existing document for your original plan with the revisions) that artfully and skillfully blends the "best of all worlds" to create a true, ultimate, superior hybrid version of the plan that best achieves our stated goals and will work the best in real-world practice to solve the problems we are facing and our overarching goals while ensuring the extreme success of the enterprise as best as possible; you should provide me with a complete series of git-diff style changes to your original plan to turn it into the new, enhanced, much longer and detailed plan that integrates the best of all the plans with every good idea included (you don't need to mention which ideas came from which models in the final revised enhanced plan):
+
+hat's why the beads are so important. All that hard work that requires understanding the entire project structure is done in "plan space" where everything can neatly fit entirely in the model's context window. Once the plan is turned into beads, agents only need to understand their current bead. It's like how a cook in a busy diner can grab a numbered ticket that tells him to make a pastrami on rye sandwich and he can do that perfectly without needing to concern himself with all the intricacies of the dining room and how long each customer has been waiting, who needs to get their check,
+
+All of that happens in the planning phase. I ask all the frontier models to come up with plans and then show their plans to GPT 5.2 Pro in the web app with a prompt of this form: --- I asked 3 competing LLMs to do the exact same thing and they came up with pretty different plans which you can read below. I want you to REALLY carefully analyze their plans with an open mind and be intellectually honest about what they did that's better than your plan. Then I want you to come up with the best possible revisions to your plan (you should simply update your existing document for your original plan with the revisions) that artfully and skillfully blends the "best of all worlds" to create a true, ultimate, superior hybrid version of the plan that best achieves our stated goals and will work the best in real-world practice to solve the problems we are facing and our overarching goals while ensuring the extreme success of the enterprise as best as possible; you should provide me with a complete series of git-diff style changes to your original plan to turn it into the new, enhanced, much longer and detailed plan that integrates the best of all the plans with every good idea included (you don't need to mention which ideas came from which models in the final revised enhanced plan):
+
+I think it's much better to keep each agent fungible and replaceable at will so that when they crash or lose their memory or whatever you can simply boot up a new one and they can parachute in and immediately be useful. Trying to give each one a role make everything more brittle. I'm not saying your approach is wrong or won't work, I'm just telling you what I've settled on and I know works really well for super high velocity development of complex projects. Agents die or crash or get dumb/have amnesia all the time and you want your system to be immune to that so you don't even care when it happens.
+
+The trick is to explicitly ask it for git-diff style changes and then have CC or codex implement the changes against the original plan document. That solves the problem, and also the related problem of the model silently truncating parts or leaving out features and functionality.
+
+This is from this person: https://github.com/Dicklesworthstone
+his x account: https://x.com/doodlestein
+
+
+
+========== NEXT MESSAGE ==========
+
+A good markdown plan doc is not “a long brainstorm.” It’s an executable spec for V1: a document that lets a (possibly amnesiac) coding agent produce correct code with minimal back-and-forth, and lets you review correctness before you pay the implementation cost.
+What a good markdown plan document does
+A good plan removes ambiguity on the things that cause rework:
+
+
+Pins down V1
+
+
+Goals (what success looks like)
+
+
+Non-goals (what you’re explicitly not doing yet)
+
+
+Constraints (security, offline-only, portability, perf budgets, etc.)
+
+
+
+
+Describes user workflows as primary truth
+
+
+Step-by-step “what the user does” flows
+
+
+Inputs/outputs, error states, empty states
+
+
+UX expectations (what’s fast, what’s safe, what’s reversible)
+
+
+
+
+Defines the “system contract”
+
+
+Data formats, schemas, file layouts, versioning
+
+
+Module boundaries and responsibilities
+
+
+CLI/API surface + flags + semantics
+
+
+Backwards compatibility / migration promises
+
+
+
+
+De-risks the hard parts on paper
+
+
+Threat model + privacy model (esp. if encryption/sharing)
+
+
+Failure modes and recovery strategies
+
+
+Performance targets + measurement approach
+
+
+Platform gotchas (browser limits, wasm, GH Pages quirks, etc.)
+
+
+
+
+Ends with an implementation path
+
+
+A task graph that naturally becomes beads (epics → tasks → subtasks)
+
+
+Acceptance criteria per task (“done means X is verifiably true”)
+
+
+Test plan baked in (unit + integration + e2e), not “later”
+
+
+
+
+That’s the core of “spending 85% on planning”: you’re moving unknowns and complexity left—into a space where edits are cheap.
+
+Good vs Great: the real difference
+Good plan = “I can implement V1 without guessing the main architecture.”
+Great plan = “I can implement V1 without guessing edge cases, invariants, security posture, performance posture, and rollback paths.”
+Here are the “greatness multipliers”:
+1) It’s falsifiable
+A great plan is full of statements that can be proven true/false:
+
+
+“Exported site unlocks only with correct password”
+
+
+“Search results update under 50ms for N records on typical laptop”
+
+
+“No decrypted plaintext is written to disk or localStorage”
+
+
+“Bundle format is forward-compatible via schema versioning”
+
+
+2) It names invariants (and guards them)
+Great plans explicitly say:
+
+
+What must never happen (e.g., plaintext leak, key persistence)
+
+
+What must always happen (e.g., authenticated encryption, integrity checks)
+
+
+What’s acceptable degradation (e.g., slower first-load OK, typing must stay fast)
+
+
+3) It’s risk-ordered
+Good plans list tasks in a reasonable order.
+Great plans put “unknowns” first (crypto choices, wasm/sqlite feasibility, GH Pages packaging constraints), so you fail fast in planning/prototyping rather than late in integration.
+4) It’s “beads-native”
+A great plan reads like it wants to become beads:
+
+
+Each section maps cleanly to a bead cluster
+
+
+Dependencies are explicit
+
+
+Acceptance criteria and tests are attached to the bead that creates the behavior
+
+
+
+A tangible example (Cass GH Pages encrypted export)
+Below is a deliberately short “good” plan, then a diff that turns it into “great.” This mirrors your workflow (plan → critique → git-diff → integrate → beads).
+“Good” plan (short but implementable)
+markdownCopy code# PLAN: GH Pages Web Export (Encrypted) for cass
+
+## Goal
+Add a new export mode that generates a static website view of selected cass sessions, deployable to GitHub Pages. The export can be public or password-protected via encryption.
+
+## Non-goals (V1)
+- Multi-user accounts / auth server
+- Sharing individual messages via deep links across bundles
+- Collaborative annotations
+
+## User Workflow
+1) User runs `cass export web` and selects:
+   - agent(s), project folder(s), time range
+   - optional password (empty = no encryption)
+2) cass generates an export folder:
+   - static web UI assets
+   - data bundle (encrypted if password provided)
+3) User can run `cass export web --deploy gh-pages` to publish via `gh`.
+
+## UX Requirements
+- If encrypted: page shows password prompt, no data visible until unlocked.
+- After unlock: responsive UI, fast search, filters by agent/project/time.
+- If unencrypted: site loads immediately.
+
+## Data Bundle
+- cass exports in canonical cass schema.
+- Bundle includes a manifest with metadata and schema version.
+- Encrypted bundle uses authenticated encryption.
+
+## Implementation Outline
+- Rust: add `export web` command and export wizard.
+- Web app: static TS + WASM. Load bundle, decrypt if needed, then index/search.
+- Deployment: optional gh-pages publish helper.
+
+## Testing
+- Unit tests for bundle creation and encryption/decryption.
+- E2E test: generate export, serve locally, verify unlock + search.
+
+That’s “good”: it communicates intent and a plausible architecture.
+Now here’s what “great” looks like: it eliminates the expensive ambiguities (crypto details, leak surfaces, perf budgets, failure modes, versioning, and test matrix).
+
+Git-diff style upgrades: good → great
+diffCopy code # PLAN: GH Pages Web Export (Encrypted) for cass
+
++## Status / Principles
++- V1 must be safe-by-default: encrypted export is the default path in docs/examples.
++- No plaintext persistence: decrypted content must never be written to disk, localStorage, or service-worker cache.
++- All encryption must be authenticated (confidentiality + integrity). “Wrong password” must be indistinguishable from “tampered bundle.”
++- Bundle format must be versioned and forward-compatible.
+
+ ## Goal
+ Add a new export mode that generates a static website view of selected cass sessions, deployable to GitHub Pages. The export can be public or password-protected via encryption.
+
+ ## Non-goals (V1)
+ - Multi-user accounts / auth server
+ - Sharing individual messages via deep links across bundles
+ - Collaborative annotations
++ - Server-side search/indexing (everything runs client-side)
++ - “Perfect secrecy” against an attacker with the password (we only aim to protect against public hosting / offline theft)
+
++## Threat Model (V1)
++### We defend against
++- Public repo hosting: strangers can download the bundle and site assets.
++- Offline attacks: attacker has the encrypted bundle and can brute-force passwords.
++- Tampering: attacker modifies bundle bytes or manifest to exploit parser/UI.
++### We do not defend against
++- A compromised browser/OS on the viewer’s machine.
++- Weak passwords (we can warn/measure, not prevent).
++### Primary leak surfaces to explicitly avoid
++- Metadata leaks (agent names, project paths, timestamps) in cleartext manifest.
++- Browser caches storing decrypted payload.
++- Error messages that reveal whether “password wrong” vs “bundle corrupted.”
+
+ ## User Workflow
+ 1) User runs `cass export web` and selects:
+    - agent(s), project folder(s), time range
+    - optional password (empty = no encryption)
+ 2) cass generates an export folder:
+    - static web UI assets
+    - data bundle (encrypted if password provided)
+ 3) User can run `cass export web --deploy gh-pages` to publish via `gh`.
+
++### Export Modes
++- `--public`: no encryption, emits plaintext bundle (explicit opt-in).
++- default: encrypted bundle, password required.
++- `--password-stdin` for automation (never echo).
++- `--hint` optional (stored inside encrypted payload, not plaintext).
+
+ ## UX Requirements
+ - If encrypted: page shows password prompt, no data visible until unlocked.
+ - After unlock: responsive UI, fast search, filters by agent/project/time.
+ - If unencrypted: site loads immediately.
++ - Wrong password and corrupted bundle produce the same generic failure UI.
++ - “Lock” button re-locks (wipes decrypted content from memory and resets UI).
++ - Performance budgets:
++   - TTI (time-to-interactive) < 2s for small bundles, graceful for large bundles
++   - search-as-you-type latency target: p95 < 50ms after unlock
+
+ ## Data Bundle
+ - cass exports in canonical cass schema.
+ - Bundle includes a manifest with metadata and schema version.
+ - Encrypted bundle uses authenticated encryption.
++
++### Bundle File Layout
++- `/export/index.html`, `/assets/*` (static UI)
++- `/data/bundle.enc` (bytes)
++- `/data/bundle.meta` (minimal, non-sensitive: schema version, sizes, KDF params, ciphertext hash)
++  - explicitly exclude: agent names, project paths, timestamps, counts
++
++### Cryptography Spec (V1)
++- KDF: Argon2id (explicit parameters in bundle.meta)
++- Salt: random per bundle
++- AEAD: XChaCha20-Poly1305 (or AES-256-GCM; pick one and standardize)
++- Nonce strategy: random nonce per chunk/page
++- Chunking:
++  - encrypt bundle in chunks to allow streaming + progress UI
++  - authenticate each chunk; also authenticate a top-level manifest inside ciphertext
++- Integrity:
++  - bundle.meta includes ciphertext hash (not a substitute for AEAD; used for quick corruption detection)
++
++### Versioning / Compatibility
++- `bundle_format_version` and `schema_version`
++- Forward-compat rules:
++  - unknown fields ignored
++  - new sections added behind version gates
++- Migration plan: keep old readers for N minor versions or provide a re-export tool
+
+ ## Implementation Outline
+ - Rust: add `export web` command and export wizard.
+ - Web app: static TS + WASM. Load bundle, decrypt if needed, then index/search.
+ - Deployment: optional gh-pages publish helper.
++
++### Rust Responsibilities
++- Selection UI/wizard with reproducible config output (save as `export_config.json`)
++- Bundle builder:
++  - canonicalize + normalize paths
++  - optional redaction hooks (V1: allow simple regex-based redaction list)
++  - deterministic ordering for stable exports (useful for diffs)
++- Crypto module with test vectors
++- `cass export web --serve` for local preview
++- `--deploy gh-pages`:
++  - validates repo is public (or warns)
++  - creates gh-pages branch or uses `/docs` strategy (configurable)
++
++### Web App Responsibilities
++- Never fetch remote data beyond local bundle files
++- Decrypt in memory; build in-browser search structures
++- Provide filters and fast rendering for large logs (virtualized list)
++- Optional: “unsafe public mode” banner when unencrypted
+
+ ## Testing
+ - Unit tests for bundle creation and encryption/decryption.
+ - E2E test: generate export, serve locally, verify unlock + search.
++
++### Test Matrix (must exist in-plan)
++- Crypto:
++  - wrong password
++  - tampered ciphertext
++  - tampered meta params
++  - chunk boundary corruption
++- Privacy:
++  - confirm no sensitive fields exist in plaintext meta
++  - confirm no localStorage/service-worker caches store decrypted data
++- Perf:
++  - benchmark unlock time and p95 search latency for sample bundle sizes
++- E2E (Playwright):
++  - encrypted export flow
++  - public export flow
++  - lock/unlock/reset behavior
++  - mobile viewport smoke tests
+
+That diff is the essence of the upgrade: threat model + invariants + leak surfaces + crypto contract + perf budgets + explicit test matrix.
+
+So what does “85% planning” actually mean in practice?
+In concrete actions, it’s usually:
+
+
+Reading and mapping the existing code (so your plan matches reality)
+
+
+Enumerating user flows and edge cases until no one has to guess behavior
+
+
+Writing the security/privacy contract (threat model + leak surfaces + mitigations)
+
+
+Defining data formats & versioning up front (so you don’t paint yourself into a corner)
+
+
+Setting performance targets + measurement method (bench harness, sample datasets)
+
+
+Designing failure modes (“what happens when X goes wrong?”)
+
+
+Producing a task graph that compiles into beads
+
+
+Embedding acceptance criteria + tests into the plan so implementation is checkable
+
+
+If you do that, implementation becomes “mechanical,” which is exactly why your swarm works: you turned ambiguity into text.
+
+A reusable “great plan” markdown skeleton (copy/paste)
+If you want a default template that tends to produce “beads-native” plans:
+markdownCopy code# PLAN: <Project/Feature Name>
+Status: Draft | Review | Final
+Owners: <name>
+Last updated: <date>
+
+## 0) Executive Summary (5-10 lines)
+## 1) Goals
+## 2) Non-goals
+## 3) Users & Primary Workflows
+### 3.1 Happy path
+### 3.2 Error paths / empty states
+### 3.3 UX polish requirements
+
+## 4) Constraints & Success Metrics
+- Perf budgets
+- Platform constraints
+- Compatibility promises
+
+## 5) System Design
+### 5.1 Architecture (modules + responsibilities)
+### 5.2 Data model / schemas / file layout
+### 5.3 APIs/CLI surface (flags, semantics, exit codes)
+
+## 6) Security & Privacy
+### 6.1 Threat model (in/out of scope)
+### 6.2 Invariants (“must never happen”)
+### 6.3 Mitigations and design choices
+
+## 7) Failure Modes & Recovery
+## 8) Testing Strategy
+- Unit
+- Integration
+- E2E
+- Test matrix + datasets
+- Observability/logging expectations
+
+## 9) Rollout / Migration
+## 10) Task Graph (beads-ready)
+- Epic → tasks → subtasks
+- Dependencies
+- Acceptance criteria per task
+
+## 11) Open Questions / Decisions Log
+## 12) Appendix (research notes, alternatives considered)
+
+
+If you want, paste any one section of your plan (e.g., just the crypto + bundle spec part) and I’ll show you exactly how I’d tighten it into a “great-plan” version—same structure as your workflow: critique + rationale + git-diff style upgrades.
+
+
+========== NEXT MESSAGE ==========
+
+i still dont get how he takes 2-3 hours to work on the plan and get it improved over time
+
+========== NEXT MESSAGE ==========
+
+Totally fair — “2–3 hours on a plan” sounds like hand-wavy grind until you see what the minutes are actually spent on.
+Here’s what’s really happening: it’s not “writing a plan from scratch.” It’s running a tight improvement loop where each loop removes ambiguity and adds the missing “contracts” (security, perf, edge cases, testability) before code exists.
+The 2–3 hour loop, in real time
+Think in 6–10 passes, each pass 10–25 minutes, each pass has a specific job.
+Pass 1 (10–20 min): Build the “spine”
+
+
+Goals / non-goals
+
+
+2–3 primary user workflows
+
+
+Rough architecture blocks
+
+
+Rough data flow
+
+
+Output: a plan that is coherent but still full of holes.
+Pass 2 (15–25 min): Read existing code + reality-check
+He (or Claude) re-reads bv’s implementation and extracts:
+
+
+What actually worked in production
+
+
+Where the pain was (bundle sizes, caching, wasm loading, etc.)
+
+
+Constraints you forget (GH Pages paths, base href, no server headers)
+
+
+Output: plan gains specific constraints that prevent later rewrites.
+Pass 3 (15–25 min): Threat model + privacy leak surfaces
+This is the big one for your Cass example.
+They enumerate:
+
+
+What must never leak (project paths, agent names, timestamps)
+
+
+What could leak accidentally (manifest fields, error messages, caching)
+
+
+What “wrong password” must look like
+
+
+What to store plaintext vs encrypted
+
+
+Output: turns “we’ll encrypt it” into a security contract.
+Pass 4 (15–25 min): Crypto + bundle contract becomes explicit
+This is where plans jump in quality:
+
+
+Pick KDF (Argon2id), params storage
+
+
+Pick AEAD (XChaCha20-Poly1305), nonce strategy
+
+
+Chunking/streaming decisions (needed for perf + progress UI)
+
+
+Versioning rules (bundle_format_version, schema_version)
+
+
+Output: removes the biggest source of bugs: vague crypto.
+Pass 5 (15–25 min): UX edge cases + failure modes
+
+
+Corrupt bundle
+
+
+Wrong password
+
+
+Partial download
+
+
+Mobile constraints
+
+
+“Lock again” behavior (wipe memory)
+
+
+“Public mode” warnings
+
+
+Output: no guessing during implementation.
+Pass 6 (15–25 min): Performance posture
+He adds:
+
+
+budgets (TTI, p95 search latency)
+
+
+measurement plan (bench harness, sample datasets)
+
+
+design choices that enforce it (virtualized list, incremental indexing)
+
+
+Output: plan becomes measurable.
+Pass 7 (15–25 min): Testing becomes a matrix
+Not “add tests,” but:
+
+
+crypto tests (wrong password indistinguishable from tamper)
+
+
+privacy tests (no sensitive plaintext in meta)
+
+
+e2e tests (Playwright flow)
+
+
+perf tests (unlock time, search p95)
+
+
+Output: the plan becomes verifiable.
+Pass 8+ (10–20 min each): Integrate feedback from another model
+This is the “v2 → v3 massive improvement” you mentioned.
+He’s basically asking: “what did we forget?”
+
+
+better architecture boundaries
+
+
+extra safety defaults
+
+
+sharper acceptance criteria
+
+
+clearer task decomposition
+
+
+Output: fewer holes, smaller beads, less rework.
+
+Why it improves “over time”
+Because each pass reduces a different kind of risk:
+
+
+Early passes improve coherence
+
+
+Mid passes improve correctness and safety
+
+
+Late passes improve implementability and speed
+
+
+Plans “feel” like they’re getting better because they’re shifting from:
+
+“What we want” → “Exactly what must be true, even under attack / failure / scale”
+
+That’s the difference between “we’ll encrypt it” and a plan that tells an agent exactly what to implement and how to test it.
+
+The trick: he’s not writing — he’s editing with diffs
+The reason it takes 2–3 hours (not 2–3 days) is:
+
+
+Start with an OK draft
+
+
+Then do diff-based refinement:
+
+
+identify holes
+
+
+patch them in
+
+
+repeat
+
+
+
+
+That’s why “no code is being written” but progress is real: ambiguity is being deleted.
+
+A concrete mini-example of “time spent”
+Here’s a real 10-minute chunk that sounds small but is huge:
+
+
+Someone notices: “bundle.meta cannot contain agent names or timestamps”
+
+
+They add:
+
+
+exact list of allowed plaintext fields
+
+
+“wrong password == tamper” identical UI
+
+
+“no localStorage cache of decrypted data”
+
+
+tests to enforce these
+
+
+
+
+That one chunk prevents the most common failure of encrypted static exports: metadata leaks and caching leaks.
+
+If you want the fastest way to “get it” viscerally: take any plan you have, and I’ll do one single improvement pass in the style above (threat model + invariants + test matrix + perf budgets) and show you the diff. You’ll immediately see why 6–10 passes compounds so hard.
+
+
+========== NEXT MESSAGE ==========
+
+what does editing with diffs mean? i dont understand
+
+========== NEXT MESSAGE ==========
+
+“Editing with diffs” just means: you don’t ask the model to rewrite the whole plan.
+You ask it to propose specific changes in a format that looks like a git patch, so you can apply those changes to the existing plan file.
+1) What a “diff” is (plain English)
+A diff shows:
+
+
+what lines to remove (prefixed with -)
+
+
+what lines to add (prefixed with +)
+
+
+where in the file those changes should go
+
+
+So instead of “here’s a new plan”, you get “here are the exact edits to make.”
+2) Tiny example
+Original plan snippet:
+mdCopy code## Security
+We will encrypt the bundle.
+
+Diff-style edit:
+diffCopy code ## Security
+-We will encrypt the bundle.
++We will encrypt the bundle using authenticated encryption (AEAD).
++Threat model:
++- Assume repo and site are public.
++- Prevent plaintext metadata leaks in bundle.meta (no project paths/agent names/timestamps).
++Wrong password and tampering must produce the same generic error UI.
++Add tests: wrong password, tampered ciphertext, tampered meta params.
+
+You can literally apply that to the file and the plan gets better without losing anything else.
+3) Why this is powerful (and why he does it)
+If you ask an AI to “rewrite the plan,” it might:
+
+
+accidentally drop features
+
+
+reword things ambiguously
+
+
+shorten stuff (“helpful summary”) and lose details
+
+
+restructure in a way that breaks your existing organization
+
+
+Diffs avoid that because they’re surgical:
+
+
+keep 95% of the plan intact
+
+
+only modify the parts that need improvement
+
+
+easier to review (“do I agree with this change?”)
+
+
+easier for Claude Code/Codex to “integrate in-place” reliably
+
+
+4) What “editing with diffs” looks like in his workflow
+He does loops like:
+
+
+Take plan v2
+
+
+Ask GPT: “Give me improvements as git-diff changes”
+
+
+Paste those diffs into Claude Code: “Apply these changes to the plan file in-place”
+
+
+Now you have plan v3
+
+
+Repeat
+
+
+So “improving over time” = stacking multiple diff rounds.
+5) Mental model
+
+
+Rewrite = “replace the document”
+
+
+Diff-editing = “patch the document”
+
+
+Patch-style editing is safer, faster to review, and preserves completeness.
+If you paste a short excerpt of any plan section (even 30–50 lines), I can show you exactly what a “diff-based improvement pass” looks like on it.
+
+
+========== NEXT MESSAGE ==========
+
+that's all he said in that text? Did he say how to work on the plan or the beads such that all issues, dependencies issues, size of beads, details of beads etc. are all fixed before the plan is converted into beads and have the ability to allow fungible swarm of agents to work on each beads independently without errors and we get the end outcome as per what is determined by the implementation plan as a whole?
+
+========== NEXT MESSAGE ==========
+
+From what you pasted: he did say some of that, but not all of it—and the parts he didn’t spell out are exactly the “how do we guarantee fungible swarms won’t step on rakes?” details.
+What he explicitly said (in your text)
+Yes, he describes these mechanics:
+
+
+Plan gets improved over time via multiple rounds:
+
+
+Claude Code drafts → GPT (extended reasoning) critiques with git-diff style edits → Claude integrates in-place → repeat.
+
+
+
+
+Plan → beads conversion:
+
+
+“Elaborate and create comprehensive + granular beads with tasks/subtasks + dependency structure + detailed comments so beads are self-contained.”
+
+
+
+
+Beads are iterated before coding:
+
+
+He runs 8–9 rounds of “re-read plan, check every bead, revise beads, don’t oversimplify, don’t lose features, add unit + e2e tests + detailed logging.”
+
+
+
+
+Fungible swarm execution model:
+
+
+Agents are generalists, all re-read AGENTS.md, pick next work via bv, mark beads in-progress, coordinate via Agent Mail.
+
+
+He emphasizes fungibility (replaceable agents) as a design goal.
+
+
+
+
+So: he does claim that the “operate in plan space” iteration is how issues get caught before implementation.
+What he did not really specify (or only implied)
+He does not lay out a concrete, formal method for:
+
+
+How to size beads (what’s “too lumpy” vs “just right”) beyond “make them granular”
+
+
+How to ensure dependency correctness (no missing deps, no cycles, no hidden prerequisites)
+
+
+How to prevent swarm collisions (two agents editing same files / shared refactors) except by “mark in-progress + communicate”
+
+
+How to guarantee the end-to-end outcome (integration strategy, interface locking, system-level acceptance criteria) other than “add e2e tests and keep reviewing”
+
+
+That stuff is doable, but it’s extra discipline you add on top.
+
+The missing “how”: a practical method to make beads swarm-safe
+If your goal is: convert plan → beads such that fungible agents can independently execute beads and you reliably get the whole-system outcome, you need two QA gates before coding starts.
+Gate A: Plan QA (make the plan “beads-ready”)
+Before you generate beads, ensure the plan has these “contracts”:
+
+
+System invariants
+
+
+
+
+“Must never happen” (security leaks, data corruption, perf regression)
+
+
+“Must always happen” (encryption integrity, schema versioning)
+
+
+
+
+Interfaces locked
+
+
+
+
+CLI flags + behavior
+
+
+Bundle format + schema + versioning rules
+
+
+Any module boundaries (who owns what)
+
+
+
+
+End-to-end acceptance
+
+
+
+
+A small list of “system-level truth statements”
+
+
+Example: “Encrypted GH Pages export shows only password prompt; unlock enables search; wrong password indistinguishable from tamper; p95 search < 50ms.”
+
+
+
+
+If those are vague, your beads will be vague.
+Gate B: Bead QA (make beads “swarm-executable”)
+After beads are generated, do a “bead lint” pass. Every bead must have:
+1) A crisp deliverable
+
+
+Output artifact (a file, module, command, endpoint, UI screen, test)
+
+
+A “done means…” checklist
+
+
+2) Explicit dependencies (no hidden prereqs)
+Bad bead: “Implement export wizard” (depends on bundle spec, CLI shape, crypto decisions)
+Good bead: “Implement export wizard UI wiring after CLI flags + bundle schema are finalized”
+Rule: If a bead needs knowledge from another bead, it must depend on it.
+3) No cross-cutting refactor beads mixed with feature beads
+Refactors create collision risk. Keep them separate:
+
+
+“Refactor module boundaries” bead (single agent)
+
+
+then feature beads that build on the new boundaries
+
+
+4) A file-touch / conflict note
+To keep agents fungible, each bead should roughly say:
+
+
+“Touches: src/export/*, web/*”
+
+
+“Avoid editing: src/indexer/*”
+
+
+If two beads touch the same hot files, you either:
+
+
+merge them, or
+
+
+add a dependency chain, or
+
+
+redesign boundaries.
+
+
+5) Test requirement attached to the bead that creates behavior
+Don’t have “add tests later” as a vague final bead.
+Instead:
+
+
+Every behavior bead includes its unit/integration test bead(s) as dependents.
+
+
+
+A simple sizing rule for “not too lumpy”
+A bead is “right-sized” if:
+
+
+A single agent can complete it without needing to make new product decisions, and
+
+
+It produces a verifiable artifact, and
+
+
+It touches a limited surface area (few modules), and
+
+
+It can be reviewed in isolation.
+
+
+If a bead requires “thinking about the whole system,” it’s too big or it’s a design bead that should be earlier and dependency-locked.
+
+The final trick to guarantee the whole-system outcome
+Add 2 special bead types that force convergence:
+1) “Interface-lock” beads (early)
+
+
+Finalize: bundle meta plaintext fields, crypto params, CLI flags, versioning
+
+
+Once locked, downstream beads don’t debate them
+
+
+2) “System integration” beads (late, but not last-minute)
+
+
+“Encrypted export happy path works end-to-end”
+
+
+“Wrong password/tamper behavior verified”
+
+
+“Perf budgets benchmarked”
+
+
+“GH Pages deploy validated”
+
+
+These beads stop the swarm from producing lots of “locally correct” code that fails globally.
+
+So to answer your question directly
+
+
+Did he say how to do it? He gave the workflow skeleton (iterate plan → generate beads → iterate beads → swarm).
+
+
+Did he specify the rigorous mechanics for dependency correctness, bead sizing, swarm collision avoidance, and whole-system convergence? Not really; he mostly implies “the iterative review rounds handle it.”
+
+
+If you want, paste just one bead cluster (say 10–20 beads) and I’ll “bead-lint” it: point out missing deps, oversized beads, collision risks, and the minimum set of interface-lock + integration beads to make it swarm-safe.

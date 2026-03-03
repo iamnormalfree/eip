@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MAF Manifest Schema",
+  "description": "JSON schema for MAF (Multi-Agent Framework) manifest file that tracks file ownership and merge strategies",
+  "type": "object",
+  "required": [
+    "version",
+    "maf_version",
+    "managed_files",
+    "franchisee_files"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON schema reference"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Manifest format version"
+    },
+    "maf_version": {
+      "type": "string",
+      "pattern": "^v\\d+\\.\\d+\\.\\d+$",
+      "description": "MAF version this manifest conforms to"
+    },
+    "managed_files": {
+      "type": "array",
+      "description": "Files managed by MAF with ownership and merge strategies",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "checksum",
+          "maf_owned",
+          "franchisee_can_modify",
+          "merge_strategy"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path to the managed file"
+          },
+          "checksum": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$",
+            "description": "SHA256 checksum of the file"
+          },
+          "maf_owned": {
+            "type": "boolean",
+            "description": "Whether the file is owned by MAF HQ"
+          },
+          "franchisee_can_modify": {
+            "type": "boolean",
+            "description": "Whether franchisees can modify this file"
+          },
+          "merge_strategy": {
+            "type": "string",
+            "enum": ["overwrite", "merge_if_no_conflict", "keep_franchisee", "keep_maf"],
+            "description": "Strategy for merging changes during updates"
+          }
+        }
+      }
+    },
+    "hq_owned_files": {
+      "type": "array",
+      "description": "Files owned exclusively by MAF HQ that franchisees should not modify",
+      "items": {
+        "type": "string",
+        "description": "Relative path to HQ-owned file"
+      }
+    },
+    "franchisee_files": {
+      "type": "array",
+      "description": "Files owned by the franchisee",
+      "items": {
+        "type": "string",
+        "description": "Relative path to franchisee-owned file"
+      }
+    }
+  }
+}

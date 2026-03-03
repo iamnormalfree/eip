@@ -1,0 +1,10 @@
+# Franchisee-specific configuration (never commit to MAF HQ)
+.maf-config
+
+# Franchisee-specific data and state
+*.local
+*.franchisee
+
+# Local overrides
+.local.env
+.franchisee.env

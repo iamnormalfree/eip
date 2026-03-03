@@ -1,0 +1,6006 @@
+Uploaded a file  MAF as a "Franchisable" System - Complete Overview
+
+  Based on the documentation in docs/plans/maf-rollout/, here's the complete picture:
+
+  ---
+  The Vision: MAF as a Shared Foundation
+
+  The core concept is that MAF (Multi-Agent Framework) is a standalone, "franchisable" system that can be deployed across multiple repositories, with each repo able to:
+
+  1. Contribute improvements back to the shared MAF
+  2. Receive updates from the shared MAF
+  3. Customize aspects locally while keeping core shared
+  4. Spin up new projects in minutes using MAF
+
+  ---
+  Architecture Diagram
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │            SHARED INFRASTRUCTURE (GitHub)                   │
+  │                                                             │
+  │   github.com/yourorg/maf (The Source Repository)            │
+  │                                                             │
+  │   ONE repo with EVERYTHING:                                │
+  │   • lib/maf/          (Core orchestration code)            │
+  │   • .claude/          (Response Awareness - 20+ skills)    │
+  │   • scripts/maf/      (170+ operational scripts)            │
+  │   • mcp_agent_mail/   (Communication layer)                │
+  │   • Telegram Bot      (Remote coordination)                 │
+  │   • .maf/config/      (Configuration templates)             │
+  │   • .beads-example/   (Task tracking template)             │
+  │   • SETUP.md          (Complete guide)                     │
+  │                                                             │
+  │   Version tags: v0.1.0, v0.1.1, v0.2.0...                 │
+  └─────────────────────────────────────────────────────────────┘
+                          │
+                          │ git subtree add
+                          ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │              CONSUMER REPOSITORIES                          │
+  │                                                             │
+  │  roundtable/        nextnest/         new-project/          │
+  │  ├── maf/           ├── maf/            ├── maf/            │
+  │  │   ├── lib/maf/  │   ├── lib/maf/   │   ├── lib/maf/    │
+  │  │   ├── .claude/  │   ├── .claude/   │   ├── .claude/     │
+  │  │   ├── scripts/  │   ├── scripts/   │   ├── scripts/     │
+  │  │   └── ...       │   └── ...        │   └── ...          │
+  │  ├── src/          ├── src/           ├── src/             │
+  │  └── package.json  └── package.json   └── package.json     │
+  └─────────────────────────────────────────────────────────────┘
+
+  ---
+  The Learning Loop: How Improvements Flow
+
+  "MAF Wednesday" - Weekly sync process:
+
+  1. Collect improvements from all repos
+     "We fixed this in nextnest"
+     "We added that in roundtable"
+
+  2. Review and categorize
+     Core code improvement? Script fix? Documentation?
+
+  3. Update the MAF repository
+     Make the improvement
+     Tag new version (v0.1.0 → v0.1.1)
+
+  4. All repos can update
+     git subtree pull --prefix=maf ...
+     Everyone gets the improvement
+
+  ---
+  Key Components Included in MAF
+
+  | Component          | Source Repository                                        | Description                                              |
+  |--------------------|----------------------------------------------------------|----------------------------------------------------------|
+  | MCP Agent Mail     | https://github.com/Dicklesworthstone/mcp_agent_mail      | Mail-like coordination layer with Git-backed audit trail |
+  | Beads (bd)         | https://github.com/steveyegge/beads                      | Graph-aware task management with PageRank triage         |
+  | Beads Viewer (bv)  | https://github.com/steveyegge/beads (CLI: @beads/viewer) | TUI for beads triage with --robot-* flags                |
+  | Memlayer           | (private, local venv at venv_memlayer/)                  | Vector storage for agent memory/context                  |
+  | Response Awareness | Custom to Roundtable (.claude/skills/)                   | Metacognitive orchestration framework                    |
+
+  ---
+  Rollout Timeline (6 Weeks)
+
+  | Week      | Target                                    | Action                       |
+  |-----------|-------------------------------------------|------------------------------|
+  | Week 1    | Foundation                                | Create GitHub MAF repository |
+  | Week 2    | Pilot (nextnest)                          | Test subtree approach        |
+  | Weeks 3-4 | Tier 3 repos (eip, erp-sg, erp-sg-design) | Roll out to 3 repos          |
+  | Week 5    | New project (railway-odoo)                | Set up from scratch          |
+  | Week 6    | Roundtable                                | Update production            |
+
+  ---
+  Key Commands
+
+  Adding MAF to a repo:
+  git subtree add --prefix=maf https://github.com/yourorg/maf main --squash
+
+  Updating to latest version:
+  git subtree pull --prefix=maf https://github.com/yourorg/maf main --squash
+
+  Starting new project (5 minutes):
+  mkdir new-project && cd new-project
+  git subtree add --prefix=maf https://github.com/yourorg/maf main --squash
+  # Copy configs, add API keys
+  bash maf/scripts/maf/spawn-agents.sh
+
+  ---
+  What Each Repo Can Customize
+
+  | MUST Change                                      | MAY Change               | SHOULD NOT Change                 |
+  |--------------------------------------------------|--------------------------|-----------------------------------|
+  | Agent topology (.maf/config/agent-topology.json) | Domain-specific skills   | Core code (maf/lib/maf/)          |
+  | API keys (.maf/credentials/)                     | Project-specific prompts | Helper scripts (scripts/maf/lib/) |
+  |                                                  |                          | Response Awareness core           |
+
+  ---
+  Current Status
+
+  Status: Plan complete, awaiting approval to begin rollout
+
+  The plan was created on 2026-01-05 and is ready for implementation. Roundtable has been designated as Tier 1: Production and will be migrated last (Week 6) after testing on other repos.
+
+  Document locations:
+  - docs/plans/maf-rollout/README.md:1 - Overview
+  - docs/plans/maf-rollout/founders-guide.md:1 - Non-technical explanation
+  - docs/plans/maf-rollout/implementation-plan.md:1 - Complete technical guide
+
+
+
+========== NEXT MESSAGE ==========
+
+This is a solid, coherent, and unusually mature systems plan. I’ll respond in the way a chief architect / franchisor / platform owner would—validating what works, calling out hidden risks, and giving you a crisp “go / no-go + refinements” view.
+I’ll structure this into 5 parts:
+
+
+What you’ve actually designed (decoded plainly)
+
+
+Why this is franchisable (not just reusable)
+
+
+The 3 real risks most people miss
+
+
+Tight refinements before rollout
+
+
+Approval verdict + next actions
+
+
+
+1. What You’ve Actually Designed (Decoded)
+You are not building “shared code”.
+You’ve designed a platform constitution.
+MAF is acting as:
+
+
+A governance layer (what can / cannot be changed)
+
+
+A coordination substrate (agent mail, beads, memlayer)
+
+
+A cognitive operating system (Response Awareness)
+
+
+A distribution mechanism (subtree + version tags)
+
+
+In plain terms:
+
+MAF = the McDonald’s kitchen manual + supply chain + training system,
+not the restaurant décor.
+
+Each repo is:
+
+
+A franchise outlet
+
+
+With local menu customisation
+
+
+But non-negotiable core operations
+
+
+That distinction matters a lot.
+
+2. Why This Is Truly Franchisable
+Most “shared frameworks” fail because they are:
+
+
+Too abstract
+
+
+Too permissive
+
+
+Or too brittle
+
+
+Yours works because of four correct constraints you’ve already enforced:
+2.1 One Canonical Source of Truth
+You did not go multi-repo + submodules + package managers.
+✅ One MAF repo
+✅ Versioned
+✅ Tagged
+✅ Pulled downstream
+This prevents “framework drift”.
+
+2.2 Asymmetric Power (Correctly Designed)
+DirectionAllowedConsumer → MAFPropose improvementsMAF → ConsumerOverwrite coreConsumer → Core❌ Direct mutation
+That asymmetry is essential.
+This is how:
+
+
+Linux kernel works
+
+
+Terraform providers work
+
+
+Franchises survive
+
+
+
+2.3 Learning Loop Is Explicit (This Is Rare)
+“MAF Wednesday” is not a ritual — it is institutional memory compression.
+You’ve formalised:
+
+
+Where learning happens
+
+
+When it’s reviewed
+
+
+How it re-enters the system
+
+
+That alone separates this from 95% of internal frameworks.
+
+2.4 Subtree Is the Right Choice (Yes, Really)
+Subtree beats:
+
+
+Submodules (too fragile)
+
+
+NPM / pip (wrong abstraction)
+
+
+Copy-paste (death)
+
+
+Why subtree is correct for MAF:
+
+
+You want snapshotted stability
+
+
+Not live dependency resolution
+
+
+You want auditable diffs
+
+
+You want deliberate upgrades
+
+
+This matches agent systems, not libraries.
+
+3. The 3 Real Risks (Read This Carefully)
+These are not obvious, and none are about Git.
+Risk #1: “Silent Core Forking”
+Symptom:
+A repo “temporarily” edits core code to unblock something… and never upstreams it.
+Mitigation (you should add):
+
+
+Add a CI guard:
+
+
+Detect diffs inside maf/lib/maf
+
+
+Fail build unless a CORE_OVERRIDE.md exists
+
+
+
+
+This turns silent drift into visible governance debt.
+
+Risk #2: Version Shock
+Symptom:
+A minor MAF update subtly changes agent behaviour and breaks a production workflow.
+Mitigation:
+
+
+Enforce semantic tags with intent, not just numbers:
+
+
+Example:
+
+
+v0.2.1-agent-mail-safe
+
+
+v0.3.0-topology-breaking
+
+
+This is especially important for cognitive systems, not APIs.
+
+Risk #3: Cognitive Coupling
+This is the most subtle one.
+Because:
+
+
+Response Awareness
+
+
+Beads semantics
+
+
+Agent mail patterns
+
+
+…are shared, teams may start assuming shared mental models that aren’t documented.
+Mitigation:
+
+
+Add a required file in MAF root:
+Copy codeMAF_ASSUMPTIONS.md
+
+Answering:
+
+
+What agents assume is “normal”
+
+
+What timing guarantees exist
+
+
+What is eventually consistent vs immediate
+
+
+
+
+This prevents human-level misunderstanding, not code bugs.
+
+4. Tight Refinements Before Rollout (High-Leverage)
+These are small but powerful.
+4.1 Add “MAF Compatibility Declaration” Per Repo
+Each consumer repo should declare:
+yamlCopy codemaf:
+  version: v0.2.0
+  compatibility:
+    agent_mail: required
+    beads: required
+    memlayer: optional
+
+This lets you:
+
+
+Audit fleet state
+
+
+Know blast radius before upgrades
+
+
+Reason like a platform operator
+
+
+
+4.2 Promote “Agent Topology” to First-Class Status
+You already treat it as MUST change — good.
+I’d go further:
+
+
+Treat agent-topology.json as the franchise blueprint
+
+
+Version it separately from MAF core
+
+
+Encourage repos to name patterns:
+
+
+solo-founder
+
+
+sme-advisory
+
+
+production-heavy
+
+
+
+
+This becomes productized intelligence later.
+
+4.3 Lock Down Scripts More Than Code
+Your instinct here is right, but worth stating explicitly:
+
+Scripts are operational doctrine, not helpers.
+
+I’d even:
+
+
+Add checksum validation for critical scripts
+
+
+Or a scripts.lock manifest
+
+
+Ops drift is more dangerous than code drift.
+
+5. Verdict: Approval + Concrete Next Actions
+✅ Architectural Verdict
+Approved. Strongly.
+This is:
+
+
+Coherent
+
+
+Scalable
+
+
+Governable
+
+
+And unusually future-proof for agent systems
+
+
+You are thinking like:
+
+
+A platform owner
+
+
+A systems franchisor
+
+
+Not a repo maintainer
+
+
+
+🚀 Immediate Next Actions (Week 0.5)
+Before Week 1 officially starts:
+
+
+Create MAF repo skeleton
+
+
+Even empty, with README + governance files
+
+
+
+
+Add these 3 files immediately:
+
+
+MAF_ASSUMPTIONS.md
+
+
+CORE_OVERRIDE_POLICY.md
+
+
+VERSIONING_GUIDE.md
+
+
+
+
+Pick Nextnest as the “canary” exactly as planned
+
+
+Do one intentional break
+
+
+Practice recovery via subtree pull
+
+
+
+
+If you want, next we can:
+
+
+Turn this into a Founders Pitch (“Why this is a moat”)
+
+
+Or design MAF-as-a-product for future externalisation
+
+
+Or write the internal constitution that future contributors must sign (mentally, at least)
+
+
+Just tell me which direction you want to go next.
+
+========== NEXT MESSAGE ==========
+
+Uploaded a filethis is the repo that we are using, please see and bring out all the issues and challenges 
+
+========== NEXT MESSAGE ==========
+
+Good — I’ve unpacked the repo and reviewed its structure, intent, and implicit contracts. I’ll give you a hard, founder-level audit, not a code-style nitpick.
+I’ll break this into 5 layers, because your repo is already behaving like a system, not a project.
+
+Executive Summary (Blunt)
+Your current repo works as a powerful internal lab, but fails the moment you treat it as a franchisable MAF source.
+Not because it’s bad — but because:
+
+It mixes runtime state, identity, experimentation, and doctrine in the same namespace.
+
+That is the central problem.
+Everything else cascades from this.
+
+1. CATEGORY ERROR: This Repo Is 4 Things at Once
+Right now, this repo is simultaneously:
+
+
+MAF Core (framework)
+
+
+A live runtime
+
+
+A specific deployment
+
+
+An experiment logbook
+
+
+A franchisable system must be only #1.
+Evidence from repo structure
+pgsqlCopy codeagent.env
+agents.json
+reservations.db
+runtime.db
+tmux.conf
+tmux-quota-status.conf
+state/
+test-results/
+agents/current-identity.txt
+
+These should never exist in a franchisable core repo.
+Why this is dangerous
+If another repo subtrees this:
+
+
+They inherit your runtime state
+
+
+Your identity assumptions
+
+
+Your tmux limits
+
+
+Your databases
+
+
+That breaks:
+
+
+Determinism
+
+
+Security
+
+
+Portability
+
+
+Mental clarity
+
+
+Verdict
+🚨 This repo cannot be the shared MAF repo in its current form.
+
+2. STATE CONTAMINATION (The Most Serious Issue)
+You have live state committed.
+Examples
+File / DirWhy It’s a Problemreservations.dbRuntime lock/state must be localruntime.dbExecution memory ≠ frameworkstate/tmp/Indicates running system, not templatecurrent-identity.txtDeployment-specific identity leakagent.envSecrets & env config mixed into core
+Consequence if franchised
+
+
+A new repo will:
+
+
+Boot with your assumptions
+
+
+Potentially clash agent IDs
+
+
+Corrupt memlayers
+
+
+Leak credentials or paths
+
+
+
+
+Required fix
+Zero runtime state in MAF core. Period.
+MAF must ship with:
+pgsqlCopy codestate/.gitkeep
+.env.example
+reservations.schema.sql
+
+Never actual data.
+
+3. IDENTITY BLEED (Subtle but Fatal Long-Term)
+This is very important.
+You have named agents with implied roles:
+nginxCopy codeauditbay
+ledgerleap
+primeportal
+rateridge
+
+And prompts tied to them.
+Problem
+These names encode:
+
+
+Domain assumptions
+
+
+Business intent
+
+
+Cognitive bias
+
+
+In a franchisable system:
+
+
+Identity is topology
+
+
+Topology is configuration
+
+
+Configuration must be local
+
+
+What should happen instead
+MAF core should provide:
+
+
+Agent types
+
+
+Role templates
+
+
+Skill bundles
+
+
+Consumer repos should define:
+jsonCopy code{
+  "agent_id": "finance-auditor",
+  "base_type": "analysis",
+  "skills": ["ledger", "risk"]
+}
+
+Right now, MAF is pre-opinionated.
+That’s fine for your repo — fatal for a franchise.
+
+4. GOVERNANCE IS IMPLIED, NOT ENFORCED
+You designed strong governance rules in the plan.
+They are not encoded here.
+Missing (critically)
+
+
+No CORE_OVERRIDE_POLICY.md
+
+
+No “do not edit” enforcement
+
+
+No CI guardrails
+
+
+No compatibility declaration
+
+
+No version discipline visible
+
+
+Which means:
+
+The rules live in your head, not the system.
+
+A franchisable system must assume:
+
+
+Future you forgets
+
+
+Others don’t read docs
+
+
+Pressure causes shortcuts
+
+
+
+5. EXPERIMENTATION POLLUTION
+This repo contains excellent experiments — but they’re mixed into the core.
+pgsqlCopy codetest-results/
+TDD_IMPLEMENTATION_SUMMARY.md
+beads-flow-test.log
+node-import-test.ts
+
+Why this is bad for MAF core
+Experiments:
+
+
+Change rapidly
+
+
+Are contextual
+
+
+Often contradict each other
+
+
+Are not doctrine
+
+
+MAF core must be:
+
+
+Conservative
+
+
+Slow-changing
+
+
+Boring
+
+
+Trustable
+
+
+Correct pattern
+powershellCopy codemaf/
+  core/
+  scripts/
+  doctrine/
+
+maf-labs/
+  experiments/
+  test-results/
+  spikes/
+
+You currently have labs inside the engine.
+
+6. TMUX & HOST COUPLING (Hidden Lock-In)
+These files encode host-specific assumptions:
+luaCopy codetmux.conf
+tmux-quota-status.conf
+
+Issues:
+
+
+Assumes tmux exists
+
+
+Assumes certain panes
+
+
+Assumes certain quotas
+
+
+Assumes Linux-style shell
+
+
+A franchisable MAF must:
+
+
+Treat tmux as a backend, not doctrine
+
+
+Allow replacement (screen, systemd, k8s, nomad)
+
+
+At minimum:
+
+
+These must be templates
+
+
+Not defaults
+
+
+Not authoritative
+
+
+
+7. WHAT THIS REPO IS GOOD AT (Important)
+Let me be very clear:
+This repo is excellent as a Tier-0 incubator.
+It proves:
+
+
+Your agent mail concept works
+
+
+Beads integration is viable
+
+
+Response Awareness is real
+
+
+Tmux-agent orchestration is feasible
+
+
+This is not wasted work.
+It’s just not the MAF source repo yet.
+
+8. REQUIRED REFACTOR (Non-Negotiable)
+You must split this into 3 repos (or logical layers)
+1️⃣ maf-core (Franchisable)
+Contains:
+
+
+lib/maf
+
+
+scripts/maf (only generic)
+
+
+.claude/skills (abstracted)
+
+
+config templates
+
+
+doctrine docs
+
+
+Contains no state, no identity, no runtime
+
+2️⃣ maf-runtime-template
+Contains:
+
+
+tmux templates
+
+
+env examples
+
+
+state schemas
+
+
+bootstrap scripts
+
+
+This is copied, not subtree-pulled.
+
+3️⃣ maf-labs (Optional but wise)
+Contains:
+
+
+test-results
+
+
+experiments
+
+
+logs
+
+
+exploratory prompts
+
+
+This is where thinking happens.
+
+Final Verdict (Direct)
+❌ This repo cannot be used as the shared MAF repo in its current form.
+✅ It is an extremely valuable proto-MAF lab.
+If you subtree this as-is, you will:
+
+
+Lock in bad assumptions
+
+
+Fight ghosts later
+
+
+Break franchising at scale
+
+
+Create subtle bugs you’ll never fully unwind
+
+
+
+Next Step (I recommend this strongly)
+If you want, next I can:
+
+
+Propose the exact file move plan (file by file)
+
+
+Design the maf-core repo skeleton
+
+
+Write the “MAF Constitution” (rules encoded, not explained)
+
+
+Simulate what happens if Roundtable subtrees this today (failure modes)
+
+
+Just tell me which one you want first.
+
+========== NEXT MESSAGE ==========
+
+Uploaded a filethis is what happened when we pull MAF into a new repo (nextnest) as a subtree and realised we couldn't get the tmux agents to work in nextnest:
+
+========== NEXT MESSAGE ==========
+
+Yep — your write-up captures the real reason tmux agents “didn’t work” in Nextnest: the subtree pull didn’t fail; your configuration model did.
+Below are the issues + challenges that this incident reveals (beyond the obvious “forgot to customize config”), and what you should change in MAF so this never happens again.
+
+1) Two Sources of Truth for Topology (This is the #1 failure)
+You ended up with two different agent-topology.json files:
+
+
+Subtree copy: maf/.maf/config/agent-topology.json (session = maf-nn, has agent_type + agent_type_mappings) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Local copy: .maf/config/agent-topology.json (session = maf-cli, missing agent_type and agent_type_mappings) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+So when you “fixed things”, you sometimes fixed the wrong file, and they drifted. MAF_INTEGRATION_HISTORY_DEEP_AN…
+Why this breaks tmux agents
+The tmux scripts need a single, authoritative session target. If your local config says maf-cli while the project’s “real” intended session is maf-nn, the spawn/attach logic will point at the wrong place and look “broken” even when the other config is correct. MAF_INTEGRATION_HISTORY_DEEP_AN…
+Systemic fix
+MAF must enforce one canonical location for topology:
+
+
+Option A (recommended): only .maf/config/agent-topology.json is allowed
+
+
+Option B: topology lives in maf/templates/... but is copied into .maf/config/... and never read from inside maf/ at runtime
+
+
+Right now you accidentally have both, and that is a design trap.
+
+2) Subtree Was Treated Like “Copy & Run” Instead of “Install & Configure”
+You assumed MAF would “just work” after subtree add. MAF_INTEGRATION_HISTORY_DEEP_AN…
+But your own docs say topology MUST be customized. MAF_INTEGRATION_HISTORY_DEEP_AN…
+Systemic fix
+Make it impossible to start without customization:
+
+
+Require a project id / session name during setup
+
+
+Fail fast if session is default (maf-cli) or if agent names still match examples
+
+
+
+3) Setup Script Not Run → No Validation Gate
+A huge part of the failure is simple: bash maf/scripts/setup-maf.sh wasn’t run. MAF_INTEGRATION_HISTORY_DEEP_AN…
+But the deeper issue is: even if it wasn’t run, your system should have screamed.
+Systemic fix
+Add a hard validation step inside spawn:
+When spawn-agents.sh runs, it should check:
+
+
+topology exists in the canonical location
+
+
+session name is not default
+
+
+every pane has agent_type
+
+
+agent_type_mappings exists and includes PROJECT_ROOT
+
+
+If any are missing → exit with a clear error explaining exactly what to edit.
+(Your report explicitly lists that missing agent_type and agent_type_mappings was part of what stayed broken in local config.) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+4) “Example Config” Is Actually Production Config
+Your docs reference an agent-topology.json.example, but in v0.1.1 it didn’t exist. MAF_INTEGRATION_HISTORY_DEEP_AN…
+So the setup script falls back to creating something that looks like Roundtable’s real config (names like GreenMountain etc.), and users treat that as a template. MAF_INTEGRATION_HISTORY_DEEP_AN…
+Why this is dangerous
+It makes people believe:
+
+
+Roundtable naming is “standard”
+
+
+Roundtable numeric IDs are meaningful everywhere MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+maf-cli is the expected session name MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Systemic fix
+Ship a real template in MAF:
+
+
+maf/templates/agent-topology.template.json
+
+
+with obvious placeholders like __PROJECT__, __SESSION__, __ROOT__
+
+
+and never ship “Roundtable-ish” values in anything that’s meant to be copied
+
+
+
+5) Agent Identity Model Was Ambiguous (IDs vs Types)
+You initially had numeric IDs (4/7/5/6) that were “meaningless without context.” MAF_INTEGRATION_HISTORY_DEEP_AN…
+Later you switched to agent_type (claude-worker, codex-reviewer) which is the right direction. MAF_INTEGRATION_HISTORY_DEEP_AN…
+Systemic fix
+Pick one:
+
+
+If agent_type exists, ignore numeric agent_id entirely
+
+
+Or enforce agent_id as a stable identity only if it maps somewhere real
+
+
+Right now it’s easy for a new repo to carry over numbers that look “valid” but aren’t.
+
+6) No “Reset & Reconfigure” Workflow
+Your history shows you fixed this in piecemeal layers over 2 days because there was no clean “wipe local state and re-run setup” path. MAF_INTEGRATION_HISTORY_DEEP_AN…
+Systemic fix
+Add a single command like:
+
+
+maf/scripts/maf/reset-local.sh
+
+
+backs up .maf/
+
+
+recreates it from templates
+
+
+re-runs validations
+
+
+prints next steps
+
+
+
+
+If a founder screws up, they should be able to recover in 3 minutes.
+
+7) Missing Health Checks as a Required Step
+You explicitly note validation scripts exist but weren’t run. MAF_INTEGRATION_HISTORY_DEEP_AN…
+Systemic fix
+Make “health check” part of setup and spawn:
+
+
+setup ends by running maf:health-check
+
+
+spawn refuses to run unless maf:health-check passes or you add --force
+
+
+
+The Real Lesson (Not “read the docs”)
+This incident proves:
+
+MAF currently relies on human correctness in the highest-friction moment (first install).
+A franchisable system must rely on invariants + validation + one source of truth.
+
+Your report already calls this out in multiple places (wrong file edited; divergence; skipped setup). MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+What I’d change in MAF, in order (Highest impact first)
+
+
+Canonicalize topology path (choose .maf/config/... only)
+
+
+Spawn script hard-validates session, agent_type, mappings, project root
+
+
+Ship a real template file, not Roundtable-ish examples MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Setup script becomes interactive: “Project code? Session name?”
+
+
+Add a reset/reinstall script
+
+
+CI guard: block commits if .maf/config contains default session name
+
+
+
+If you want, I can now take the repo you uploaded (/mnt/data/maf-repo.zip) and produce a patch plan that implements these exact fixes (file locations, script edits, and the new template + validator) so the next subtree integration is genuinely “5 minutes, works first time.”
+
+========== NEXT MESSAGE ==========
+
+Uploaded a fileUploaded a filewhat about this? Nextnest pulled maf subtree and then made a series of its own changes. pease take a look.
+
+========== NEXT MESSAGE ==========
+
+I took a look at what happened in the “Nextnest pulled MAF subtree → then made its own changes” pattern, and the core challenge is exactly what your own audit concludes:
+
+Your consumer repo ended up changing things that should be “local-only”, while also leaving behind state that should never be committed.
+And because there are two topology files, fixes landed in the wrong place and drifted. MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+Here are the real issues + challenges this creates, and why it’s dangerous for a franchisable MAF model.
+
+1) The consumer repo “touched the subtree” (drift + future conflicts)
+Your Nextnest integration history explicitly calls out a best-practice lesson: “Keep subtree pristine, customize locally.” MAF_INTEGRATION_HISTORY_DEEP_AN…
+But in practice, Nextnest still had to make changes after the subtree pull (agent prompts updates are mentioned as part of the fix timeline). MAF_INTEGRATION_HISTORY_DEEP_AN…
+Why this matters
+Once a consumer edits files inside maf/:
+
+
+Every future git subtree pull becomes a merge conflict waiting to happen
+
+
+You can no longer trust “MAF version tags” as a clean baseline (because every repo is now “MAF + local patchset”)
+
+
+You lose the whole franchise guarantee (“same core everywhere”)
+
+
+Franchise rule: local customizations must have a separate namespace.
+
+2) Two topology files = guaranteed configuration split-brain
+Your audit shows two different topology files disagreeing:
+
+
+Subtree config: maf/.maf/config/agent-topology.json has correct session maf-nn and proper agent_type + agent_type_mappings. MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Local config: .maf/config/agent-topology.json still says session maf-cli and is missing mappings. MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+This is the kind of bug that feels like “tmux agents don’t work”, when really you’re launching/attaching to the wrong session target.
+What this implies structurally
+MAF currently allows “two competing truths”. That’s not an implementation bug; that’s a design bug.
+
+3) The consumer repo carried Roundtable defaults too far (identity bleed)
+You documented the exact drift pattern:
+
+
+It started with Roundtable-ish defaults (GreenMountain, BlackDog, etc.) and generic session maf-cli MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Then later got renamed to Nextnest-specific agents and session maf-nn MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+This shows a systemic risk:
+
+“Example config” that looks real becomes “production config by accident.”
+
+If you want franchising, your templates must scream PLACEHOLDER and force a project identifier early.
+
+4) Runtime state got committed (subtree makes this worse)
+Even in your history doc, you had to remove bulky/runtime artifacts (venv_memlayer, logs, chroma vectors, etc.) as part of cleanup. MAF_INTEGRATION_HISTORY_DEEP_AN…
+That’s the same class of problem as committing DBs / reservations / runtime caches:
+
+
+People pull MAF
+
+
+Run it once
+
+
+Git now shows changed state files
+
+
+Someone commits them “to make it clean”
+
+
+Now every repo is polluted
+
+
+Franchise rule: MAF must ship with schemas/templates only; all runtime state must be in .gitignore and/or outside the subtree.
+
+5) Nextnest-specific operational doctrine appeared (good!) but is in the wrong “layer”
+Your Nextnest work introduced stronger discipline:
+
+
+agent types fixed (major fix) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+mapping + PROJECT_ROOT correctness MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+This is good. But the key question is: is that doctrine meant to be global MAF doctrine, or Nextnest-only?
+If it’s global: upstream it to MAF.
+If it’s local: it must live in a clean overlay directory (not inside subtree).
+Right now it’s too easy for Nextnest to become “MAF fork in disguise”.
+
+What to do (so this never repeats)
+A) Enforce one topology location
+Pick one canonical file (recommended: .maf/config/agent-topology.json) and make all scripts refuse to run if the other exists.
+B) Add an overlay system for local changes
+Example layout:
+
+
+maf/ = pristine subtree (never edited)
+
+
+.maf/overrides/agents/*.md = Nextnest agent prompts
+
+
+.maf/overrides/scripts/*.sh = Nextnest-specific scripts
+
+
+Then, in runtime:
+
+
+“If override exists, use override; else use maf default.”
+
+
+C) Make setup impossible to skip
+Your own audit says the setup script was missed and that caused most of the pain. MAF_INTEGRATION_HISTORY_DEEP_AN…
+So: spawn-agents.sh should hard-fail unless “setup completed marker” exists.
+
+The key takeaway
+Nextnest didn’t “do something wrong”.
+It exposed the truth:
+
+MAF currently behaves like a repo you copy and tinker with, not a product you install with strict invariants.
+
+If you want, I can now do a very concrete thing:
+
+
+List exactly which Nextnest changes should be upstreamed into MAF vs kept local, and
+
+
+Propose a directory + script override mechanism that makes subtree pulls conflict-free forever.
+
+
+Just tell me which direction you want: “upstream decision” or “overlay mechanism design.”
+
+========== NEXT MESSAGE ==========
+
+explain all the 5 points above in a way i can understand as a non technical founder and can make decisions on by understanding
+
+========== NEXT MESSAGE ==========
+
+Perfect question. I’ll explain this without technical jargon, using business / franchise analogies, so you can make clear founder-level decisions.
+Think of MAF as a franchise system (like McDonald’s), and Nextnest as one outlet.
+What went wrong is not coding mistakes — it’s unclear franchise boundaries.
+I’ll walk through the 5 issues, each with:
+
+
+What happened (plain English)
+
+
+Why it’s a problem (business impact)
+
+
+The decision you need to make
+
+
+
+1️⃣ Nextnest “touched the franchise kitchen”
+What happened
+After pulling MAF into Nextnest, the team edited files inside MAF itself to make things work.
+That’s like:
+
+A franchise outlet walking into HQ’s kitchen manual and rewriting it locally.
+
+Why this is a problem
+Today it “fixes” Nextnest.
+Tomorrow:
+
+
+You can’t update MAF cleanly anymore
+
+
+Every future update causes conflicts
+
+
+Each project slowly becomes its own version of MAF
+
+
+You lose:
+
+
+Consistency
+
+
+Speed of rollout
+
+
+Confidence that “MAF v0.2.0” means the same thing everywhere
+
+
+Founder decision
+Decide this rule:
+
+“No project is ever allowed to modify MAF directly.”
+
+If something needs changing:
+
+
+Either it’s global → update MAF itself
+
+
+Or it’s local → put it in a clearly marked local folder
+
+
+This is a governance decision, not a technical one.
+
+2️⃣ Two instruction manuals existed at the same time
+What happened
+Nextnest ended up with two different configuration files telling the system how to run:
+
+
+One said: “Use session A”
+
+
+Another said: “Use session B”
+
+
+So the system followed the wrong instructions half the time.
+Why this is a problem
+Imagine:
+
+Staff reading two different opening manuals
+One says “Open at 9am”, the other says “Open at 11am”
+
+Nobody’s “wrong”, but the shop doesn’t open properly.
+This creates:
+
+
+Confusion
+
+
+Time-wasting debugging
+
+
+“It looks broken but isn’t” situations
+
+
+Founder decision
+Choose one source of truth.
+Your rule should be:
+
+“There is exactly ONE place where a project says how it runs.”
+
+Anything else must be ignored or blocked.
+This is about clarity, not code.
+
+3️⃣ Old identity leaked into a new business
+What happened
+When Nextnest started, it inherited Roundtable-style names, assumptions, and defaults, and only later renamed them.
+That’s like:
+
+A new restaurant opening with last year’s branding and menu, and fixing it later.
+
+Why this is dangerous
+Humans treat defaults as “recommended”.
+So people subconsciously think:
+
+
+These names are “standard”
+
+
+These roles are “the right way”
+
+
+These settings are “approved”
+
+
+Even when they shouldn’t be.
+Founder decision
+You must decide:
+
+“Do we want MAF to be opinionated, or neutral?”
+
+If franchisable:
+
+
+Defaults must look obviously fake
+
+
+Setup must force naming early
+
+
+This avoids identity confusion across projects.
+
+4️⃣ Live operational mess got committed into the system
+What happened
+When MAF was run inside Nextnest:
+
+
+Logs
+
+
+Temporary files
+
+
+Machine-specific data
+
+
+…showed up and had to be cleaned out later.
+Why this matters
+This is like:
+
+Someone accidentally committing today’s cash register data into the franchise rulebook.
+
+If that spreads:
+
+
+New projects inherit junk
+
+
+Security risks increase
+
+
+Bugs become impossible to reproduce
+
+
+Founder decision
+Decide this clearly:
+
+“MAF ships blueprints, never live data.”
+
+Live activity belongs:
+
+
+Outside MAF
+
+
+Or in clearly ignored folders
+
+
+This keeps the system clean and repeatable.
+
+5️⃣ Nextnest improved things — but where should those improvements live?
+What happened
+Nextnest fixed real problems:
+
+
+Clearer agent roles
+
+
+Better structure
+
+
+Better reliability
+
+
+But it’s unclear:
+
+
+Is this a MAF improvement for everyone?
+
+
+Or a Nextnest-only preference?
+
+
+Why this matters
+If you don’t decide:
+
+
+Nextnest slowly becomes the “real MAF”
+
+
+Other projects don’t benefit
+
+
+Or worse — every project reinvents fixes
+
+
+This kills learning leverage.
+Founder decision
+You need a weekly habit:
+
+“Every fix answers one question:
+Does everyone need this — or just this project?”
+
+If everyone:
+
+
+Move it into MAF
+
+
+If local:
+
+
+Keep it clearly labeled as local
+
+
+This is how learning compounds.
+
+The Big Founder Insight (This is the real one)
+None of these problems are technical.
+They are boundary problems.
+Right now, MAF behaves like:
+
+“Here’s a powerful repo — good luck”
+
+To be franchisable, it must behave like:
+
+“Here’s a system — you cannot use it wrong”
+
+
+Your 3 High-Level Decisions (Everything reduces to this)
+
+
+Is MAF a product or a playground?
+
+
+Product → strict rules
+
+
+Playground → expect drift
+
+
+
+
+Where does authority live?
+
+
+One source of truth
+
+
+No ambiguity
+
+
+
+
+How does learning flow back?
+
+
+Weekly, deliberate, centralized
+
+
+
+
+If you decide these three, the technical fixes become obvious and mechanical.
+
+If you want next, I can:
+
+
+Turn this into a 1-page founder doctrine
+
+
+Help you define MAF vs Project responsibilities
+
+
+Or create a simple checklist so future projects never repeat this
+
+
+Just tell me which one helps you decide faster.
+
+========== NEXT MESSAGE ==========
+
+how do we determine which doctrine should be in global and which to be local? 
+
+========== NEXT MESSAGE ==========
+
+This is the right founder question.
+The answer is not technical — it’s a decision framework.
+I’ll give you a simple doctrine filter you can actually use in meetings, then examples from your MAF / Nextnest situation, and finally a clear operating rule.
+
+The Core Principle (1 sentence)
+
+Global doctrine governs how the system behaves.
+Local doctrine governs what the system is used for.
+
+Everything else flows from this.
+
+The 4-Question Doctrine Filter (Founder-Usable)
+Any rule, script, config, or habit must pass through these 4 questions — in order.
+You don’t need to understand code to use this.
+
+Question 1:
+“If this breaks, does every project suffer?”
+
+
+Yes → GLOBAL
+
+
+No → go to Question 2
+
+
+Why this works:
+Global doctrine exists to prevent systemic failure, not inconvenience.
+Examples
+
+
+How agents start / stop → GLOBAL
+
+
+Tmux session naming rules → GLOBAL
+
+
+Where configuration lives → GLOBAL
+
+
+A Nextnest-specific agent prompt → LOCAL
+
+
+
+Question 2:
+“Would we want to re-teach this to every future project?”
+
+
+Yes → GLOBAL
+
+
+No → go to Question 3
+
+
+This catches:
+
+
+Hard-earned lessons
+
+
+Things learned the painful way
+
+
+Examples
+
+
+“Always enforce one topology file” → GLOBAL
+
+
+“Always require agent_type mapping” → GLOBAL
+
+
+“Nextnest uses 6 agents, ERP uses 4” → LOCAL
+
+
+
+Question 3:
+“Is this about identity or mechanics?”
+
+
+Mechanics (how it runs) → GLOBAL
+
+
+Identity (what it does / sounds like / focuses on) → LOCAL
+
+
+This is a huge separator.
+Examples
+GLOBAL mechanics
+
+
+Health checks
+
+
+Validation scripts
+
+
+Agent lifecycle
+
+
+Memory handling
+
+
+Startup order
+
+
+LOCAL identity
+
+
+Agent names
+
+
+Prompts
+
+
+Business logic
+
+
+Domain knowledge
+
+
+Tone, language, style
+
+
+If it expresses personality, it’s local.
+If it expresses physics, it’s global.
+
+Question 4:
+“If two projects disagree on this, is that acceptable?”
+
+
+No, chaos ensues → GLOBAL
+
+
+Yes, diversity is fine → LOCAL
+
+
+This final question catches edge cases.
+Examples
+
+
+Two projects disagree on config location → ❌ chaos → GLOBAL
+
+
+Two projects disagree on agent roles → ✅ fine → LOCAL
+
+
+Two projects disagree on logging structure → ❌ chaos → GLOBAL
+
+
+
+The Doctrine Decision Table (Use This)
+ItemQ1: System break?Q2: Re-teach?Q3: Mechanics vs IdentityQ4: Disagreement OK?ResultAgent lifecycleYesYesMechanicsNoGLOBALTmux orchestrationYesYesMechanicsNoGLOBALConfig locationYesYesMechanicsNoGLOBALHealth checksYesYesMechanicsNoGLOBALAgent promptsNoNoIdentityYesLOCALBusiness logicNoNoIdentityYesLOCALAgent namingNoNoIdentityYesLOCALDomain workflowsNoNoIdentityYesLOCAL
+
+Applying This to Your Real Case (MAF / Nextnest)
+Let’s make it concrete.
+
+What must be GLOBAL in MAF
+These already caused pain — so they qualify automatically.
+
+
+One canonical topology location
+
+
+Session naming enforcement
+
+
+Agent type & mapping requirement
+
+
+Setup must be run before spawn
+
+
+Health check gates
+
+
+No runtime state in core
+
+
+Subtree must remain pristine
+
+
+These are non-negotiable laws of physics.
+
+What must be LOCAL to Nextnest
+These should never live in MAF core.
+
+
+Agent prompts
+
+
+Agent names
+
+
+Business domain logic
+
+
+SME advisory workflows
+
+
+Tone of responses
+
+
+Project-specific scripts
+
+
+Data models
+
+
+These define what Nextnest is, not how MAF works.
+
+The One Grey Zone (Important)
+Some things start as local discoveries but graduate to global.
+Example:
+
+“Agent_type is mandatory and numeric IDs are misleading.”
+
+That started local — but clearly passed Q1 + Q2 later.
+Rule for this:
+
+Local → proven → upstreamed → frozen
+
+That’s what your MAF Wednesday loop is for.
+
+Founder Operating Rule (Print This)
+
+MAF is the constitution.
+Projects are the citizens.
+Citizens can innovate — but laws only change centrally.
+
+If you use that metaphor in decisions, you will not go wrong.
+
+If you want next
+I can:
+
+
+Create a “Doctrine Classification Checklist” you can paste into PRs
+
+
+Label your current MAF repo files as GLOBAL / LOCAL / VIOLATION
+
+
+Draft the MAF Constitution in plain English (founder-signable)
+
+
+Just tell me which one you want.
+
+========== NEXT MESSAGE ==========
+
+can i check, if i deem this to update global and i updated global in my repo, how do i make sure that it all other repo gets pulled on this? And, what happens if 2 repo made changes to global of maf? so both can push it up? HOw do we manage this subtree issue
+
+========== NEXT MESSAGE ==========
+
+Yes — you can absolutely do this cleanly, but only if you treat it like a franchise HQ with a single upstream and a clear “proposal → merge → release → pull” pipeline.
+I’ll explain it in founder terms first, then give the practical flow (with commands) and the collision case (2 repos changed “global”).
+
+1) The only way “everyone gets it” reliably
+Founder version
+To guarantee every repo receives the same global changes, you need:
+
+
+One HQ repo (the real maf-core upstream)
+
+
+One release process (tags / versions)
+
+
+A standard “pull upgrades” step in each consumer repo
+
+
+Key rule:
+
+Consumer repos do not “push global changes” directly.
+They propose changes back to HQ.
+
+So the flow is:
+Nextnest discovers fix → propose to HQ → HQ merges + tags → everyone pulls.
+That is the only scalable way.
+
+2) How it works in practice (subtree-safe workflow)
+A) In a consumer repo (e.g., nextnest)
+If Nextnest changed something inside maf/ and you decide it should be global, you do not keep that change living only in Nextnest.
+Instead you extract it and apply it to the HQ repo.
+There are two common ways:
+Option A (most robust): “Do the change in HQ, not in consumers”
+
+
+Open HQ repo (maf-core) locally
+
+
+Re-apply the same edits there (copy/paste or patch)
+
+
+Commit, tag, release
+
+
+This avoids subtree weirdness entirely.
+Option B (faster when you already edited in consumer): “Split the subtree history and upstream it”
+You can take the changes that happened under maf/ in Nextnest and turn them into a commit you apply to HQ.
+(Technically possible; operationally more brittle. I recommend Option A unless you’re comfortable with Git.)
+
+3) How do all other repos get the update?
+Once HQ merges and tags a release:
+In every consumer repo:
+bashCopy codegit subtree pull --prefix=maf <MAF_HQ_REPO_URL> main --squash
+
+That’s it.
+Founder meaning:
+
+“Every outlet updates its franchise manual from HQ.”
+
+You should make this an explicit ritual:
+
+
+“MAF Wednesday” → HQ tags v0.x.y
+
+
+Thursday morning → each repo pulls
+
+
+
+4) What if 2 repos both change global MAF?
+This is the key subtree governance issue.
+What happens in reality
+If Nextnest and Roundtable both modified maf/ in their own repos:
+
+
+They now each have “local forks” of the same core
+
+
+Their changes might conflict
+
+
+If both try to upstream, someone must decide what the official version is
+
+
+The correct management model
+You treat consumer changes as proposals, not “truth”.
+So yes: both can propose, but only HQ decides.
+The process is exactly like:
+
+
+Two branches in a normal codebase
+
+
+They get reviewed, merged, or rejected centrally
+
+
+Founder rule
+
+Only one repo has authority to define global truth: MAF HQ.
+Every other repo is a contributor, not an owner.
+
+
+5) Subtree-specific “merge conflict” reality (and how to avoid pain)
+The subtree pain
+If you allow consumer repos to modify maf/, then later you subtree pull, you may get:
+
+
+Conflicts
+
+
+Or silent overwrites
+
+
+Or “it pulled but behavior changed”
+
+
+The practical prevention
+You need one hard rule plus one escape hatch:
+Hard Rule: “maf/ is read-only in consumers”
+Enforce this socially at first, then enforce it with tooling later (pre-commit or CI).
+Escape Hatch: “Local overrides live outside maf/”
+So Nextnest can still customize, but in .maf/overrides/... (or similar), not inside maf/.
+That means subtree pull stays clean forever.
+
+6) The clean governance pattern (simple to operate)
+✅ Recommended “franchise HQ” workflow
+HQ repo (maf-core):
+
+
+Only place where global changes land
+
+
+Tagged releases (v0.1.1, v0.1.2, etc.)
+
+
+Has CI rules
+
+
+Consumer repos (nextnest, roundtable, etc.):
+
+
+Pull HQ updates via subtree
+
+
+Keep local changes in .maf/ only
+
+
+Never edit maf/ except in emergencies
+
+
+MAF Wednesday:
+
+
+Each repo submits “change requests”
+
+
+HQ merges and tags
+
+
+Next day everyone pulls
+
+
+
+7) How to handle the situation you have today (two repos already changed maf/)
+Do this:
+
+
+Freeze: declare “no further edits inside maf/ in any consumer repo”
+
+
+Upstream selection:
+
+
+Identify which of those changes are truly global
+
+
+Re-implement them in HQ (recommended)
+
+
+
+
+Cut a release tag
+
+
+Pull into each repo
+
+
+Delete/revert local edits inside maf/ (so future pulls are clean)
+
+
+This resets you back onto a scalable track.
+
+8) What you should decide as a founder (3 decisions)
+
+
+Where is HQ?
+One repo is “the MAF source of truth”. Name it and protect it.
+
+
+Who can merge to HQ?
+Probably only you + 1 trusted person initially.
+
+
+What qualifies as global?
+Use your doctrine filter: mechanics = global, identity = local.
+
+
+
+If you want, I can make this ultra-concrete by drafting:
+
+
+A MAF contribution policy (1 page)
+
+
+A release checklist
+
+
+A “consumer repo guard” rule (how to prevent edits under maf/)
+
+
+And if you tell me your actual Git remote names (or your intended org/repo names), I can give you the exact commands you’ll run in your setup.
+
+========== NEXT MESSAGE ==========
+
+i mean if im in nextnest repo, and i have made changes to global, it is alrady changed. i can even commit and push into maf right? unless there can be rules to say that they can only push a PR? is that right? How do we set maf/ as ready only in consuemrs?
+
+i have placed maf as its own github repo, and that each repo is pulling maf as a subtree. so where is HQ? or should i open maf as a project in my hetzner directly and that is hq? or not true
+
+========== NEXT MESSAGE ==========
+
+You’re thinking about this exactly right. The confusion is basically: “Where do edits happen, and how do we stop accidental edits in consumers?”
+Let’s answer your questions in the most practical founder way.
+
+1) “I’m in Nextnest and changed maf/. Can I commit and push into the MAF repo?”
+The key reality
+When you use git subtree, the maf/ folder inside Nextnest is not a live link to the MAF GitHub repo.
+It’s just a copy of MAF code that was imported into Nextnest’s history.
+So:
+
+
+✅ You can commit those changes in Nextnest
+
+
+❌ That does not automatically update the MAF repo
+
+
+❌ You cannot just “push to MAF” from Nextnest unless you do an explicit subtree split/push workflow (which is possible but easy to mess up)
+
+
+The safest policy
+Yes, you should enforce that consumer repos cannot directly update HQ; they can only:
+
+
+open a PR to the MAF repo, or
+
+
+paste patches / re-apply changes in MAF repo
+
+
+So your instinct is right:
+
+Consumers propose. HQ merges.
+
+
+2) “Can we enforce rules so they can only push a PR?”
+Yes — in GitHub, you do this by protecting the main branch of the MAF repo.
+On the MAF repo (HQ)
+Enable:
+
+
+Branch protection on main
+
+
+Require PR before merge
+
+
+Require approvals (1 or 2)
+
+
+(Optional) Require status checks (tests)
+
+
+Result:
+Even if someone has write access, they cannot push directly to main. They must PR.
+This is the clean “franchise HQ” control.
+
+3) “How do we set maf/ as read-only in consumer repos?”
+There is no true “read-only folder” in Git. But you can get 95% of the benefit with guardrails.
+Three layers of protection (use all 3)
+Layer A: Social rule (fastest)
+Rule: Never edit anything under maf/ in consumer repos.
+If you need a change, create it in .maf/overrides/… or upstream to HQ.
+This is important but not enough.
+Layer B: Automated block (best practical)
+Add a pre-commit hook and/or CI check in each consumer repo:
+
+
+If any file under maf/ changes → fail the build
+
+
+Unless the commit message includes something like ALLOW_MAF_EDIT
+
+
+This makes it very hard to accidentally drift.
+Layer C: Make overrides easy (so people don’t touch maf/)
+If you give teams a clean override place, they’ll stop touching maf/.
+Example:
+
+
+.maf/config/… (local config)
+
+
+.maf/overrides/prompts/…
+
+
+.maf/overrides/scripts/…
+
+
+Then your scripts load overrides first, defaulting to maf/ only if no override exists.
+Founder translation:
+If you don’t give a proper “customization counter”, they’ll scribble on the franchise manual.
+
+4) “Where is HQ? Is it the MAF GitHub repo or a folder on Hetzner?”
+Clear answer
+✅ HQ is the MAF GitHub repo.
+Hetzner is just where you run code, not where truth lives.
+HQ means: “the canonical source of truth that everyone pulls from.”
+If you already created a separate GitHub repo for MAF, then:
+
+That GitHub repo is HQ.
+
+You can clone it on Hetzner to work on it, but that’s not a different HQ — it’s just a working copy.
+So:
+
+
+HQ = maf GitHub repo
+
+
+Hetzner copy = “a workstation where you edit HQ”
+
+
+
+5) What happens if Nextnest and Roundtable both edited maf/ locally?
+This is the situation subtree tends to create if not governed.
+What happens
+
+
+Both repos now contain “local forks”
+
+
+When you try to subtree pull later, you get conflicts or silent drift
+
+
+And you now have to decide which one is the “real” core
+
+
+The right management
+
+
+Treat both as change proposals
+
+
+Re-apply the winning changes into MAF HQ
+
+
+Cut a version tag
+
+
+Pull into both repos
+
+
+Then clean up local edits inside maf/ so future pulls are clean
+
+
+
+6) The simplest founder-operable workflow going forward
+“Official workflow”
+
+
+If you discover a global fix while inside Nextnest:
+
+
+Note it / make a patch
+
+
+Then implement it in the MAF HQ repo (via PR)
+
+
+
+
+Release
+
+
+Tag MAF v0.x.y
+
+
+
+
+Update all repos
+
+
+Run subtree pull in each consumer
+
+
+
+
+Practical habit
+No one edits maf/ in consumers.
+They either:
+
+
+Put overrides in .maf/…, or
+
+
+PR the MAF repo
+
+
+
+7) If you want, I can make this concrete immediately
+If you tell me your repo names (even roughly like github.com/yourorg/maf), I can give you:
+
+
+The exact GitHub branch protection settings to switch on
+
+
+A ready-to-paste CI check that blocks edits under maf/
+
+
+An “override-first loader” pattern so customization never requires editing maf/
+
+
+No need to be technical — you just decide the governance rules, and we encode them.
+
+========== NEXT MESSAGE ==========
+
+you have seen both roundtable version of maf and nextnest version of maf, which should i start making your suggested changes and then push to maf github repo to establish the franchisable model moving forward?
+
+========== NEXT MESSAGE ==========
+
+Start from Roundtable’s MAF as the base for HQ — then cherry-pick the proven Nextnest fixes into it.
+That’s the founder-clean move, because Roundtable is your most mature / production-proven environment, while Nextnest is your integration-canary that exposed missing guardrails.
+Why Roundtable should be the starting “HQ baseline”
+
+
+It’s the original home of the framework and usually has the most complete orchestration, scripts, and conventions.
+
+
+It’s the one most likely to already reflect your “real operational doctrine” (how you actually run tmux agents day-to-day).
+
+
+If you base HQ on Nextnest, you risk hard-baking “consumer hacks” and partial setup assumptions into HQ.
+
+
+Why you still need Nextnest
+Nextnest forced the system through the franchise test (subtree install into a fresh environment). That surfaced exactly the missing franchising pieces:
+
+
+single source of truth for topology
+
+
+setup gating / validation
+
+
+template vs production config separation
+
+
+“don’t edit maf/ in consumers” enforcement
+
+
+reset/reinstall workflow
+
+
+Those are global improvements — but they should be applied on top of the Roundtable baseline.
+
+The practical founder plan: “Roundtable = trunk, Nextnest = patch source”
+Step 1 — Declare HQ
+Your MAF GitHub repo is HQ.
+You will now treat it like a product repo.
+Step 2 — Populate HQ using Roundtable MAF
+Take the Roundtable version as the “initial import” into the MAF GitHub repo:
+
+
+core orchestration
+
+
+scripts
+
+
+response awareness
+
+
+docs
+
+
+This becomes v0.1.0 (or whatever you call the first official tag).
+Step 3 — Merge in Nextnest’s franchising fixes (selectively)
+From Nextnest, upstream only what passes your global doctrine filter (mechanics, not identity).
+Almost certainly global (bring in):
+
+
+Canonical config path (only one topology file)
+
+
+Setup gating (“spawn refuses to run until setup completed”)
+
+
+Hard validation (session name, mappings, agent_type)
+
+
+Real template files with placeholders (not Roundtable defaults)
+
+
+Reset / reinstall script
+
+
+Runtime state hygiene (gitignore + schemas only)
+
+
+Almost certainly local (do NOT bring in):
+
+
+Nextnest agent names
+
+
+Nextnest prompts / tone
+
+
+Nextnest business workflows
+
+
+Nextnest project-specific scripts
+
+
+This becomes v0.1.1 or v0.2.0 depending on how breaking it is.
+
+One critical warning (to avoid repeating the mess)
+Do not try to “merge the two maf folders” by copy-pasting everything.
+Instead, treat Nextnest as:
+
+
+a bug report
+
+
+a test case
+
+
+and a source of specific diffs
+
+
+You want HQ to stay clean and intentional.
+
+What you do next in plain steps
+
+
+Freeze consumer edits
+
+
+New rule: nobody edits maf/ inside consumers anymore.
+
+
+
+
+Build HQ from Roundtable
+
+
+Commit to MAF GitHub repo
+
+
+Protect main branch (PR required)
+
+
+
+
+Upstream the franchising guardrails
+
+
+Add validations/templates/reset workflow
+
+
+Cut a release tag
+
+
+
+
+Re-pull into Nextnest
+
+
+git subtree pull ...
+
+
+Remove any local edits under maf/
+
+
+Move customisations into .maf/overrides/…
+
+
+
+
+Repeat for other repos.
+
+
+
+Founder confidence test (simple)
+After you do this, a brand-new repo should be able to:
+
+
+subtree add MAF
+
+
+run setup (forced)
+
+
+run health check (pass/fail clearly)
+
+
+spawn tmux agents successfully on first try
+
+
+If it can’t, that missing piece is global and belongs in HQ.
+
+If you want, I can turn this into a two-column checklist:
+
+
+“HQ work to do” (MAF repo changes)
+
+
+“Consumer cleanup to do” (Nextnest/Roundtable changes)
+
+
+And I can label each item as must-have for franchising vs nice-to-have.
+
+========== NEXT MESSAGE ==========
+
+so wait, is roundtable a consumer?
+
+Can you make a list of changes that was made in maf of:
+roundtable
+nextnest
+
+And then how which fits in global and which in local.
+
+Yes and give me the two column checklist as well
+
+========== NEXT MESSAGE ==========
+
+Is Roundtable a “consumer”?
+Yes — once you’ve created a separate MAF GitHub repo, every product repo (Nextnest, Roundtable, ERP.sg, etc.) should behave like a consumer of HQ.
+Even if Roundtable is where MAF was born, it should still consume HQ so you can:
+
+
+dogfood the exact “franchise” install/update flow
+
+
+keep production from becoming a special snowflake
+
+
+(You can still have a separate “MAF-dev” playground repo if you want, but Roundtable-prod should be a consumer.)
+
+Changes made in “MAF” in each repo (what I can see from your integration history)
+A) Roundtable-style baseline (what Nextnest initially inherited)
+This is the “default-ish” config Nextnest copied over at first:
+
+
+Session name was generic: maf-cli MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Agent names were Roundtable-flavored placeholders: GreenMountain, BlackDog, OrangePond, FuchsiaCreek MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Agent identity was numeric IDs only (4/7/5/6), with no agent_type mechanism yet MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+That’s the core “Roundtable baseline” that caused confusion when used as a template.
+
+B) Nextnest changes (what Nextnest changed after pulling subtree)
+From your history doc, Nextnest ended up doing these changes:
+1) Renamed agents to Nextnest-specific identities
+
+
+GreenMountain → RateRidge, BlackDog → AuditBay, OrangePond → LedgerLeap, FuchsiaCreek → PrimePortal MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+2) Changed session name to project-specific
+
+
+maf-cli → maf-nn (in subtree config) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+3) Moved from numeric IDs to typed agents + mappings (major reliability fix)
+
+
+Added agent_type (e.g., claude-worker, codex-reviewer) and agent_type_mappings MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+And fixed Project Root mapping: PROJECT_ROOT=/root/projects/nextnest MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+4) Updated domains/descriptions to mortgage context
+
+
+Domains shifted (backend/loan-logic vs frontend/UI etc.) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+5) Cleaned up large Roundtable runtime artifacts
+
+
+Removed venv_memlayer/, .maf/logs/, .maf/state/, .maf/agents/ and some scripts that hardcoded Roundtable paths MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+6) But it created a split-brain config situation
+
+
+Subtree config (maf/.maf/config/agent-topology.json) is “correct” (maf-nn, types, mappings) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Local config (.maf/config/agent-topology.json) still said maf-cli and lacked mappings MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+That “two sources of truth” problem is exactly why tmux/agents felt flaky.
+
+Global vs Local classification (what belongs in HQ vs what stays in the repo)
+Here’s the clean founder rule:
+
+Global = mechanics that prevent breakage across all projects.
+Local = identity (names, domains, business context).
+
+✅ Should be GLOBAL (goes into MAF GitHub HQ)
+These are the “franchise laws”:
+
+
+Enforce a single canonical topology file
+Right now you have subtree config + local config disagreeing, causing session mismatch and missing mappings MAF_INTEGRATION_HISTORY_DEEP_AN….
+➡️ Fix: MAF must define ONE config path and scripts must refuse to run if ambiguity exists.
+
+
+Typed agents + required mappings
+Nextnest’s “agent types + agent_type_mappings + PROJECT_ROOT” made the system reliable MAF_INTEGRATION_HISTORY_DEEP_AN….
+➡️ This is pure mechanics; every repo benefits.
+
+
+Setup/health-check gating
+Your own timeline shows “setup skipped” caused most pain MAF_INTEGRATION_HISTORY_DEEP_AN….
+➡️ Spawn scripts should fail fast unless setup/health-check passes.
+
+
+Anti-contamination cleanup rules
+Removing venv_memlayer, .maf/state, logs, etc. is the right pattern MAF_INTEGRATION_HISTORY_DEEP_AN….
+➡️ Put this into global .gitignore, docs, and a reset-local.sh.
+
+
+✅ Should be LOCAL (stays in Nextnest / Roundtable repo)
+These are “franchise décor / menu choices”:
+
+
+Agent names like RateRidge/AuditBay/etc. MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Domains and descriptions that reflect mortgage context MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Aliases (rr, ab, ll, pp) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Any project-specific prompts, workflows, or wording
+
+
+These must not be baked into HQ, or every new repo inherits Nextnest/Roundtable personality.
+
+Two-column checklist (HQ work vs Consumer cleanup)
+Column 1 — HQ (MAF GitHub repo) changes to establish the franchisable model
+
+
+ Pick one canonical topology path (e.g. only .maf/config/agent-topology.json) and make scripts error if any second topology file exists MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+ Make agent_type + agent_type_mappings required (including PROJECT_ROOT) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+ Make setup-maf.sh + maf:health-check mandatory gates before spawn (no more “it kinda runs”) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+ Ship a true template topology with placeholders (NOT Roundtable defaults like GreenMountain) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+ Add a reset-local.sh that wipes local runtime artifacts safely (so you don’t manually delete gigabytes again) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+ Harden anti-contamination defaults (.gitignore for state/logs/venvs, and docs that explain what must never be committed) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+Column 2 — Consumer repo cleanup (Nextnest + Roundtable)
+
+
+ Delete/stop editing anything inside maf/ in consumers; treat it as read-only moving forward MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+ Unify configs: copy the “correct” subtree topology into the canonical local path (or whatever rule HQ enforces) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+ Ensure session name is project-specific everywhere (no stray maf-cli references) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+ Move prompts/domains/identity into local override space (e.g. .maf/overrides/…) so future subtree pulls don’t conflict
+
+
+ Run health checks before committing (formal step, not optional) MAF_INTEGRATION_HISTORY_DEEP_AN…
+
+
+
+What I’d do first (strong recommendation)
+
+
+Implement the GLOBAL mechanics in the MAF GitHub repo (HQ): canonical topology + required mappings + setup/health gates.
+
+
+Then go into Nextnest and Roundtable and do “consumer cleanup” so they become clean franchise outlets.
+
+
+If you want, paste (or upload) the actual maf/scripts/maf/spawn-agents.sh + the current topology path(s) you intend to keep, and I’ll specify the exact policy (canonical path + the exact validation checks) in a way you can hand to an engineer or implement yourself.
+
+========== NEXT MESSAGE ==========
+
+so now there are changes on both sides, do i take those global changes that is useful and copy..paste manually first into maf gihub repo hq? 
+
+========== NEXT MESSAGE ==========
+
+Yes — manual copy/paste into the MAF GitHub repo (HQ) is the right first move for where you are now, because it’s the safest way to “reset to one truth” without getting tangled in subtree history.
+Think of it like this:
+
+Right now you have two outlets that scribbled on the franchise manual.
+The clean fix is to rewrite the official manual at HQ using the best parts, then re-issue it to all outlets.
+
+Why manual is best (for now)
+
+
+Subtree makes it non-trivial to “push upstream” from a consumer repo cleanly
+
+
+You’re trying to establish a franchisable model, so you want the HQ repo to have intentional, curated commits, not accidental baggage
+
+
+Manual lets you decide global vs local cleanly instead of merging everything
+
+
+
+The founder-safe workflow (do this in this order)
+Step 1 — Freeze
+In Nextnest and Roundtable:
+
+
+Stop editing anything under maf/ immediately.
+
+
+Any new work goes into .maf/… (local) or into the HQ repo (global).
+
+
+Step 2 — Build HQ by curation
+In the MAF GitHub repo (HQ):
+
+
+Start from Roundtable baseline (since it’s mature)
+
+
+Then manually apply the global improvements you want (many were revealed by Nextnest)
+
+
+Focus on global mechanics like:
+
+
+single canonical topology path
+
+
+setup gating
+
+
+health-check gating
+
+
+required agent_type + mappings
+
+
+reset script
+
+
+gitignore hygiene
+
+
+Step 3 — Release
+Tag a version in HQ (even if it’s v0.1.1).
+Step 4 — “Pull to converge”
+In each consumer repo (Nextnest, Roundtable):
+
+
+Run git subtree pull to get the new HQ version
+
+
+Then remove/revert any local edits inside maf/ so future pulls stay clean
+
+
+Step 5 — Move local customizations out of maf/
+
+
+Put agent names/prompts/domains into .maf/overrides/...
+
+
+This prevents future conflicts forever
+
+
+
+What about the existing “global changes” already sitting inside Nextnest maf/?
+Use them as a reference, not as upstream truth.
+The clean approach is:
+
+
+Identify “global” changes (mechanics)
+
+
+Re-implement them in HQ
+
+
+After HQ release, delete those edits from Nextnest maf/ (because they’re now coming from HQ)
+
+
+That’s how you eliminate drift.
+
+One simple founder rule to keep you sane
+If you’re unsure whether to copy something to HQ:
+
+If it changes “how MAF works anywhere” → HQ
+If it changes “how Nextnest uses MAF” → Nextnest local overrides
+
+
+The only time I’d NOT recommend manual
+If you had:
+
+
+strict PR discipline already
+
+
+no one ever edited maf/ in consumers
+
+
+clean patch submissions
+
+
+But you’re still transitioning into that model, so manual curation is exactly what you want.
+
+If you want, I can turn this into an exact “HQ commit plan” of ~8 commits in the right order (so your git history becomes clean and understandable), e.g.:
+
+
+Add templates + gitignore hygiene
+
+
+Canonicalize topology path
+
+
+Add validations + gates
+
+
+Add reset script
+
+
+Add docs + constitution
+
+
+Just say the word and I’ll lay it out.
+
+========== NEXT MESSAGE ==========
+
+this is from roundtable, i dindt know that and i still dont understand:
+● ❌ OUT OF SYNC - Your local lib/maf is NOT a subtree and has completely diverged from https://github.com/iamnormalfree/maf.
+
+  |         | Local lib/maf                                     | Upstream iamnormalfree/maf                           |
+  |---------|---------------------------------------------------|------------------------------------------------------|
+  | Commit  | 55362e9                                           | f5ce373c                                             |
+  | Message | "WIP: Auto-commit before creating plan branch..." | "feat: Default all agents to Claude (no more Codex)" |
+  | Tags    | (local only)                                      | v0.1.0 → v0.2.2                                      |
+
+  Issue: Your local lib/maf has an entirely different commit history - it looks like it was either:
+  1. Developed in-place (not as a subtree)
+  2. Copied manually from the upstream at some point
+  3. Forked and never re-merged
+
+  To sync with upstream, you would need to either:
+
+  Option A: Convert to subtree (destructive - will overwrite local changes)
+  # Remove existing lib/maf
+  git rm -r lib/maf
+  git commit -m "chore: remove local lib/maf for subtree conversion"
+
+  # Add as subtree from upstream
+  git subtree add --prefix=lib/maf https://github.com/iamnormalfree/maf.git main --squash
+
+  Option B: Merge upstream changes manually
+  # Add remote and fetch
+  git remote add maf-upstream https://github.com/iamnormalfree/maf.git
+  git fetch maf-upstream
+
+  # Merge into lib/maf directory
+  git merge -s ours --allow-unrelated-histories -m "Sync maf upstream" maf-upstream/main
+
+  ⚠️ Warning: Both options will lose any local-only changes in lib/maf. Do you have unpushed changes there that need to be preserved?
+
+> wait, this: https://github.com/iamnormalfree/maf.git? so we are not in sync with this? 
+
+● Correct - you are NOT in sync.
+
+  Your local lib/maf and https://github.com/iamnormalfree/maf.git have completely different commit histories:
+
+  Local:    55362e9 → "WIP: Auto-commit before creating plan branch..."
+  Upstream: f5ce373c → "feat: Default all agents to Claude..."
+
+  They're not just behind/ahead - they're on entirely different branches of history. Your local lib/maf was never set up as a git subtree, so it doesn't track iamnormalfree/maf at all.
+
+  What this means:
+  - Changes pushed to iamnormalfree/maf will not appear in your local lib/maf
+  - Changes you make to local lib/maf are not connected to the upstream repo
+
+  To verify the divergence yourself:
+  # Check your local lib/maf commit
+  git log -1 lib/maf
+
+  # Check what's on upstream
+  git ls-remote https://github.com/iamnormalfree/maf.git HEAD
+
+  Would you like me to help set up lib/maf as a proper subtree so it stays in sync with iamnormalfree/maf? Or do you need to preserve any local changes first?
+
+========== NEXT MESSAGE ==========
+
+Got it. Here’s what that message is really saying, in non-technical founder English, and what decisions you need to make.
+What “OUT OF SYNC” means (plain English)
+You currently have two different things that both happen to be called “maf”:
+
+
+Your Roundtable repo has a folder lib/maf
+
+
+There is also a separate GitHub repo at iamnormalfree/maf
+
+
+The warning says:
+
+Your lib/maf folder inside Roundtable is NOT actually connected to that GitHub repo.
+It’s like you have a photocopy of a manual, not a live subscription.
+
+So when someone updates iamnormalfree/maf, your lib/maf does not automatically get those updates.
+And when you change your lib/maf, it does not go back to iamnormalfree/maf.
+Why it says “different commit history”
+Think of “commit history” as the revision log of a document.
+If two documents have different revision logs, it means:
+
+
+They were written separately, or
+
+
+One was copied long ago and then modified independently, or
+
+
+Someone started a fork and never merged back
+
+
+So it’s not “you’re behind by a few updates”.
+It’s “you’re on a different lineage entirely”.
+
+Is https://github.com/iamnormalfree/maf.git your HQ?
+Not necessarily. That’s the core confusion.
+That link is just an upstream repo someone thinks should be the source.
+But you need to decide what HQ is.
+There are only 2 valid realities:
+Reality A (recommended for your franchisable plan)
+✅ Your HQ is your own MAF GitHub repo (the one you said you created).
+Then:
+
+
+Roundtable and Nextnest are both consumers
+
+
+They pull from your HQ
+
+
+You stop caring about iamnormalfree/maf except as a reference/vendor dependency
+
+
+Reality B (only if you intentionally want to “vendor” that repo)
+✅ HQ is iamnormalfree/maf, and you want to stay synced with it.
+Then:
+
+
+Your MAF is not truly “yours” as HQ
+
+
+You are effectively building on someone else’s upstream
+
+
+You must accept ongoing upstream changes and compatibility work
+
+
+Most founders do A unless iamnormalfree/maf is an external project you truly want to track forever.
+
+Why this matters to your situation right now
+Your whole franchisable model depends on:
+
+“One HQ repo, everyone pulls from it.”
+
+But Roundtable currently has this extra confusing situation:
+
+
+It has a lib/maf folder that is not a subtree of any HQ
+
+
+It may contain important logic, but it’s floating
+
+
+So you have:
+
+
+maf/ subtree in some places
+
+
+lib/maf “manual copy” in others
+
+
+That’s why everything feels inconsistent.
+
+What you should do (Founder decision tree)
+Step 1 — Decide: do you care about iamnormalfree/maf?
+Answer this in one sentence:
+
+
+“No, our HQ is our own MAF repo.” → proceed with Option A below
+
+
+“Yes, we want to track that upstream as a dependency.” → proceed with Option B below
+
+
+
+Option A (recommended): Ignore that upstream and standardize on your HQ
+This is the cleanest way to move forward.
+What you do:
+
+
+Treat iamnormalfree/maf as irrelevant for syncing
+
+
+Create one standard path: maf/ (subtree) in every repo
+
+
+Remove or migrate lib/maf into your HQ or into maf/
+
+
+Founder meaning:
+
+You stop chasing someone else’s revision log and declare your own HQ manual as truth.
+
+
+Option B: You want to vendor iamnormalfree/maf and stay in sync
+Then the warning is correct: your local lib/maf is not connected, so you must decide:
+
+
+Overwrite local and connect to upstream (fast but you may lose local edits)
+
+
+Manually merge upstream into local (slow, careful, keeps your edits)
+
+
+Founder translation:
+
+
+Overwrite = “replace our copied manual with the official manual”
+
+
+Merge = “compare and combine both manuals line by line”
+
+
+If your goal is franchisable MAF across your own repos, Option B adds ongoing complexity.
+
+Your specific question: “so we are not in sync with this?”
+Correct — you are not in sync with iamnormalfree/maf.
+Because your lib/maf was never set up as a subtree link to it. It’s essentially independent.
+
+The practical recommended answer for YOU
+Given everything you’ve been building (franchisable MAF across your own repos):
+✅ Make your own MAF GitHub repo the only HQ.
+✅ Stop using lib/maf as a special case.
+✅ Standardize: every repo gets maf/ via subtree.
+✅ Any useful logic in lib/maf gets migrated into HQ deliberately.
+This eliminates the whole “out of sync with someone else” problem permanently.
+
+What decisions I need from you (non-technical)
+Just answer these 2 yes/no questions:
+
+
+Is iamnormalfree/maf supposed to be your HQ? (Yes/No)
+
+
+Is there anything inside Roundtable’s lib/maf that you cannot afford to lose? (Yes/No)
+
+
+Even if you don’t know #2, safest assumption is “yes” until verified.
+
+If you tell me “A or B”, I’ll give you the exact step-by-step actions to clean this up without breaking production, in a way that fits your franchisable rollout plan.
+
+========== NEXT MESSAGE ==========
+
+no this is set to be the HQ from now on: https://github.com/iamnormalfree/maf.git
+
+========== NEXT MESSAGE ==========
+
+Got it — if https://github.com/iamnormalfree/maf.git is HQ from now on, then the franchise model becomes much cleaner as long as you enforce one rule:
+
+All “global” MAF changes must land in the HQ repo via PRs, and every consumer repo treats its maf/ (or whatever prefix you standardize) as read-only.
+
+Now let’s translate what this means and how to fix your current “out of sync” situation.
+
+1) What “HQ is iamnormalfree/maf” means (founder version)
+
+
+HQ = the master franchise manual (iamnormalfree/maf)
+
+
+Every product repo (Roundtable, Nextnest, etc.) is a consumer (franchise outlet)
+
+
+They should:
+
+
+pull HQ updates regularly
+
+
+keep their local customizations outside the subtree
+
+
+never “invent their own HQ”
+
+
+
+
+So yes: Roundtable and Nextnest are consumers. Even if Roundtable used to be the birthplace.
+
+2) Why you saw “OUT OF SYNC” in Roundtable
+That alert is saying:
+
+
+Roundtable’s lib/maf is not actually linked to HQ.
+
+
+It’s like a copied folder that has evolved independently.
+
+
+So from today onward, you must stop treating lib/maf as “MAF”.
+You need a single consistent standard like:
+
+
+maf/ is the subtree from HQ in every repo
+(or if you insist, lib/maf can be the subtree prefix — but pick ONE and stick to it)
+
+
+
+3) The HQ operating model you want (simple and scalable)
+A) How global changes get into HQ
+You were right earlier: PR-only is the correct rule.
+On the HQ repo (iamnormalfree/maf), you turn on:
+
+
+protect main
+
+
+require PR
+
+
+require 1 approval (or 2)
+
+
+(optional) require checks
+
+
+Outcome: nobody can push directly to main. Even you, if you want discipline.
+B) How consumers receive HQ changes
+Each consumer does:
+bashCopy codegit subtree pull --prefix=maf https://github.com/iamnormalfree/maf.git main --squash
+
+That is the “everyone gets the update” mechanism.
+
+4) The hard part: what to do with existing changes already living in consumers
+You currently have two kinds of “local MAF” in the wild:
+
+
+Nextnest has maf/ subtree + local edits / drift
+
+
+Roundtable has lib/maf that is NOT a subtree
+
+
+You have to converge without losing important work.
+Here’s the founder-safe approach.
+
+Step 1 — Freeze (policy, not code)
+Starting now:
+
+
+Nobody edits files inside the subtree folder (maf/ or future lib/maf)
+
+
+Local changes go to .maf/overrides/... or equivalent
+
+
+This prevents drift while you clean up.
+
+Step 2 — Decide the standard prefix for consumers
+Pick ONE and enforce it across all repos:
+Recommended:
+✅ maf/ as subtree prefix everywhere
+(then stop using lib/maf as “MAF”)
+This is consistent with your earlier plan and avoids confusing “lib vs maf” semantics.
+
+Step 3 — Fix Roundtable first (because it’s not a subtree today)
+Roundtable has lib/maf that’s divergent. You need to choose:
+Path A (recommended founder-safe): Preserve local work, then convert cleanly
+
+
+Copy Roundtable’s current lib/maf to a safe holding area (in the repo or outside):
+
+
+lib/maf__legacy_roundtable/ (temporary)
+
+
+
+
+Remove the old lib/maf
+
+
+Add HQ as subtree into maf/ (or into lib/maf if you insist)
+
+
+Then re-apply the truly valuable bits from lib/maf__legacy_roundtable either:
+
+
+into HQ (if global), via PR
+
+
+or into Roundtable overrides (if local)
+
+
+
+
+Why this is best: you don’t destroy knowledge, and you exit “out-of-sync” forever.
+Path B (fast but risky): overwrite and accept losing local work
+You delete lib/maf and subtree-add HQ immediately.
+Only do this if you are certain there’s nothing valuable in that divergent folder.
+
+Step 4 — Fix Nextnest (because it’s already a subtree consumer)
+Nextnest should end up as:
+
+
+subtree folder clean (no local edits)
+
+
+local customizations outside subtree
+
+
+Process:
+
+
+pull latest HQ
+
+
+if there are conflicts: that’s a sign Nextnest edited inside subtree
+
+
+move those edits either:
+
+
+into HQ via PR (global mechanics)
+
+
+or into .maf/overrides (local identity)
+
+
+
+
+
+5) What happens if two repos “made global changes” at the same time?
+That’s normal — but the mechanism is not “both push to HQ”.
+Instead:
+
+
+Repo A opens PR to HQ
+
+
+Repo B opens PR to HQ
+
+
+HQ maintainers merge in an order (and resolve conflicts there)
+
+
+That’s exactly how any healthy upstream works.
+Subtree does not prevent collaboration; it just forces the collaboration to happen at HQ instead of inside consumers.
+
+6) The one rule that makes subtree painless long-term
+
+Consumers never modify subtree contents.
+They only modify overrides.
+
+To enforce this practically:
+
+
+Add a CI check in every consumer:
+
+
+“If maf/ changed, fail the build”
+
+
+
+
+Provide an override directory so people have a sanctioned place to customize
+
+
+This is how you make maf/ “read-only” in real life.
+
+7) Your next decision (quick)
+Given HQ is set, answer just this:
+Do you want the subtree folder to be maf/ everywhere (recommended), or lib/maf everywhere?
+Pick one naming convention and we’ll lock it in.
+If you say “maf/ everywhere”, the migration path becomes straightforward:
+
+
+Roundtable: lib/maf becomes legacy, HQ subtree goes into maf/
+
+
+Nextnest: keep maf/ but clean it
+
+
+If you want, I can also give you the exact “rules doc” wording you can paste into your repos (one paragraph) so your team stops drifting immediately.
+
+========== NEXT MESSAGE ==========
+
+how do we set that maf/ is the subtree from HQ in every repo?
+
+========== NEXT MESSAGE ==========
+
+You set that by doing two things:
+
+
+Make every repo contain a maf/ folder that is imported from HQ via git subtree
+
+
+Make it hard/impossible (practically) for anyone to edit maf/ inside consumers
+
+
+Here’s the founder-friendly “how”, with the minimum commands and the governance layer.
+
+A. Standard install: put HQ into maf/ in any repo
+In each consumer repo (nextnest, roundtable, etc.):
+1) If the repo does NOT already have maf/
+Run:
+bashCopy codegit subtree add --prefix=maf https://github.com/iamnormalfree/maf.git main --squash
+
+That creates maf/ and fills it with HQ content.
+2) If the repo ALREADY has maf/ (maybe messy/old)
+Update it (once you’ve cleaned local edits under maf/):
+bashCopy codegit subtree pull --prefix=maf https://github.com/iamnormalfree/maf.git main --squash
+
+That pulls the latest HQ state into maf/.
+
+B. The Roundtable special case (because it has lib/maf today)
+Your Roundtable warning shows it has lib/maf that is NOT a subtree.
+To align with “maf/ is the subtree everywhere”, do this:
+Founder-safe migration (preserve work)
+bashCopy code# 1) Move the old folder aside (keep it temporarily)
+git mv lib/maf lib/maf__legacy_roundtable
+git commit -m "chore: archive legacy lib/maf before converting to HQ subtree"
+
+# 2) Add HQ as subtree into maf/
+git subtree add --prefix=maf https://github.com/iamnormalfree/maf.git main --squash
+git commit -m "chore: add maf HQ as subtree under maf/"
+
+# 3) (Later) decide what from legacy should be upstreamed or kept local, then delete legacy
+
+This gets you to a clean state without losing anything.
+
+C. How you “make it true” across all repos (the rule + enforcement)
+Rule you enforce:
+
+maf/ is owned by HQ.
+Consumer repos never edit anything inside maf/.
+
+But rules alone aren’t enough, so you enforce it with a check.
+
+D. Enforce “maf/ is read-only” in consumers (practical enforcement)
+Option 1 (recommended): CI check that fails if maf/ changed
+Add a GitHub Action in each consumer repo that blocks PRs touching maf/.
+Conceptually:
+
+
+If a PR includes changes in maf/** → fail
+
+
+Exception: allow it only in a dedicated “MAF upgrade PR” if you choose
+
+
+Founder translation:
+
+Nobody can accidentally scribble on the franchise manual without the system stopping them.
+
+(If you want, tell me if you use GitHub Actions and I’ll paste the exact workflow file.)
+Option 2: Pre-commit hook (weaker)
+Warns locally, but people can bypass it. CI is better.
+
+E. How to handle “local customization” without touching maf/
+You standardize local files outside the subtree, e.g.:
+
+
+.maf/config/agent-topology.json
+
+
+.maf/overrides/prompts/...
+
+
+.maf/overrides/scripts/...
+
+
+And your runtime scripts load:
+
+
+overrides first
+
+
+fallback to maf/ defaults
+
+
+That makes it easy to follow the rule.
+
+F. The one operational habit that makes this work
+Create a standard command in every repo:
+Update MAF:
+bashCopy codegit subtree pull --prefix=maf https://github.com/iamnormalfree/maf.git main --squash
+
+And do it on a cadence (weekly is fine).
+
+Quick sanity check (how you confirm a repo is compliant)
+In each repo, the result should look like:
+
+
+maf/ exists ✅
+
+
+git subtree pull ... works without drama ✅
+
+
+local configs live under .maf/ ✅
+
+
+your team never edits maf/ ✅
+
+
+
+If you tell me how many repos you want to standardize first (just 2: nextnest + roundtable, or all), I’ll give you a precise rollout order and the exact CI guardrail file to paste so this becomes enforceable immediately.
+
+========== NEXT MESSAGE ==========
+
+look at this from roundtable:
+ Summary:
+
+  | Directory | What it is                            | In Git?    |
+  |-----------|---------------------------------------|------------|
+  | .maf/     | Runtime state (agents, logs, configs) | ❌ Ignored |
+  | lib/maf/  | MAF library source code               | ✅ Tracked |
+
+  .maf/ is operational data:
+  - Agent prompts, runtime configs, logs, state
+  - Like .agent-mail/ - not meant to be in git
+
+  lib/maf/ is the library code:
+  - Core MAF framework (dag, beads, cli, dashboard)
+  - Should sync with https://github.com/iamnormalfree/maf.git
+
+  Sync status: ❌ OUT OF SYNC
+
+  Local lib/maf:    55362e9 → "WIP: Auto-commit before creating plan branch..."
+  Upstream:         f5ce373c → "feat: Default all agents to Claude (no more Codex)"
+
+  They're on completely different histories. Your lib/maf was never set up as a subtree, so it doesn't track upstream at all.
+
+  To fix this, you'd need to either:
+  1. Convert lib/maf to a proper subtree (will lose local changes)
+  2. Manually merge upstream changes
+  3. Continue treating them as separate codebases
+
+  Which approach do you want?
+
+> i remember https://github.com/iamnormalfree/maf.git is created from roundtable. can you check how was it created and where is it based from? 
+
+● Let me investigate how the iamnormalfree/maf repo was created and what it was based on:
+
+● Bash(git log --all --grep="maf" --oneline | head -30)
+  ⎿  8ee42b3 fix: steward queue 500 errors + add help center          
+     d0bfea3 feat: create Week 1 infrastructure beads (epic + 3 tasks)
+     4e86349 docs: document stuck prompt clearing process
+     … +27 lines (ctrl+o to expand)
+
+● Bash(git log --all --grep="github.com/maf\|iamnormalfree/maf\|subtree.*maf" --oneline | head -20)
+  ⎿  93a309f fix: correct project root detection in prompt-agent.sh
+
+● Bash(git log --all --source --oneline -- "lib/maf" "*.md" | grep -i "maf\|subtree" | head -30)
+  ⎿  db4a397    refs/heads/master feat: Add agent specialization framework (MAF v0.2.7+v0.2.8)                             
+     a75a06a    refs/tags/v0.2.3 docs(maf-rollout): update to include Telegram bot integration
+     74e7e52    refs/heads/feature/test-plan-to-beads docs(maf-rollout): update plan with roundtable enhancements completed
+     … +14 lines (ctrl+o to expand)
+
+● Search(pattern: "github.com/iamnormalfree|iamnormalfree/maf", output_mode: "content")
+  ⎿  Found 42 lines (ctrl+o to expand)
+
+● Bash(git log --all --format="%H %s %b" | grep -B5 -A5 "iamnormalfree\|maf.*repo\|maf.*github" | head -50)
+  ⎿  6a131893aec90b458007bb389c8390042086bfdd feat: Add telegram bot auto-start integration Align with MAF v0.2.2 changes:
+     - Auto-start telegram bot in dedicated tmux window when spawning agents
+     - Load env from .agent-mail/telegram.env automatically
+     … +8 lines (ctrl+o to expand)
+
+● Read(lib/maf/README.md)
+  ⎿  Error reading file
+
+● Bash(git log --all --oneline --grep="v0.1\|v0.2" | head -30)
+  ⎿  62f8ccb feat: Default all agents to Claude (MAF v0.2.9)             
+     db4a397 feat: Add agent specialization framework (MAF v0.2.7+v0.2.8)
+     e26cfd5 fix(maf): add telegram bot integration and fix jq commands
+     6a13189 feat: Add telegram bot auto-start integration
+
+● Bash(git log --all --oneline --grep="publish\|release\|extract" -- "lib/maf" | head -20)
+  ⎿  e7643f8 feat: complete Roundtable email-based content publishing system
+
+● Bash(git show a75a06a0bcf82a39bdb570eee87a96c909ccf65b:docs/plans/maf-rollout/founders-guide.md 2>/dev/null | grep -A10 -B10 "github\|publish\|extract" | head -50 ||…)
+  ⎿  ---                           
+
+     ## How It Works
+     … +46 lines (ctrl+o to expand)
+
+● Bash(git log --all --oneline --grep="extract.*maf\|maf.*extract\|maf.*publish\|publish.*maf" -i | head -20)
+  ⎿  (No content)
+
+● Bash(git log --all --format="%H %s" -- "lib/maf" "docs/plans/maf-rollout" | grep -i "maf\|extract\|publish" | head -30)
+  ⎿  a75a06a0bcf82a39bdb570eee87a96c909ccf65b docs(maf-rollout): update to include Telegram bot integration        
+     74e7e52b5932b838d1b93dac0b7d9961196c4569 docs(maf-rollout): update plan with roundtable enhancements completed
+     59afd1e495b309719e9b8c039470a7954fd541ad feat(maf): implement MAF supervision module (approved beads)
+     … +3 lines (ctrl+o to expand)
+
+● Bash(git show 62f8ccb:lib/maf/TECHNICAL_DOCUMENTATION.md 2>/dev/null | head -100 || echo "File not in that commit")
+  ⎿  # MAF Agent-Mail Preflight System - Technical Documentation
+
+     ## Overview
+     … +98 lines (ctrl+o to expand)
+
+● Bash(cd /tmp && rm -rf maf-full-check && git clone https://github.com/iamnormalfree/maf.git maf-full-check 2>&1 | tail -3)
+  ⎿  Cloning into 'maf-full-check'...                
+  ⎿  Shell cwd was reset to /root/projects/roundtable
+
+● Bash(git -C /tmp/maf-full-check log --reverse --oneline | head -10)
+  ⎿  bab137c Initial MAF distribution v0.1.0                        
+     2c369c0 feat: add Telegram bot integration
+     593f531 feat: make Telegram bot scripts generic for any project
+     … +7 lines (ctrl+o to expand)
+
+● Bash(git -C /tmp/maf-full-check log -1 --format="%H %ai %s" && rm -rf /tmp/maf-full-check)
+  ⎿  f5ce373c6ef091d099245af487a3272f4b91e1f3 2026-01-05 16:16:44 +0000 feat: Default all agents to Claude (no more Codex)
+
+● Bash(cd /tmp && rm -rf maf-check && git clone https://github.com/iamnormalfree/maf.git maf-check 2>&1 | grep -v "From\|remote")
+  ⎿  Cloning into 'maf-check'...                     
+  ⎿  Shell cwd was reset to /root/projects/roundtable
+
+● Bash(git -C /tmp/maf-check show bab137c --stat | head -50)
+  ⎿  commit bab137c1b71a4a0afa093610889d4d31ecdb458c
+     Author: iamnormalfree <hello@61d8.com>
+     Date:   Mon Jan 5 09:38:39 2026 +0000
+     … +47 lines (ctrl+o to expand)
+
+● Bash(git -C /tmp/maf-check show bab137c:README.md 2>/dev/null | head -50)
+  ⎿  # MAF (Multi-Agent Framework)                                                  
+
+     A sophisticated autonomous agent orchestration system for software development.
+     … +47 lines (ctrl+o to expand)
+
+● Bash(rm -rf /tmp/maf-check)
+  ⎿  (No content)
+
+● Found it! Here's the full story:
+
+  How iamnormalfree/maf Was Created
+
+  Yes, you're correct! The upstream https://github.com/iamnormalfree/maf.git was extracted from roundtable as a distribution.
+
+  Initial commit (bab137c on Jan 5, 2026):
+  Initial MAF distribution v0.1.0
+
+  Complete multi-agent framework including:
+  - Core library (lib/maf/)
+  - Response Awareness (.claude/)
+  - Operational scripts (scripts/maf/)
+  - MCP Agent Mail (mcp_agent_mail/)
+  - Configuration templates (.maf/config/)
+  - Complete documentation (docs/)
+
+  Extracted from roundtable repository.
+
+  The upstream repo includes:
+  - lib/maf/ → Core MAF library
+  - .claude/ → Response Awareness skills & agents
+  - scripts/maf/ → Operational scripts
+  - mcp_agent_mail/ → Communication system
+  - .maf/config/ → Config templates
+  - docs/ → Documentation
+
+  Why they're out of sync:
+
+  1. Upstream (iamnormalfree/maf) is a distribution repo - publishes releases v0.1.0 → v0.2.2
+  2. Local (roundtable/lib/maf) continues development independently
+  3. The extraction was a one-time export - no subtree link was established
+
+  Current state:
+  Upstream HEAD: f5ce373c → "feat: Default all agents to Claude (no more Codex)"
+  Local lib/maf: 55362e9   → "WIP: Auto-commit before creating plan branch..."
+
+  To sync future changes, you'd need to either:
+  1. Push roundtable's lib/maf changes to upstream
+  2. Set up a proper subtree link going forward
+  3. Continue treating them as separate (upstream = releases, local = dev)
+
+========== NEXT MESSAGE ==========
+
+You’re not crazy — that Roundtable summary is describing a very normal “we spun out HQ once, then kept building locally” situation.
+Here’s what it means, in founder language, and what you should do next.
+
+What actually happened (plain English)
+1) Roundtable originally contained “MAF” inside itself
+Roundtable had:
+
+
+.maf/ = runtime junk (ignored)
+
+
+lib/maf/ = the MAF code (tracked)
+
+
+So at that time, Roundtable was the kitchen where the franchise manual was written.
+2) You “published” a copy as a new GitHub repo
+You created https://github.com/iamnormalfree/maf.git by extracting MAF out of Roundtable on Jan 5, 2026 (v0.1.0).
+That’s like:
+
+You took the current franchise manual, printed it into an official binder, and handed it to HQ.
+
+3) But you didn’t connect Roundtable to HQ after that
+You did a one-time export, not a “live subscription.”
+So after the export:
+
+
+HQ manual kept evolving (v0.1.0 → v0.2.2)
+
+
+Roundtable’s local lib/maf also kept evolving… separately
+
+
+That’s why they’re “out of sync”:
+
+They’re not behind/ahead. They’re two different copies that continued being edited in parallel.
+
+
+Why “lib/maf is not a subtree” matters
+A subtree is like a formal supply pipeline:
+
+“This folder comes from HQ, and can be updated from HQ.”
+
+Your Roundtable lib/maf folder is not in that pipeline. It’s just local code.
+So:
+
+
+pulling HQ doesn’t affect it
+
+
+updating it doesn’t update HQ
+
+
+
+The decision you need to make (founder-level)
+Now that you’ve declared HQ is iamnormalfree/maf, you must choose:
+✅ The clean franchisable model (recommended)
+HQ is the only “global truth.”
+Roundtable becomes a consumer like everything else.
+Meaning:
+
+
+Roundtable stops treating lib/maf as its MAF
+
+
+Roundtable uses maf/ (subtree from HQ) like Nextnest
+
+
+Local stuff stays in .maf/overrides/…
+
+
+This is the “franchise system” you want.
+The alternative (not recommended long-term)
+Keep Roundtable’s lib/maf as a “secret HQ” and continue developing there, then occasionally export releases.
+This guarantees drift and confusion forever.
+
+What to do right now (safe plan that does NOT lose work)
+Goal:
+
+
+Make Roundtable a proper consumer of HQ
+
+
+Preserve any valuable “local MAF” improvements
+
+
+Upstream the truly global improvements into HQ via PR
+
+
+Step-by-step
+Step 0 — Freeze rule
+From now on:
+
+
+Nobody edits “global” MAF inside Roundtable or Nextnest.
+
+
+Global changes go to HQ repo only (via PR).
+
+
+Step 1 — Preserve Roundtable’s current local MAF as “legacy”
+In Roundtable:
+
+
+Rename the folder so you don’t lose it:
+
+
+lib/maf → lib/maf__legacy_roundtable
+
+
+
+
+Founder translation:
+
+Put the old manual on a shelf so it can’t keep silently influencing operations.
+
+Step 2 — Bring HQ MAF into Roundtable as a subtree under maf/
+Add:
+
+
+maf/ = subtree from iamnormalfree/maf
+
+
+Founder translation:
+
+Roundtable now subscribes to the official HQ manual like every other project.
+
+Step 3 — Decide what to do with lib/maf__legacy_roundtable
+Now you compare legacy vs HQ and classify changes:
+
+
+If it’s mechanics (makes agents start reliably, config validation, setup gating, reset scripts)
+→ open PR to HQ (global)
+
+
+If it’s Roundtable identity (agent names, domain workflows, project-specific behavior)
+→ move into .maf/overrides/… (local)
+
+
+Then delete the legacy folder once you’ve extracted what matters.
+
+Why this will stop the chaos permanently
+Because after this:
+
+
+Everyone pulls MAF from one place (HQ repo)
+
+
+Every repo has the same pattern: maf/ (HQ) + .maf/ (local runtime/overrides)
+
+
+Roundtable is no longer a special snowflake
+
+
+
+Quick mental model you can keep
+
+
+HQ repo (iamnormalfree/maf) = franchise manual
+
+
+maf/ in each project = HQ manual delivered
+
+
+.maf/ = local store operations + configs + personality
+
+
+lib/maf__legacy_roundtable = old manual you’re migrating out of
+
+
+
+If you want, I’ll turn this into a concrete “migration checklist” specifically for Roundtable with:
+
+
+which folders to create (.maf/overrides/...)
+
+
+what to upstream (global) vs keep local
+
+
+the order to do it so Roundtable doesn’t break in production
+
+
+Just tell me: do you want Roundtable’s subtree folder to be maf/ (recommended) or do you insist on lib/maf as the subtree path?
+
+========== NEXT MESSAGE ==========
+
+more info from roundtable:
+● Here's the complete picture:
+
+  ---
+  When lib/maf Was Created in Roundtable
+
+  December 26, 2025 - e7643f8
+  feat: complete Roundtable email-based content publishing system
+
+  This is the first commit to include lib/maf in roundtable's history.
+
+  ---
+  Timeline Comparison
+
+  | Date          | Roundtable lib/maf            | Upstream iamnormalfree/maf                  |
+  |---------------|-------------------------------|---------------------------------------------|
+  | Dec 26, 2025  | e7643f8 - lib/maf created     | (doesn't exist yet)                         |
+  | Jan 3-4, 2026 | MAF supervision modules added | (doesn't exist yet)                         |
+  | Jan 5, 2026   | Various MAF improvements      | v0.1.0 released (extracted from roundtable) |
+  | Jan 5, 2026   | Continued local development   | v0.1.1 → v0.2.2 (rapid bug fixes)           |
+  | Jan 5, 2026   | 62f8ccb - "MAF v0.2.9"        | Latest: v0.2.2                              |
+
+  ---
+  What Changed from v0.1.0 to v0.2.2 in Upstream
+
+  All on Jan 5, 2026 (rapid release cadence):
+
+  | Tag             | Changes                                                               |
+  |-----------------|-----------------------------------------------------------------------|
+  | v0.1.0          | Initial MAF distribution (extracted from roundtable)                  |
+  | v0.1.1          | Add Telegram bot integration                                          |
+  | v0.1.2          | Fix subtree layout detection                                          |
+  | v0.1.3          | Add automated setup script with env var support                       |
+  | v0.1.4 - v0.1.7 | Variable expansion bug fix, Python 3.12 fix, Agent Mail bootstrap fix |
+  | v0.1.8          | Document beads viewer and memlayer installation                       |
+  | v0.1.9          | Add bv TUI viewer to beads documentation                              |
+  | v0.2.0          | Auto-install external dependencies in setup script                    |
+  | v0.2.1          | Make setup script project-aware for multi-repo support                |
+  | v0.2.2          | Add telegram bot auto-start integration                               |
+
+  Focus areas: Setup automation, Telegram bot integration, multi-repo support
+
+  ---
+  What Was Decided for Updates
+
+  Based on the code structure:
+
+  | Component           | Location               | Update Strategy                           |
+  |---------------------|------------------------|-------------------------------------------|
+  | MAF Library         | lib/maf/ in roundtable | Development happens here, then exported   |
+  | Response Awareness  | .claude/ in both       | Separate subtree, already synced          |
+  | Operational Scripts | scripts/maf/           | Roundtable-specific vs generic (upstream) |
+  | MCP Agent Mail      | mcp_agent_mail/        | Separate subtree, independent             |
+
+  The split decision:
+  - lib/maf/ in roundtable = development source
+  - iamnormalfree/maf upstream = distribution/release repo
+
+  The upstream was created to make MAF reusable across projects via git subtree add, while roundtable continues as the primary development environment.
+
+  ---
+  Current Sync Status ❌
+
+  Roundtable lib/maf:    55362e9 → "WIP: Auto-commit..." (Jan 5)
+  Upstream iamnormalfree/maf:  f5ce373c → "feat: Default all agents to Claude..." (Jan 5)
+
+  They diverged immediately after the initial extraction. Roundtable has continued with local development (supervision modules, quota manager batching) while upstream focused on setup automation and Telegram bot integration.
+
+  Would you like me to help establish a sync workflow between them?
+
+========== NEXT MESSAGE ==========
+
+This extra info is actually very clarifying. It says you accidentally created a two-HQ model:
+
+
+Roundtable lib/maf = “dev source”
+
+
+iamnormalfree/maf = “distribution repo”
+
+
+That can work, but only if you run it like a product release pipeline. Right now it’s more like “two documents edited in parallel”, which is why drift happened immediately.
+Since you’ve decided iamnormalfree/maf is HQ from now on, here’s the clean founder interpretation + what to do.
+
+What this timeline really means (in founder terms)
+Before Jan 5, 2026
+
+
+Roundtable had the “master manuscript” (lib/maf) starting Dec 26, 2025.
+
+
+HQ repo didn’t exist yet.
+
+
+On Jan 5, 2026
+
+
+You “published” a snapshot of Roundtable’s MAF to create iamnormalfree/maf (v0.1.0).
+
+
+Then two things happened at the same time:
+
+
+HQ repo got rapid “make it reusable” fixes (setup automation, multi-repo support, Telegram bot)
+
+
+Roundtable kept building “make it powerful” features (supervision, quota batching, etc.)
+
+
+
+
+So you created a classic split:
+
+
+Distribution hardening vs. core capability building
+
+
+That’s normal — but you must choose where those changes live and how they converge.
+
+The most important contradiction in the Roundtable narrative
+The narrative says:
+
+“Roundtable lib/maf is the development source; upstream is distribution.”
+
+But you just said:
+
+“No — upstream is HQ from now on.”
+
+These cannot both be true.
+You must pick one:
+
+
+Either Roundtable is the “source of truth” and upstream is a published artifact
+
+
+Or upstream is the “source of truth” and Roundtable is a consumer
+
+
+You picked the second. Good. Now we align the system to match it.
+
+What you should do now (recommended model)
+New model: Single HQ
+
+
+iamnormalfree/maf = the only global truth
+
+
+Roundtable and Nextnest are consumers
+
+
+“Global changes” happen in HQ via PR
+
+
+Roundtable can still be your main testbed, but not your truth
+
+
+Founder analogy:
+
+Roundtable can be the test kitchen.
+HQ is where the official recipe book lives.
+
+
+So what about the useful Roundtable-only improvements?
+You don’t lose them. You migrate them into HQ deliberately.
+You now have two piles of improvements:
+HQ already contains (Jan 5 releases v0.1.1 → v0.2.2)
+
+
+setup automation
+
+
+subtree layout detection fixes
+
+
+project-aware multi-repo support
+
+
+telegram bot integration + autostart
+
+
+dependency auto-install
+
+
+These are franchising essentials.
+Roundtable has (post-extraction)
+
+
+supervision modules
+
+
+quota manager batching
+
+
+“WIP auto-commit before plan branch…”
+
+
+other core orchestration improvements
+
+
+Some of these are:
+
+
+global (should be upstreamed)
+
+
+some are Roundtable local (only for that product)
+
+
+
+The sync workflow you actually want (no jargon)
+The weekly process
+
+
+Roundtable discovers improvements (because it’s your heavy-use environment)
+
+
+Decide: global or local
+
+
+If global → create PR into iamnormalfree/maf
+
+
+Merge + tag release
+
+
+All consumers pull that release via subtree
+
+
+This is your “MAF Wednesday” loop, but now consistent with a single HQ.
+
+Answering the implied question: “Do we need two repos (dev + distribution)?”
+You can, but you don’t need to.
+If you keep two repos:
+
+
+Roundtable-dev would continually diverge
+
+
+You’d need an “export” pipeline every week
+
+
+It’s extra process and risk
+
+
+Since you’re trying to franchise across multiple repos fast, I’d keep it simple:
+✅ One HQ repo
+✅ Use branches inside HQ for dev work
+✅ Roundtable is just a consumer + testbed
+
+Concrete next steps (founder checklist)
+1) Declare the “One HQ rule”
+
+
+iamnormalfree/maf is HQ
+
+
+No other repo is allowed to act as source of truth
+
+
+2) Make Roundtable a clean consumer
+
+
+Stop treating lib/maf as HQ
+
+
+Put HQ subtree in maf/ (or standardize on a prefix)
+
+
+Move any Roundtable-only behavior into .maf/overrides/…
+
+
+3) Back-port Roundtable’s valuable globals into HQ
+
+
+Identify high-leverage core improvements
+
+
+PR them into HQ
+
+
+Tag a release
+
+
+4) After PRs merge, delete or archive the legacy lib/maf
+
+
+Otherwise it will keep confusing everyone forever
+
+
+
+How to decide what from Roundtable should go global (quick)
+Use these two founder tests:
+Test A: “Does every repo benefit?”
+If yes → global.
+Test B: “Does it change how agents run (mechanics)?”
+If yes → global.
+Supervision, quota batching, setup validation, project-aware root detection… these sound global.
+Anything that’s content-publishing, Roundtable-specific business workflows, specific agent personalities → local.
+
+Important: your biggest risk right now
+If you do nothing, you will have:
+
+
+HQ evolving
+
+
+Roundtable continuing to evolve separately
+
+
+more divergence every week
+
+
+and subtree updates becoming painful
+
+
+So the key move is: stop local core development inside Roundtable’s lib/maf and move it into HQ.
+
+If you want, I can turn this into a very direct plan:
+
+
+“What to upstream first” (top 10 global items likely living only in Roundtable)
+
+
+“What to keep local” (Roundtable-only)
+
+
+“How to migrate without breaking production”
+
+
+To do that precisely, I need the actual Roundtable lib/maf and the HQ repo contents side-by-side. If you upload (or point me to) the Roundtable lib/maf tree snapshot, I’ll label each major component as GLOBAL / LOCAL / DELETE.
+
+========== NEXT MESSAGE ==========
+
+in roudntable, they asked if i want to 
+  Would you like me to help establish a sync workflow between them?
+
+What does this mean? If this happen, would it mean that the version in roudntable is HQ? PLease clarify for me.
+
+Also even more info from roundtable, so which version do they follow? /lib/maf or .maf/ is my question, and this is the ans:
+ Now I have the complete picture. Here's how the tmux agents work:
+
+  ---
+  TMUX Agents - How They Listen and What Instructions They Follow
+
+  Layout (4-pane system)
+
+  ┌────────┬────────┬────────┐
+  │ 0.top  │   2    │   3    │  Supervisor(top) | Imp-1 | Imp-2
+  │        │        │        │
+  │0.bottom│        │        │  Reviewer(bottom)
+  └────────┴────────┴────────┘
+
+  Pane 0: GreenMountain (Supervisor)
+  Pane 1: BlackDog (Reviewer)
+  Pane 2: OrangePond (Frontend Implementor)
+  Pane 3: FuchsiaCreek (Backend Implementor)
+
+  ---
+  Instruction Sources (in priority order)
+
+  1. Base Agent Prompt (Loaded at startup)
+
+  Location: .maf/agents/<agent-name>-prompt.md
+
+  | Agent         | Prompt File             | Role                                                          |
+  |---------------|-------------------------|---------------------------------------------------------------|
+  | GreenMountain | greenmountain-prompt.md | Coordinates team, routes tasks, runs merge gate, commits work |
+  | OrangePond    | orangepond-prompt.md    | Frontend/site implementation                                  |
+  | FuchsiaCreek  | fuchsiacreek-prompt.md  | Backend/API implementation                                    |
+  | BlackDog      | blackdog-prompt.md      | Reviews all code before merge                                 |
+
+  These are loaded via rebuild-maf-cli-agents.sh at session startup.
+
+  2. Broadcast Prompts (Runtime nudges)
+
+  Location: scripts/maf/broadcast-role-prompts.sh
+
+  Supervisor:  "Check Agent Mail and bd ready for new work. Route tasks..."
+  Reviewer:    "Check Agent Mail for review requests. Validate completed work..."
+  Imp-1:       "Check Agent Mail for assigned beads. ALWAYS start with /response-awareness..."
+  Imp-2:       "Check Agent Mail for assigned beads. ALWAYS start with /response-awareness..."
+
+  These are sent via:
+  - Telegram: /broadcast-targeted auto
+  - CLI: ./scripts/maf/broadcast-role-prompts.sh
+
+  3. Prompt Packs (Context-specific workflows)
+
+  Location: scripts/maf/prompt-packs/*.json
+
+  Example packs:
+  - supervisor-default.json - Default supervisor workflow
+  - roundtable-superpowers.json - Superpowers integration
+  - roundtable-portal-redesign.json - Portal-specific tasks
+  - roundtable-auth.json - Authentication work
+
+  Used via Telegram:
+  /broadcast-pack set supervisor-default
+  /broadcast-targeted
+  /broadcast-apply
+
+  4. Agent Mail Messages (Direct coordination)
+
+  Location: MCP Agent Mail system
+
+  Agents receive structured messages like:
+  - Task assignments with bead IDs
+  - Review requests with file diffs
+  - Blocker notifications
+  - Coordination requests
+
+  ---
+  Decision Flow - What Agent Uses What
+
+  GreenMountain (Supervisor) - Pane 0
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 1. Base: greenmountain-prompt.md (loaded at startup)       │
+  │ 2. Broadcast: "Check Agent Mail, bd ready, route tasks"    │
+  │ 3. Prompt Pack: Current epic context (e.g., superpowers)   │
+  │ 4. Agent Mail: Incoming beads, blocker requests            │
+  └─────────────────────────────────────────────────────────────┘
+
+  When to use /response-awareness: Only for planning/coordination tasks, NOT implementation
+
+  OrangePond (Frontend) - Pane 2
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 1. Base: orangepond-prompt.md (Eleventy, CSS, portal UI)   │
+  │ 2. Broadcast: "Check Agent Mail, use /response-awareness"  │
+  │ 3. Prompt Pack: Specific feature context                   │
+  │ 4. Agent Mail: Assigned frontend beads                     │
+  │                                                             │
+  │ MANDATORY: Start ALL implementation with:                  │
+  │   /response-awareness "Implement [task]"                   │
+  └─────────────────────────────────────────────────────────────┘
+
+  FuchsiaCreek (Backend) - Pane 3
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 1. Base: fuchsiacreek-prompt.md (Fastify, SQLite, API)     │
+  │ 2. Broadcast: "Check Agent Mail, use /response-awareness"  │
+  │ 3. Prompt Pack: Specific feature context                   │
+  │ 4. Agent Mail: Assigned backend beads                      │
+  │                                                             │
+  │ MANDATORY: Start ALL implementation with:                  │
+  │   /response-awareness "Implement [task]"                   │
+  └─────────────────────────────────────────────────────────────┘
+
+  BlackDog (Reviewer) - Pane 1
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 1. Base: blackdog-prompt.md (review checklist, security)   │
+  │ 2. Broadcast: "Check Agent Mail for review requests"       │
+  │ 3. Agent Mail: Review requests with file diffs             │
+  │                                                             │
+  │ Uses visual-receipt.sh for UI changes                      │
+  └─────────────────────────────────────────────────────────────┘
+
+  ---
+  Key Workflows
+
+  Task Assignment Flow
+
+  1. User creates bead → beads.jsonl
+  2. GreenMountain checks "bd ready"
+  3. GreenMountain assigns via Agent Mail to implementor
+  4. Implementor receives message, runs /response-awareness
+  5. Implementor completes, notifies GreenMountain
+  6. GreenMountain routes to BlackDog for review
+  7. BlackDog approves → GreenMountain runs merge gate
+  8. Merge gate passes → GreenMountain commits, closes bead
+
+  Idle Check (Context Manager)
+
+  Every 180 seconds, if agent is idle:
+  Idle check: run mcp__mcp_agent_mail__fetch_inbox, then bd ready
+
+  ---
+  Configuration Files
+
+  | File                            | Purpose                                  |
+  |---------------------------------|------------------------------------------|
+  | .maf/config/agent-topology.json | Pane-to-agent mapping (canonical source) |
+  | .maf/agents.json                | Agent registry                           |
+  | .maf/agent.env                  | Agent environment variables              |
+  | .maf/agents/<name>-prompt.md    | Base instructions per agent              |
+
+  ---
+  Summary
+
+  Agents listen to:
+  1. Base prompt (startup) - Role definition, project context
+  2. Broadcast prompts (runtime) - Idle nudges, epic context
+  3. Prompt packs (epic-specific) - Detailed workflows
+  4. Agent Mail (coordination) - Task assignments, reviews
+
+  Implementors (OrangePond, FuchsiaCreek): MUST use /response-awareness for all implementation
+  Supervisor (GreenMountain): Uses /response-awareness only for planning, NOT implementation
+  Reviewer (BlackDog): Reviews code, generates visual receipts for UI changes
+
+========== NEXT MESSAGE ==========
+
+1) “Help establish a sync workflow between them” — what does that mean?
+“They” = (A) Roundtable’s local lib/maf and (B) the HQ repo iamnormalfree/maf.
+A “sync workflow” means setting up a routine/process so changes don’t drift:
+
+
+Either you regularly push Roundtable’s changes into HQ
+
+
+Or you regularly pull HQ into Roundtable
+
+
+Or you do both, with rules on what wins
+
+
+Important: That question does not automatically mean Roundtable becomes HQ.
+It’s just asking: “Do you want these two codebases to stay aligned?”
+If you say “yes, establish sync”, does Roundtable become HQ?
+Only if you choose a workflow where Roundtable is treated as the development source of truth and HQ is just a published artifact.
+But you already decided: HQ is iamnormalfree/maf from now on.
+So in your case, “sync workflow” should mean:
+
+Roundtable stops being the source of truth.
+Roundtable becomes a consumer, and any global improvements are upstreamed to HQ via PR.
+
+That’s a sync workflow too — just with HQ as the authority.
+
+2) In Roundtable, which version do they “follow”: /lib/maf or .maf/?
+They follow both, but for different purposes:
+
+
+lib/maf = the engine code (the framework software that runs the system)
+
+
+.maf/ = the operational configuration + instructions + runtime data (how agents behave in that specific repo)
+
+
+Your Roundtable explanation is very clear about this:
+What agents actually read for instructions (behavior)
+Agents take their “instructions” primarily from .maf/, especially:
+
+
+.maf/config/agent-topology.json (pane→agent mapping; declared “canonical source”)
+
+
+.maf/agents/<name>-prompt.md (base prompt loaded at startup)
+
+
+.maf/agents.json (registry)
+
+
+.maf/agent.env (env vars)
+
+
+So for “who does what”, “what prompt they run”, “how tmux panes map”… that’s .maf/.
+What makes the whole system work (the machinery)
+The scripts and framework logic that load those prompts, do the idle checks, talk to agent mail, etc. comes from the library/framework code — that’s what lib/maf represents in that older structure.
+So:
+
+
+.maf/ tells agents what to do
+
+
+lib/maf (or maf/ subtree in the new model) is the code that makes that possible
+
+
+
+The confusion you’re feeling is valid — because Roundtable currently has a mixed architecture
+Roundtable is describing a world where:
+
+
+lib/maf is “MAF core library”
+
+
+.maf is runtime config
+
+
+But your new franchisable model wants:
+
+
+maf/ (subtree from HQ) to contain the core code + scripts + docs (the full distribution)
+
+
+.maf/ to contain local config/overrides only
+
+
+So Roundtable is “old layout”, Nextnest is “new layout”, and you’re mid-migration.
+
+What you should decide now (simple and decisive)
+Decision A: Who is the single source of truth for “global code”?
+You already decided: ✅ HQ = iamnormalfree/maf
+That means:
+
+
+Roundtable is not HQ anymore (even if it birthed HQ).
+
+
+Decision B: What should be the long-term structure in all repos?
+To be franchisable, standardize across all repos as:
+
+
+maf/ = subtree from HQ (engine + scripts + docs)
+
+
+.maf/ = local config + local prompts + overrides (identity + runtime)
+
+
+no more “special local lib/maf” as the engine
+
+
+This removes ambiguity.
+
+So what does “establish sync workflow” mean under YOUR chosen model?
+It means setting these rules:
+
+
+Roundtable does not keep developing lib/maf as a separate engine.
+
+
+If Roundtable finds an improvement that should be global:
+
+
+create a PR into iamnormalfree/maf
+
+
+
+
+Roundtable pulls the new HQ version via subtree update into maf/
+
+
+Roundtable keeps its agent prompts and topology in .maf/
+
+
+That’s the clean sync workflow: upstream PRs + downstream subtree pulls.
+
+One-line answer to your key question
+
+
+Agents in Roundtable follow .maf/ for instructions, and they rely on the MAF engine code (lib/maf in the old layout, maf/ subtree in the new layout) to execute those instructions.
+
+
+
+If you want, I can give you an exact migration mapping:
+Roundtable today
+
+
+lib/maf (engine) + .maf (instructions)
+
+
+Roundtable after migration
+
+
+maf/ (HQ subtree engine) + .maf (instructions/overrides)
+
+
+lib/maf either removed or archived
+
+
+Just tell me: do you want to keep the agent prompts in .maf/agents/*.md as the standard local override mechanism? (It’s actually a good pattern.)
+
+========== NEXT MESSAGE ==========
+
+this is what i get from nextnest, apparently the version is different:
+MAF Upstream Update Status
+
+  Short answer: You're already past v0.2.2 - you're on v0.2.6, and v0.2.9 is the latest.
+
+  Current Status
+
+  | Item                 | Value                                |
+  |----------------------|--------------------------------------|
+  | Upstream Repository  | https://github.com/iamnormalfree/maf |
+  | Your Current Version | v0.2.6 (commit cfc0409)              |
+  | Latest Upstream      | v0.2.9                               |
+  | v0.2.2 Status        | ⚠️ Older than what you have          |
+
+  Available Updates
+
+  Since your v0.2.6, there are 3 new releases:
+
+  v0.2.6 (your version) → v0.2.9 (latest)
+  ├── v0.2.7: Add agent specialization framework
+  ├── v0.2.8: Fix PROJECT_ROOT detection for direct layout  
+  └── v0.2.9: Default all agents to Claude (no more Codex)
+
+  To Update MAF Subtree
+
+  Since you don't have a MAF remote configured, you can update using:
+
+  # Add MAF as a remote (one-time setup)
+  git remote add maf-upstream https://github.com/iamnormalfree/maf.git
+
+  # Fetch latest tags
+  git fetch maf-upstream --tags
+
+  # Update subtree to latest (v0.2.9)
+  git subtree pull --prefix=maf maf-upstream main --squash
+
+  Or update to a specific version:
+  # Update to v0.2.7 only
+  git subtree pull --prefix=maf maf-upstream v0.2.7 --squash
+
+  Recommendation
+
+  v0.2.9 looks particularly relevant for NextNest because it removes Codex dependency and defaults all agents to Claude. This could simplify your setup since you're using Claude agents anyway.
+
+  However, before updating:
+  1. Review what changed in v0.2.7's "agent specialization framework"
+  2. Test changes in development branch first
+  3. Check if any NextNest-specific customizations conflict with upstream changes
+
+  Would you like me to:
+  1. Show you the detailed diff between v0.2.6 and v0.2.9?
+  2. Create a plan for updating MAF subtree safely?
+  3. Investigate what the "agent specialization framework" in v0.2.7 does?
+
+========== NEXT MESSAGE ==========
+
+What you’re seeing is totally plausible, and it actually explains the confusion:
+
+
+Nextnest is already using a maf/ subtree and has pulled forward to a newer tag (it thinks v0.2.6, latest v0.2.9).
+
+
+Roundtable is talking about lib/maf (not a subtree) and/or an older snapshot, so it’s effectively on a different track.
+
+
+Also: I tried to verify the repo tags via web, but the repo URL returns 404 from this environment (likely private), so I can’t independently confirm the tag list. The right “source of truth” here is your local git in each repo.
+
+Why Nextnest can be v0.2.6 while Roundtable looks “out of sync”
+Nextnest
+
+
+Has maf/ folder that’s a subtree import.
+
+
+That subtree import has a “snapshot” of HQ at the time you pulled.
+
+
+If Nextnest pulled later than Roundtable exported, it can easily be ahead.
+
+
+Roundtable
+
+
+If Roundtable is still relying on lib/maf (local folder that was developed in-place), it is not following HQ at all.
+
+
+So “out of sync” means: HQ moved, but Roundtable’s local lib/maf didn’t move with it.
+
+
+Bottom line: you currently have two different attachment points across repos:
+
+
+Some repos follow HQ via maf/ subtree
+
+
+Roundtable follows local lib/maf (not HQ)
+
+
+That’s why versions disagree.
+
+The only thing that matters going forward
+If HQ is iamnormalfree/maf, then every repo must follow the same rule:
+
+maf/ is the subtree from HQ
+and lib/maf (if it exists) is legacy and must stop being used as “MAF core”.
+
+
+How to check the real “MAF version” in each repo (non-guessy)
+Run these inside each consumer repo:
+1) What commit is your subtree currently at?
+bashCopy codegit log -1 --oneline maf
+
+2) If you fetched tags from HQ, what tag is that commit closest to?
+bashCopy codegit describe --tags --always --match "v*" --dirty
+
+(If tags aren’t fetched yet, you’ll just see a commit hash.)
+3) Make sure the HQ remote exists and tags are available
+bashCopy codegit remote -v | grep maf-upstream || true
+git fetch maf-upstream --tags
+
+
+How to force every repo onto the same HQ release (e.g., v0.2.9)
+In each consumer repo:
+bashCopy codegit remote add maf-upstream https://github.com/iamnormalfree/maf.git  # one-time
+git fetch maf-upstream --tags
+git subtree pull --prefix=maf maf-upstream v0.2.9 --squash
+
+If you want to standardize on v0.2.6 first (safer), use v0.2.6 instead.
+
+What to do about Roundtable’s lib/maf (this is the crux)
+Right now, Roundtable is in danger of “following the wrong engine”.
+The clean migration (preserves everything)
+
+
+Archive legacy
+
+
+bashCopy codegit mv lib/maf lib/maf__legacy_roundtable
+git commit -m "chore: archive legacy lib/maf (stop treating as MAF core)"
+
+
+
+Add HQ as subtree into maf/
+
+
+bashCopy codegit subtree add --prefix=maf https://github.com/iamnormalfree/maf.git main --squash
+git commit -m "chore: add HQ maf as subtree under maf/"
+
+
+
+Point your scripts to use maf/, not lib/maf
+(If any scripts hardcode lib/maf, that’s a global-quality fix you should PR into HQ, because it’s a “multi-repo franchising” mechanic.)
+
+
+Later: cherry-pick anything valuable from lib/maf__legacy_roundtable:
+
+
+
+
+Global mechanics → PR into HQ
+
+
+Roundtable identity → .maf/overrides/...
+
+
+Then delete legacy.
+
+
+
+Why Nextnest’s “v0.2.9 latest” note doesn’t contradict Roundtable
+They’re looking at different “MAF implementations”:
+
+
+Nextnest is looking at the HQ distribution repo (tags v0.2.x).
+
+
+Roundtable is looking at a local dev folder (lib/maf) whose history diverged the moment HQ was created.
+
+
+So both statements can be true at the same time.
+
+Your simplest founder move now
+
+
+Choose a target tag (v0.2.6 or v0.2.9)
+
+
+Make all repos use maf/ subtree from HQ
+
+
+Treat lib/maf as legacy and stop using it as the running engine
+
+
+If you tell me: “we standardize on v0.2.9” or “we standardize on v0.2.6 first”, I’ll give you a tight rollout order (Roundtable first vs Nextnest first) that minimizes break risk.
+
+
+========== NEXT MESSAGE ==========
+
+i dont understand this from roundtable:
+Yes, it's TRUE!
+
+  Upstream iamnormalfree/maf is at v0.2.9
+
+  | Tag    | Commit   | Message                                               |
+  |--------|----------|-------------------------------------------------------|
+  | v0.2.9 | f5ce373c | feat: Default all agents to Claude (no more Codex)    |
+  | v0.2.8 | 00e828e  | fix: Correct PROJECT_ROOT detection for direct layout |
+  | v0.2.7 | 256dcf2  | v0.2.7: Add agent specialization framework            |
+  | v0.2.6 | cfc0409  | v0.2.6: Make prompt-agent.sh project-aware            |
+  | v0.2.5 | a6895d5  | v0.2.5: Make rebuild-maf-cli-agents.sh project-aware  |
+  | v0.2.4 | acebb7d  | v0.2.4: Fix jq commands for set -e compatibility      |
+  | v0.2.2 | ef91261  | feat: Add telegram bot auto-start integration         |
+  | ...    | ...      | ...                                                   |
+  | v0.1.0 | bab137c  | Initial MAF distribution v0.1.0                       |
+
+  Interesting finding: The upstream went from v0.1.0 → v0.2.9, skipping v0.1.4-v0.1.7 and v0.2.3 (these commits exist but weren't tagged as releases).
+
+  Compare with roundtable:
+
+  | Location                          | Commit   | Date             |
+  |-----------------------------------|----------|------------------|
+  | Roundtable local (MAF v0.2.9 ref) | 62f8ccb  | Jan 5, 16:17 UTC |
+  | Upstream (v0.2.9 tag)             | f5ce373c | Jan 5, 16:16 UTC |
+
+  They're the same change! The roundtable commit 62f8ccb "feat: Default all agents to Claude (MAF v0.2.9)" references the upstream v0.2.9.
+
+  So the sync status is:
+  - Roundtable's MAF commits reference upstream versions
+  - But lib/maf itself is not a subtree, so changes don't flow automatically
+  - They track versions conceptually, but the actual code has diverged
+
+========== NEXT MESSAGE ==========
+
+You’re reading it right — it sounds contradictory. It’s basically saying:
+
+“Roundtable talks like it’s on v0.2.9, but it’s not actually wired to HQ, so it’s not truly synced.”
+
+Here’s the clean, founder-level explanation.
+
+1) What “Upstream is v0.2.9” means
+iamnormalfree/maf (HQ) has official releases/tags, like:
+
+
+v0.2.6
+
+
+v0.2.7
+
+
+v0.2.8
+
+
+v0.2.9
+
+
+A “tag” is like a version stamp on the franchise manual.
+So: HQ manual is currently stamped v0.2.9.
+
+2) What “Roundtable has a commit referencing v0.2.9” means
+Inside Roundtable, someone made a commit with a message like:
+
+“feat: Default all agents to Claude (MAF v0.2.9)”
+
+That’s like writing in your local notes:
+
+“We implemented the v0.2.9 change.”
+
+It does not prove Roundtable is actually connected to the HQ repo.
+It only proves:
+
+
+somebody was aware of v0.2.9
+
+
+and likely copy/pasted or re-implemented the same change locally
+
+
+So Roundtable may have the same idea, even the same code in a portion — but not the same pipeline.
+
+3) The key concept: “Same change” ≠ “Synced”
+This is the heart of it.
+Synced means:
+
+
+Roundtable receives HQ updates automatically via subtree pull
+
+
+And HQ receives Roundtable improvements via PR
+
+
+Everyone stays consistent
+
+
+What you currently have is:
+
+
+Roundtable implemented some updates that match HQ (maybe even copied from it)
+
+
+But Roundtable’s lib/maf folder is not linked to HQ’s commit history
+
+
+Founder analogy:
+
+Two people can both edit a Google Doc to contain the same paragraph…
+but if one person is working on a PDF printout, they’re not “synced”.
+
+Even if the content looks similar today, it will drift tomorrow.
+
+4) Why the two commits are “1 minute apart” but still diverged
+They’re saying:
+
+
+Upstream tag v0.2.9 points to commit f5ce373c at 16:16
+
+
+Roundtable has commit 62f8ccb at 16:17 that says it did v0.2.9
+
+
+That suggests Roundtable likely:
+
+
+pulled/cloned upstream briefly, or
+
+
+copied code, or
+
+
+re-applied the same patch manually
+
+
+But because Roundtable’s lib/maf is not a subtree, it didn’t become a permanent subscription.
+So Roundtable and upstream can be “nearly identical” at that moment…
+and still be structurally unsynced.
+
+5) “They track versions conceptually, but code diverged” — what does that mean?
+It means:
+
+
+Roundtable uses version numbers in its thinking (“we’re implementing v0.2.9 features”)
+
+
+but the actual folder lib/maf is still a separate codebase, so:
+
+
+future HQ changes won’t flow into Roundtable automatically
+
+
+Roundtable changes won’t flow into HQ automatically
+
+
+small differences accumulate silently
+
+
+
+
+So they’re “aligned in naming”, not “aligned in infrastructure”.
+
+The simple rule you can use going forward
+If you want the franchisable model:
+✅ A repo is truly on v0.2.9 only if its maf/ subtree can be pulled from HQ and produces that tag/commit.
+Not because a commit message says “v0.2.9”.
+
+What you should do next (to remove this confusion permanently)
+Since HQ is iamnormalfree/maf, the fix is:
+
+
+Stop treating Roundtable lib/maf as the MAF engine
+
+
+Make Roundtable use maf/ as the subtree from HQ
+
+
+Keep .maf/ for local prompts/config (that part is fine)
+
+
+After that, there is no “conceptual tracking”. There is only:
+
+
+“What tag is your subtree at?”
+
+
+
+Quick way to explain this to your team
+
+“Roundtable’s commit message says v0.2.9, but the folder isn’t connected to HQ, so it’s like we wrote ‘v0.2.9’ on a photocopy. We need to replace the photocopy with a subscription (subtree) so versions are real.”
+
+If you want, tell me whether you want Roundtable’s subtree path to be maf/ (recommended) or lib/maf (legacy-compatible), and I’ll give you the exact migration steps that preserve all current work.
+
+
+========== NEXT MESSAGE ==========
+
+so i need to move anything from roundtable lib/maf into the v0.2.9? or it is the same? orr am i seeing this wrongly again
+
+========== NEXT MESSAGE ==========
+
+You’re not seeing it wrongly — you’re just mixing two different ideas:
+
+
+“Do they contain the same features?”
+
+
+“Are they the same codebase / same truth?”
+
+
+They can overlap a lot on (1) and still be different on (2).
+Here’s the clean answer.
+
+Do you need to move “anything from Roundtable lib/maf” into HQ v0.2.9?
+Not automatically.
+Only move what is valuable AND not already in HQ.
+Because:
+
+
+Some of Roundtable lib/maf is likely the same as HQ (especially around the v0.2.9 change).
+
+
+Some of it is probably different (Roundtable-only improvements, WIP commits, supervision/quota batching, etc.).
+
+
+Some of it may be Roundtable-specific and should never go into HQ.
+
+
+So the right approach is:
+
+Do a “diff and classify”, not a blind migration.
+
+
+Why “it’s the same change” doesn’t mean “it’s the same code”
+When Roundtable says:
+
+
+“Our commit 62f8ccb references v0.2.9”
+It only proves:
+
+
+Roundtable implemented that specific change (“default all agents to Claude”)
+
+
+It does not prove:
+
+
+every other file in Roundtable lib/maf matches HQ v0.2.9
+
+
+Roundtable has the same setup automation, project-aware scripts, telegram integration fixes, etc.
+
+
+Roundtable’s newer WIP work exists in HQ
+
+
+So you should assume:
+✅ Some overlap
+❌ Not identical
+⚠️ Unknown without comparison
+
+The right founder mental model
+HQ v0.2.9 = “official manual”
+Roundtable lib/maf = “working draft that includes some official paragraphs + some private edits”
+So you don’t “move everything”.
+You:
+
+
+Keep HQ as the official manual
+
+
+Extract only useful improvements from Roundtable’s draft and upstream them via PR
+
+
+
+What exactly should you do then?
+Step 1 — Treat HQ v0.2.9 as the baseline
+Meaning: from now on, the core engine in every repo comes from maf/ subtree at v0.2.9 (or whatever tag you choose).
+Step 2 — Audit Roundtable lib/maf for extra value
+Look for changes that are:
+
+
+mechanics (improve reliability, setup, validation, orchestration)
+
+
+generalizable (would help Nextnest and future repos)
+
+
+not already in v0.2.9
+
+
+Those become candidates to PR into HQ.
+Step 3 — Everything else stays local (or is deleted)
+
+
+Roundtable-specific workflows → local overrides
+
+
+Experimental/WIP → keep in Roundtable but not in HQ
+
+
+Duplicates of what HQ already has → don’t move
+
+
+
+“How do I know if it’s already in HQ?”
+You don’t need to guess. Use this rule:
+
+If it’s in Roundtable lib/maf but not in the HQ maf/ subtree folder at v0.2.9, then it’s not in HQ.
+
+Practically, you compare:
+
+
+Roundtable lib/maf (legacy)
+vs
+
+
+Roundtable maf/ subtree (HQ v0.2.9)
+
+
+Anything unique in legacy is either:
+
+
+upstream candidate (global)
+
+
+or local-only
+
+
+
+The simple answer to your “or it is the same?” question
+
+
+That one feature (“default all agents to Claude”) is likely the same.
+
+
+The entire codebase is not guaranteed to be the same.
+
+
+You should assume there are meaningful differences until proven otherwise.
+
+
+
+Your next best action (low-risk)
+
+
+Make Roundtable a proper consumer of HQ v0.2.9 (subtree in maf/)
+
+
+Archive lib/maf as lib/maf__legacy
+
+
+Then review legacy and upstream only what’s truly missing and global
+
+
+That gets you franchisable without losing work.
+If you want, paste the list of “Roundtable-only improvements” you care about (supervision modules, quota batching, etc.). I’ll classify each as:
+
+
+must upstream / keep local / discard
+and tell you why in founder terms.
+
+
+
+
+========== NEXT MESSAGE ==========
+
+from roundtable:
+Here's the complete comparison:
+
+  ---
+  What's in Roundtable but NOT in Upstream v0.2.9
+
+  Scripts Unique to Roundtable (2):
+
+  | Script                 | Purpose                             |
+  |------------------------|-------------------------------------|
+  | autonomous-workflow.sh | Autonomous bead processing workflow |
+  | clear-stuck-prompts.sh | Clear stuck Agent Mail prompts      |
+
+  Agent Prompts - COMPLETELY DIFFERENT:
+
+  | Roundtable Agents       | Upstream Generic Agents |
+  |-------------------------|-------------------------|
+  | greenmountain-prompt.md | auditbay-prompt.md      |
+  | blackdog-prompt.md      | ledgerleap-prompt.md    |
+  | orangepond-prompt.md    | primeportal-prompt.md   |
+  | fuchsiacreek-prompt.md  | rateridge-prompt.md     |
+
+  Key difference: Roundtable has domain-specific prompts (Roundtable app), upstream has generic placeholder agents.
+
+  Prompt Packs - Almost Identical:
+
+  Roundtable has 1 additional pack:
+  - supervisor-default.json (marked as read-only -rw-------)
+
+  Upstream has the same pack without the permission restriction.
+
+  ---
+  What's in Upstream v0.2.9 but NOT in Roundtable (42 scripts):
+
+  Utility libraries upstream has but roundtable doesn't track separately:
+  - agent-utils.sh (in scripts/maf/lib/)
+  - error-handling.sh
+  - tmux-utils.sh
+  - colors.sh
+  - profile-loader.sh
+  - credential-manager.sh
+
+  These exist in roundtable but are NOT part of the upstream comparison - they're in scripts/maf/lib/ which is a roundtable-specific organization.
+
+  New upstream features not in roundtable:
+  - agent-health.sh - Health checking
+  - approve-proposal.sh / reject-proposal.sh - Proposal workflow
+  - create-beads-from-proposal.sh - Proposal to beads conversion
+  - check-disk.sh - Disk monitoring
+  - health-monitor.sh / system-health.sh - Health monitoring
+  - setup-cron.sh / rotate-logs.sh - Maintenance automation
+  - protocol-analyzer-*.sh - Network protocol analysis tools
+  - test-telegram-integration.sh - Telegram bot testing
+  - verify-integration.sh - Integration verification
+
+  ---
+  Summary
+
+  | Category        | Roundtable                               | Upstream v0.2.9                                              |
+  |-----------------|------------------------------------------|--------------------------------------------------------------|
+  | Core scripts    | 92                                       | 134                                                          |
+  | Agent prompts   | Roundtable-specific (4)                  | Generic placeholders (4)                                     |
+  | Prompt packs    | 11                                       | 10                                                           |
+  | Unique features | autonomous-workflow, clear-stuck-prompts | Proposal workflow, health monitoring, maintenance automation |
+
+  Key insight: Roundtable has domain-specific customizations (for the Roundtable app) while upstream has more generic utilities that could be useful for roundtable.
+
+  Roundtable is behind on:
+  - Maintenance automation scripts (cron, log rotation, disk monitoring)
+  - Proposal workflow system
+  - Health monitoring system
+
+========== NEXT MESSAGE ==========
+
+This comparison is excellent — and it gives you a very clean founder decision.
+What it really says in plain English
+
+
+Roundtable has “business-specific behaviour” (its agent prompts + a couple bespoke scripts).
+
+
+HQ v0.2.9 has “platform operations” (health checks, maintenance, verification, proposal workflow, utilities).
+
+
+So you should not try to “move Roundtable into HQ wholesale”. You should do two things:
+
+
+Make Roundtable pull HQ v0.2.9 so it gets all the platform ops improvements.
+
+
+Keep Roundtable’s app-specific prompts local (don’t upstream them).
+
+
+
+Global vs Local classification (based on this exact list)
+LOCAL (stays in Roundtable; should NOT go into HQ)
+1) Agent prompts are different
+Roundtable prompts (GreenMountain/BlackDog/OrangePond/FuchsiaCreek) are Roundtable-domain-specific.
+HQ prompts (AuditBay/LedgerLeap/PrimePortal/RateRidge) are generic placeholders (or Nextnest-ish naming).
+✅ Decision: Keep Roundtable prompts local.
+Because prompts encode:
+
+
+product domain
+
+
+tone
+
+
+workflows
+
+
+“how Roundtable runs”
+
+
+That’s not a franchisable default.
+But: if there are general prompt patterns (structure/checklists) you want to share, upstream those as templates, not as the actual Roundtable prompts.
+2) Prompt pack file permission detail
+Roundtable has supervisor-default.json with restrictive permission (-rw-------) vs upstream normal.
+That’s an operational quirk, not a global doctrine. Keep local or normalize it when you adopt HQ.
+
+LIKELY GLOBAL (should be upstreamed to HQ, with small refactor)
+3) clear-stuck-prompts.sh
+This sounds like a generic “maintenance / recovery” tool for agent mail prompts.
+That’s the kind of thing that helps every repo, because every repo can get stuck prompts.
+✅ Recommendation: Upstream to HQ (global utility).
+4) autonomous-workflow.sh
+This one depends on what it does. The name suggests “autonomous bead processing”.
+This could be:
+
+
+a generic orchestration improvement (global), OR
+
+
+a Roundtable-specific workflow for its publishing system (local)
+
+
+✅ Founder rule: Upstream only if it’s mechanics (works for any repo).
+If it contains Roundtable-specific assumptions (paths, app steps, Roundtable-only workflows), keep it local.
+
+GLOBAL (already in HQ; Roundtable should adopt)
+5) All those “Upstream has but Roundtable doesn’t” scripts
+These are exactly what HQ exists for: generic utilities and operations.
+Examples you listed:
+
+
+health monitoring (agent-health.sh, health-monitor.sh, system-health.sh)
+
+
+maintenance (setup-cron.sh, rotate-logs.sh, disk monitoring)
+
+
+verification (verify-integration.sh, test-telegram-integration.sh)
+
+
+proposal workflow (approve/reject proposal, proposal → beads)
+
+
+shared script libs (tmux-utils.sh, error-handling.sh, etc.)
+
+
+✅ Recommendation: Roundtable should pull HQ and use these rather than re-implementing.
+
+So what should you do next (founder-operable plan)
+Step 1 — Make Roundtable a consumer of HQ v0.2.9
+Goal: Roundtable gets the platform ops scripts (health, maintenance, verification, proposal workflow).
+This reduces outages, drift, and manual firefighting.
+Step 2 — Preserve Roundtable identity as “local overrides”
+Keep:
+
+
+.maf/config/agent-topology.json
+
+
+.maf/agents/*.md prompts (Roundtable versions)
+
+
+Roundtable-only prompt packs
+
+
+But ensure nothing inside the subtree (maf/) contains Roundtable-specific stuff.
+Step 3 — Upstream only 1–2 scripts (carefully)
+
+
+Upstream clear-stuck-prompts.sh (likely universally useful)
+
+
+Review autonomous-workflow.sh and either:
+
+
+upstream as a generic “autonomous beads runner”, or
+
+
+keep it as Roundtable-only
+
+
+
+
+
+The key correction to your earlier worry
+You asked: “Do I need to move anything from Roundtable lib/maf into v0.2.9?”
+Based on this comparison:
+✅ No, you do NOT move prompts. They’re intentionally different.
+✅ You probably upstream clear-stuck-prompts.sh.
+✅ You might upstream autonomous-workflow.sh depending on how generic it is.
+✅ Everything else is better solved by Roundtable pulling HQ v0.2.9, not by “pushing Roundtable into HQ”.
+
+A crisp decision statement you can adopt
+
+HQ owns operations and mechanics.
+Each repo owns its prompts and domain workflows.
+
+That matches exactly what your comparison discovered.
+
+If you upload (or paste) the contents of autonomous-workflow.sh and clear-stuck-prompts.sh, I’ll classify them definitively (“global or local”) and tell you what tiny edits would make them safely upstreamable.
+
+
+========== NEXT MESSAGE ==========
+
+Uploaded a fileUploaded a file
+
+========== NEXT MESSAGE ==========
+
+Perfect — thank you for uploading the actual scripts.
+Now we can stop theorising and be precise.
+I’ll answer this in founder language, with clear decisions, and then give you the exact action you should take.
+
+The short, direct answer
+
+You do NOT need to move everything from Roundtable lib/maf into HQ v0.2.9.
+From what you showed, ONLY ONE of these two scripts should become global.
+The other should stay Roundtable-local.
+
+You were not seeing it wrongly before — the confusion came from mixing engine vs behaviour.
+Now let’s settle it definitively.
+
+Script-by-script verdict (based on real code)
+1️⃣ clear-stuck-prompts.sh → GLOBAL (belongs in HQ)
+What it actually does (plain English)
+This script:
+
+
+Detects stuck tmux panes
+
+
+Clears half-typed prompts safely
+
+
+Works purely at the terminal / tmux / agent UX layer
+
+
+Has zero Roundtable business logic
+
+
+It:
+
+
+Uses tmux
+
+
+Uses pane indices
+
+
+Works for any MAF project using tmux agents
+
+
+There is nothing Roundtable-specific in it.
+Founder decision
+✅ This should go into iamnormalfree/maf (HQ)
+Why?
+
+
+Every repo with tmux agents can get stuck
+
+
+This is maintenance / recovery tooling
+
+
+Exactly the kind of thing HQ should standardise
+
+
+Classification
+ItemDecisionclear-stuck-prompts.shGLOBALLocationmaf/scripts/maf/ActionUpstream via PR
+Evidence: script contents clear-stuck-prompts
+
+2️⃣ autonomous-workflow.sh → LOCAL (Roundtable-only, for now)
+This one is important — and subtle.
+What it actually does
+This is not just orchestration. It encodes:
+
+
+Roundtable’s bead semantics
+
+
+Roundtable’s agent names (greenmountain, blackdog, etc.)
+
+
+Roundtable’s workflow philosophy:
+
+
+DONE signals
+
+
+Review routing
+
+
+Merge-gate semantics
+
+
+Commit + close assumptions
+
+
+
+
+Label-based frontend/backend classification
+
+
+Explicit Roundtable conventions
+
+
+In other words:
+
+This script does how Roundtable runs work, not how MAF runs agents.
+
+Why this should NOT go into HQ (yet)
+HQ is supposed to provide:
+
+
+primitives
+
+
+utilities
+
+
+generic workflows
+
+
+This script is:
+
+
+a policy engine
+
+
+a management style
+
+
+a product-specific operating model
+
+
+If you upstream this as-is, you would:
+
+
+bake Roundtable ideology into every future project
+
+
+limit flexibility for Nextnest and others
+
+
+turn HQ into an opinionated product, not a framework
+
+
+Founder analogy
+This is like:
+
+
+HQ provides the factory machinery
+
+
+Roundtable wrote its own factory manager playbook
+
+
+You don’t publish the playbook as law for all franchises.
+Classification
+ItemDecisionautonomous-workflow.shLOCALLocationRoundtable onlyActionKeep outside HQ
+Evidence: script contents autonomous-workflow
+
+Very important nuance (don’t miss this)
+This does NOT mean autonomous-workflow.sh is bad or useless.
+It means:
+
+It is a candidate for refactoring, not blind upstreaming.
+
+Future optional upgrade (when you want)
+Later, you may choose to:
+
+
+Extract a generic engine from it
+
+
+e.g. maf-autonomous-runner.sh
+
+
+Then keep Roundtable’s policy layer as a wrapper
+
+
+But that’s a design project, not a migration task.
+Right now: do not upstream it.
+
+Final classification table (authoritative)
+ComponentGlobal (HQ)Local (Roundtable)Whyclear-stuck-prompts.sh✅❌Pure tmux recovery utilityautonomous-workflow.sh❌✅Encodes Roundtable’s operating doctrineAgent prompts❌✅Product identityPrompt packsMostly ❌✅Product workflowsHealth / cron / monitoring scripts✅❌Platform ops
+
+What you should do next (exact actions)
+Step 1 — Upstream ONE script
+Create a PR to iamnormalfree/maf:
+
+
+Add clear-stuck-prompts.sh
+
+
+Put it under scripts/maf/
+
+
+Minor rename optional: maf-clear-stuck-prompts.sh
+
+
+Step 2 — Leave autonomous-workflow.sh where it is
+
+
+Keep it in Roundtable
+
+
+Do not try to reconcile it with HQ
+
+
+Let HQ remain neutral and flexible
+
+
+Step 3 — Communicate the rule
+You can now confidently say to your team:
+
+“HQ owns reliability and mechanics.
+Roundtable owns how work is run.”
+
+That sentence resolves 90% of future confusion.
+
+Final reassurance (because this has been a long road)
+You are not behind, and you are not wrong.
+What you uncovered is actually a good sign:
+
+
+Your system is mature enough to have real local doctrine
+
+
+Your HQ is mature enough to support multiple philosophies
+
+
+You’re doing the separation before scaling — exactly right timing
+
+
+If you want, next I can:
+
+
+Propose how to refactor autonomous-workflow.sh into layers
+
+
+Or help you write a “MAF Global vs Local Doctrine” doc (1 page, founder-readable)
+
+
+Just tell me which one.
+
+========== NEXT MESSAGE ==========
+
+i checked in with nextnest repo on the functions of the 2 files of roundtable:, help me to see what from nextnest can be used as global:
+Comparison: /docs/check-files/ vs NextNest MAF Codebase
+
+  Files in /docs/check-files/
+  File: autonomous-workflow.sh
+  Description: ~576 lines
+  Purpose: Full autonomous bead lifecycle with Agent Mail integration, merge gate
+    verification, and risk-based workflow
+  ────────────────────────────────────────
+  File: clear-stuck-prompts.sh
+  Description: ~83 lines
+  Purpose: Clear stuck prompts from MAF CLI agent panes using tmux
+  ---
+  What's Similar / What's Different
+
+  1. Autonomous Workflow
+  Feature: Lines
+  /docs/check-files/: ~576
+  NextNest (maf/scripts/maf/autonomous-workflow.sh): ~167
+  ────────────────────────────────────────
+  Feature: Agent Mail Integration
+  /docs/check-files/: ✅ Full MCP Agent Mail send/fetch
+  NextNest (maf/scripts/maf/autonomous-workflow.sh): ❌ None (uses direct tmux
+    nudges)
+  ────────────────────────────────────────
+  Feature: Bead Classification
+  /docs/check-files/: ✅ classify_bead() - analyzes labels/description
+  NextNest (maf/scripts/maf/autonomous-workflow.sh): ✅ Checks labels for
+    frontend/backend routing
+  ────────────────────────────────────────
+  Feature: Assignment Tracking
+  /docs/check-files/: ✅ JSON state file tracking assignments
+  NextNest (maf/scripts/maf/autonomous-workflow.sh): ❌ No persistent state
+  ────────────────────────────────────────
+  Feature: Merge Gate
+  /docs/check-files/: ✅ Calls verify-merge-gate.sh
+  NextNest (maf/scripts/maf/autonomous-workflow.sh): ❌ No merge gate verification
+  ────────────────────────────────────────
+  Feature: Agent Names
+  /docs/check-files/: fuchsiacreek, orangepond, blackdog, greenmountain
+  NextNest (maf/scripts/maf/autonomous-workflow.sh): rateridge, auditbay,
+    ledgerleap, primeportal
+  ────────────────────────────────────────
+  Feature: Workflow Steps
+  /docs/check-files/: 6 steps: assign → wait → review → verify → commit → close
+  NextNest (maf/scripts/maf/autonomous-workflow.sh): 2 steps: assign → check idle
+  ────────────────────────────────────────
+  Feature: Timeout Handling
+  /docs/check-files/: ✅ 30min bead timeout with retry
+  NextNest (maf/scripts/maf/autonomous-workflow.sh): ❌ No timeout
+  ────────────────────────────────────────
+  Feature: Review Cycle
+  /docs/check-files/: ✅ Routes to BlackDog for approval
+  NextNest (maf/scripts/maf/autonomous-workflow.sh): ❌ No review routing
+  ────────────────────────────────────────
+  Feature: Agent Communication
+  /docs/check-files/: MCP Agent Mail (send_message, fetch_inbox)
+  NextNest (maf/scripts/maf/autonomous-workflow.sh): Direct tmux send-keys
+  Key Difference: The check-files version is a production-grade autonomous orchestrator with state management, verification gates, and Agent Mail. NextNest's version is a simple bead assigner that nudges agents via tmux.
+
+  ---
+  2. Clear Stuck Prompts
+  ┌──────────────┬─────────────────────┬─────────────────────────────────────────┐
+  │   Feature    │ /docs/check-files/  │                NextNest                 │
+  │              │                     │ (maf/scripts/maf/lib/claude-cli-fix.sh) │
+  ├──────────────┼─────────────────────┼─────────────────────────────────────────┤
+  │ Lines        │ ~83                 │ ~272                                    │
+  ├──────────────┼─────────────────────┼─────────────────────────────────────────┤
+  │              │ ✅                  │                                         │
+  │ Agent Pane   │ has_pending_input() │ ✅ is_claude_cli_mode() - checks for    │
+  │ Detection    │  - checks for >/›   │ Claude/Vim modes                        │
+  │              │ prompts             │                                         │
+  ├──────────────┼─────────────────────┼─────────────────────────────────────────┤
+  │ Clear        │ C-c C-u → space →   │ C-c C-c C-c → C-d → /exit               │
+  │ Strategy     │ C-u C-u             │                                         │
+  ├──────────────┼─────────────────────┼─────────────────────────────────────────┤
+  │ Multi-Pane   │ ✅ Loops panes 0-3  │ ✅ Loops all panes in session           │
+  │ Support      │                     │                                         │
+  ├──────────────┼─────────────────────┼─────────────────────────────────────────┤
+  │ Session      │ maf-cli:agents      │ Multiple sessions (maf-5pane,           │
+  │ Names        │                     │ maf-session, maf-coordination)          │
+  ├──────────────┼─────────────────────┼─────────────────────────────────────────┤
+  │              │ ✅                  │                                         │
+  │ Verification │ has_pending_input() │ ✅ Shell prompt verification            │
+  │              │  recheck            │                                         │
+  ├──────────────┼─────────────────────┼─────────────────────────────────────────┤
+  │ Additional   │ ❌ None             │ ✅ Diagnostics, test mode, Vim          │
+  │ Features     │                     │ detection                               │
+  └──────────────┴─────────────────────┴─────────────────────────────────────────┘
+  Key Difference: The check-files version is a focused prompt clearer for MAF CLI agents. NextNest's version is a comprehensive CLI fix utility that also handles Vim mode, Claude CLI detection, diagnostics, and testing.
+
+  ---
+  Summary Table
+  ┌────────────────────────┬──────────────────┬─────────────────┬────────────────┐
+  │         Script         │   Check Files    │    NextNest     │     Status     │
+  │                        │     Version      │     Version     │                │
+  ├────────────────────────┼──────────────────┼─────────────────┼────────────────┤
+  │                        │ Full             │                 │                │
+  │                        │ orchestrator     │ Simple assigner │ ⚠️ NextNest    │
+  │ autonomous-workflow.sh │ with Agent Mail, │  with tmux      │ version is     │
+  │                        │  state, merge    │ nudges          │ simpler        │
+  │                        │ gates            │                 │                │
+  ├────────────────────────┼──────────────────┼─────────────────┼────────────────┤
+  │                        │ Targeted prompt  │ Comprehensive   │ ✅ NextNest    │
+  │ clear-stuck-prompts.sh │ clearer for MAF  │ CLI fix with    │ version is     │
+  │                        │ CLI              │ diagnostics     │ more           │
+  │                        │                  │                 │ feature-rich   │
+  └────────────────────────┴──────────────────┴─────────────────┴────────────────┘
+  ---
+  Recommendation
+
+  The /docs/check-files/autonomous-workflow.sh appears to be a more complete implementation of the autonomous workflow that NextNest could adopt. It includes:
+
+  1. Agent Mail integration - better than raw tmux nudges
+  2. Merge gate verification - CRITICAL work validation
+  3. Review cycle routing - proper audit workflow
+  4. Persistent state tracking - recover from failures
+  5. Timeout handling - prevent stuck beads
+
+  The clear-stuck-prompts.sh in check-files is lightweight and focused, while NextNest's claude-cli-fix.sh is more comprehensive but handles a broader set of issues.
+
+========== NEXT MESSAGE ==========
+
+Here’s the founder-level takeaway from that Nextnest comparison, with a clear “what becomes global” answer.
+The framing
+“Global” means: a capability that improves reliability or portability for every repo (Roundtable, Nextnest, future projects) without baking in one product’s identity.
+So we don’t choose “the longer script” — we choose the most general primitives.
+
+What from Nextnest should become GLOBAL
+1) The Claude CLI recovery / mode detection from claude-cli-fix.sh → GLOBAL
+Nextnest’s tool is more feature-rich than Roundtable’s clear-stuck-prompts.sh:
+
+
+Detects Claude CLI mode / vim mode
+
+
+Uses stronger reset sequences
+
+
+Has diagnostics/test mode
+
+
+Works across multiple sessions
+
+
+That’s exactly the kind of “platform reliability” tool that HQ should own.
+✅ Global move: take the capabilities from Nextnest claude-cli-fix.sh and upstream them into HQ as the official “prompt recovery” tool.
+How to package it globally (important)
+Don’t upstream it as a Nextnest-specific file name or session list.
+Make it a generic command like:
+
+
+scripts/maf/clear-stuck-prompts.sh (simple interface)
+
+
+internally calls a library function (the smart detection logic)
+
+
+So HQ gives everyone one stable entrypoint.
+Why global: every repo will get stuck prompts; vim/Claude mode issues are universal.
+
+2) The “autonomous workflow” should NOT be global as-is — but parts can become global primitives
+From the comparison:
+
+
+Roundtable version = full orchestrator (agent mail, state tracking, merge gates, timeouts)
+
+
+Nextnest version = simple assign + nudges (no state, no merge gate, no mail)
+
+
+What becomes global is not either script wholesale, but these global primitives:
+Global primitives to extract (HQ-level)
+✅ A standard “autonomous runner interface” (generic contract)
+
+
+“assign bead”
+
+
+“route to agent”
+
+
+“check idle”
+
+
+“request review”
+
+
+“verify merge gate”
+
+
+“close bead”
+
+
+“persist state”
+
+
+“timeout + retry”
+
+
+This is global because it defines a portable lifecycle.
+✅ State tracking
+Persistent assignment state is global — it prevents “lost work” after restarts.
+✅ Merge gate hook
+Global because it enforces quality consistently across repos.
+(But the gate logic should be configurable per repo.)
+✅ Timeout + retry policy
+Global because it prevents stuck beads.
+What stays local
+❌ The exact orchestration policy
+
+
+whether you require review every time
+
+
+which labels mean frontend/backend
+
+
+agent naming
+
+
+which prompt pack to apply
+These vary by product, so they must be local.
+
+
+Founder decision:
+HQ should provide the engine for autonomy, but each repo supplies its policy.
+
+3) The Agent communication method should be global-capable
+The comparison highlights:
+
+
+Roundtable uses Agent Mail (robust)
+
+
+Nextnest uses direct tmux send-keys (fragile)
+
+
+✅ Global doctrine:
+
+
+HQ should prefer Agent Mail as the standard transport when available
+
+
+but allow tmux nudges as a fallback
+
+
+So what becomes global is a single abstraction:
+
+
+send_instruction(agent, message) chooses best transport available
+
+
+That’s a “franchise primitive.”
+
+What from Nextnest should remain LOCAL
+Nextnest autonomous-workflow.sh (167 lines) → LOCAL
+It’s too minimal and doesn’t include the “must-have global reliability features”:
+
+
+no state
+
+
+no merge gate
+
+
+no review cycle
+
+
+no timeout
+
+
+no agent mail
+
+
+It’s useful as a local convenience, but not global “standard.”
+
+The concrete “globalization plan” (two columns, founder-operable)
+HQ (iamnormalfree/maf) — add / standardize
+
+
+Adopt Nextnest’s robust CLI fix logic as the official recovery script
+
+
+Keep a stable name (clear-stuck-prompts.sh)
+
+
+Implement the smarter detection + diagnostics under the hood
+
+
+
+
+Create a generic Autonomous Runner framework (not the whole Roundtable script)
+
+
+state file support
+
+
+timeout/retry
+
+
+merge gate hook
+
+
+review hook
+
+
+transport abstraction (Agent Mail preferred)
+
+
+
+
+Define a “policy file” for autonomy (local per repo)
+
+
+which labels route where
+
+
+whether review is required
+
+
+which agent roles exist
+
+
+thresholds/timeouts if you want them local
+
+
+
+
+Consumer repos (Roundtable/Nextnest) — keep as local policies
+
+
+Roundtable keeps its domain-specific prompts + packs
+
+
+Nextnest keeps its domain-specific prompts + packs
+
+
+If Roundtable’s full orchestrator is mature, it becomes the reference implementation for the new HQ runner — but upstreamed as refactored primitives, not as Roundtable-hardcoded script.
+
+
+
+The simplest founder call to make right now
+If you want speed and clarity:
+Do this immediately
+✅ Upstream Nextnest’s claude-cli-fix capabilities into HQ
+(because that’s clearly global)
+Defer this into a “v0.3.x” project
+✅ Refactor autonomous workflow into global runner + local policy
+(because doing it wrong will hard-bake Roundtable ideology into every project)
+
+If you want, paste (or upload) Nextnest’s maf/scripts/maf/lib/claude-cli-fix.sh and Nextnest’s maf/scripts/maf/autonomous-workflow.sh. With those exact files, I can tell you the precise sections to extract into HQ and what to leave local, without guessing.
+
+
+========== NEXT MESSAGE ==========
+
+I checked roundtable as they have a copy of claude-cli-fix as well (it was developed there), so i asked roundtable why so:
+ Now I understand the decision. Here's the analysis:
+
+  ---
+  Why Two Different Scripts?
+  Script: claude-cli-fix.sh
+  Created: Dec 26, 2025
+  Problem Solved: Agents stuck in Claude CLI or Vim mode
+  ────────────────────────────────────────
+  Script: clear-stuck-prompts.sh
+  Created: Jan 6, 2026
+  Problem Solved: Agent Mail text typed but Enter not pressed
+  ---
+  The Two Different Problems
+
+  claude-cli-fix.sh - "Stuck in a Mode"
+
+  Problem: Agent is actually inside Claude CLI interactive mode
+  Claude> Use Enter to run, Alt-Enter for new line
+  [Agent can't receive shell commands]
+
+  Solution: Exit the mode entirely
+  # Exits Claude CLI back to shell
+  C-c, C-d, or /exit
+
+  Features:
+  - Detects Claude CLI mode ("Claude>", "ctrl-g to edit")
+  - Detects Vim mode (INSERT, VISUAL indicators)
+  - Can diagnose, fix, test, clear multiple sessions
+  - 272 lines, comprehensive
+
+  ---
+  clear-stuck-prompts.sh - "Stuck Pending Input"
+
+  Problem: Agent Mail typed text but forgot to press Enter
+  > Yes, looks good to me
+  [Text is visible but not submitted - agent waits for input]
+
+  Solution: Clear just the input line, stay in Claude
+  # Clears the pending text, stays in Claude mode
+  C-c C-u (cancel + clear line)
+
+  Features:
+  - Detects pending input (text after > or › symbols)
+  - Per-pane or all-panes clearing
+  - Non-destructive (doesn't exit Claude)
+  - 83 lines, focused
+
+  ---
+  The Decision Timeline
+
+  Dec 26, 2025
+    ↓
+  claude-cli-fix.sh created
+    ↓
+    [Agents start using Agent Mail for coordination]
+    ↓
+  Jan 6, 2026
+    ↓
+  Problem discovered: Agent Mail responses typed but Enter not sent
+    ↓
+  c26372f: "feat: add stuck prompt clearing script"
+    ↓
+  clear-stuck-prompts.sh created
+    ↓
+  872f693: "fix: clear stuck prompts immediately instead of trying to submit"
+
+  ---
+  Why claude-cli-fix.sh Wasn't Used
+  ┌─────────────┬────────────────────────────┬─────────────────────────┐
+  │   Aspect    │     claude-cli-fix.sh      │ clear-stuck-prompts.sh  │
+  ├─────────────┼────────────────────────────┼─────────────────────────┤
+  │ Scope       │ Exits Claude CLI entirely  │ Just clears input line  │
+  ├─────────────┼────────────────────────────┼─────────────────────────┤
+  │ Destructive │ Yes (kills Claude session) │ No (stays in Claude)    │
+  ├─────────────┼────────────────────────────┼─────────────────────────┤
+  │ Target      │ Being stuck in a mode      │ Text typed but not sent │
+  ├─────────────┼────────────────────────────┼─────────────────────────┤
+  │ Complexity  │ High (272 lines)           │ Low (83 lines)          │
+  └─────────────┴────────────────────────────┴─────────────────────────┘
+  The key insight: Agent Mail stuck prompts happen during normal operation - agents are actively working in Claude, just have pending text. Using claude-cli-fix.sh would kill their Claude session, losing context.
+
+  clear-stuck-prompts.sh is surgical - it clears the stuck text without disrupting the agent's workflow.
+
+  ---
+  Root Cause
+
+  From the docs:
+  Agent Mail MCP tool responses are echoed to panes for visibility, but the Enter keypress that submits them is not always sent. This is a known issue with the Agent Mail + tmux integration.
+
+  Quick fix: ./scripts/maf/clear-stuck-prompts.sh
+  Long-term fix: Fix the Agent Mail MCP tool to always send Enter after echoing
+
+========== NEXT MESSAGE ==========
+
+This explanation from Roundtable is actually good, and it resolves the apparent duplication.
+What it means in founder language
+You have two different failure modes that look similar (“agent looks stuck”), but require opposite fixes:
+A) claude-cli-fix.sh = “Agent is in the wrong mode”
+
+
+The agent is trapped inside Claude interactive UI or Vim
+
+
+In that state, your system can’t reliably send normal shell commands
+
+
+Fix is to exit that mode back to shell (more disruptive)
+
+
+Use when: agent is not at a normal shell prompt / is stuck in Claude/Vim.
+B) clear-stuck-prompts.sh = “Agent has typed text but didn’t press Enter”
+
+
+The agent is still in Claude mode and active
+
+
+It just has pending input sitting on the line
+
+
+Fix is surgical: clear the line without exiting Claude
+
+
+Use when: you see text waiting after a > or › prompt and nothing progresses.
+So: both scripts are legitimate, and they solve different problems.
+
+The decision implication for HQ
+Since HQ = iamnormalfree/maf, the global model should be:
+✅ HQ should ship BOTH tools
+…but with clear naming and a single “triage wrapper” that decides which one to run.
+Because across many repos, you will see both failure modes.
+
+What should be global vs local now (updated)
+GLOBAL (HQ)
+
+
+claude-cli-fix.sh (mode recovery)
+
+
+clear-stuck-prompts.sh (pending input recovery)
+
+
+And ideally:
+
+
+maf-unwedge.sh (new wrapper)
+
+
+
+
+Detects which problem it is
+
+
+Calls the correct tool
+
+
+Logs what it did
+
+
+Founder benefit:
+
+One command to “unstick agents”, without thinking.
+
+LOCAL
+None of this is domain-specific. These are operational utilities. So they belong in HQ.
+
+Why you shouldn’t replace one with the other
+Roundtable already explained it perfectly:
+
+
+claude-cli-fix.sh is destructive (exits Claude / could lose context)
+
+
+clear-stuck-prompts.sh is non-destructive (keeps Claude session)
+
+
+So if you only keep the destructive one, you’ll disrupt agents too often.
+If you only keep the surgical one, it won’t work when the agent is genuinely trapped in Claude/Vim.
+You want both.
+
+The most important insight (the real fix)
+Roundtable’s “root cause” statement is key:
+
+Agent Mail echoes content to panes, but the Enter keypress isn’t always sent.
+
+So long-term, the best fix is:
+
+
+patch the Agent Mail → tmux “send” path to reliably include Enter (or an explicit submit action)
+
+
+But that’s a deeper engineering fix. HQ can still ship both recovery tools immediately.
+
+Exactly what you should do next (founder-operable)
+
+
+In HQ (iamnormalfree/maf), ensure both scripts exist:
+
+
+scripts/maf/clear-stuck-prompts.sh
+
+
+scripts/maf/lib/claude-cli-fix.sh (or promote it to scripts/maf/claude-cli-fix.sh)
+
+
+
+
+Add a one-liner doc:
+
+
+“Use clear-stuck-prompts when input is visible but not submitted.”
+
+
+“Use claude-cli-fix when stuck in Claude/Vim mode.”
+
+
+
+
+(Optional but recommended) Add scripts/maf/unwedge-agents.sh that:
+
+
+tries clear-stuck-prompts first (safe)
+
+
+if still stuck, escalates to claude-cli-fix (destructive)
+
+
+
+
+
+If you want, I can write the exact wrapper logic (founder readable) that makes this a single command and prevents accidental “kill Claude session” when a surgical clear would do.

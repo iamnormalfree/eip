@@ -1,0 +1,397 @@
+CANVAS:
+Ralph Loops, Loom, and Agentic Best Practices — Expanded Notes
+Overview
+
+Ralph is a loop-based way to run coding agents continuously. Loom is a larger environment that runs and chains many Ralph loops together. The core theme is first-principles engineering: build a harness that stays productive, cheap, and stable over long unattended runs.
+
+1) Economics: unit cost for autonomous software development
+Unit economics
+
+Run the agent continuously, measure API spend over 24 hours, and divide to get an hourly cost.
+
+Cost
+
+Software development costs $10.42 USD/hour under a Sonnet 4.5 loop measured over a 24-hour burn rate.
+
+Why this changes behaviour
+
+Continuous execution becomes the default because the loop is inexpensive.
+
+Output rate is high enough to clear backlog-sized work quickly; the important metric becomes cost per backlog consumed, not cost per hour.
+
+A widening gap forms between teams that can run reliable loops and teams that cannot.
+
+2) Development vs engineering
+Software development
+
+Automated.
+
+Cheap.
+
+Runnable continuously.
+
+Achievable with simple loop tooling (including trivial bash loops).
+
+Software engineering
+
+Design constraints and safety rails that keep autonomous generation correct and safe.
+
+Manage failure domains.
+
+Engineer back-pressure and feedback.
+
+Build observability so autonomous systems can be trusted.
+
+A recurring metaphor: stop hand-carrying cargo; operate the locomotive and standardise the containers.
+
+3) Screwdriver vs jackhammer
+
+Jackhammer: full-power automation (Ralph-style unattended looping / heavy orchestration).
+
+Screwdriver: manual fundamentals first — shaping specs, controlling context, steering search and linkage, and learning how to keep the system on the rails before turning it loose.
+
+The workflow starts with fundamentals, then graduates to power tools.
+
+4) Loom
+
+Loom is a self-evolving software environment designed around agents rather than humans.
+
+Cutting human-designed assumptions
+
+Repeatedly ask:
+
+Was this designed for humans?
+
+If yes, can it be cut?
+
+If cut, what value was lost and how is it replaced?
+
+Examples of human-first assumptions:
+
+Unix user space and TTY conventions
+
+common agile/process practices
+
+Capabilities
+
+Code hosting (GitHub-like)
+
+Source control using JJ
+
+Codespaces-like remote environments (remote provisioning)
+
+A coding agent similar to AMP / Claude Code
+
+Multi-LLM “alloying” (mix providers)
+
+Remote execution (not limited to the local machine)
+
+Architectural direction
+
+Actor / pub-sub mindset
+
+Loops composed into chains (“loops on loops on loops”)
+
+Erlang/OTP-style chaining and message passing
+
+5) Ralph: orchestration to avoid context rot and compaction
+Context windows are arrays
+
+The context window is an array.
+
+Less in the array means less sliding.
+
+Less sliding means fewer degradations.
+
+More in the array means more sliding and earlier compaction.
+
+Compaction
+
+Compaction is lossy. Loss drops critical anchors and produces drift.
+
+System boundary
+
+The “system” includes:
+
+the application
+
+the operating system
+
+external vendors/APIs
+
+Reliability requires engineering across that boundary.
+
+6) The “pin”: specs as a living anchor
+
+Specs provide the stable reference point (“pin”) that prevents invention.
+
+Spec production
+
+Generate specs through conversation.
+
+Review and edit by hand.
+
+Use the spec set as the primary input to implementation loops.
+
+Specs as lookup tables
+
+Specs function as lookup-oriented structures:
+
+descriptors and synonyms that help the search tool hit the right places
+
+links to known system areas (e.g., authentication)
+
+Better search hit-rate reduces hallucination and aligns new work with existing behaviour.
+
+7) Worked example: product analytics (PostHog-like)
+
+A concrete spec-shaping example is building product analytics inside Loom.
+
+Scope
+
+Product analytics for apps built on Loom.
+
+Track anonymous (non-authenticated) users.
+
+PII handling
+
+Use a dedicated secret/PII wrapper for IP addresses.
+
+Prevent sensitive fields from leaking into logs.
+
+Integration
+
+Ingest via web API.
+
+Provide Rust + TypeScript clients/SDKs that interact with the Loom API.
+
+Experiments and flags
+
+Integrate analytics with existing feature-flag/experiment capability.
+
+Enable other apps to run experiments on Loom.
+
+Event model
+
+Use established best practices.
+
+Follow patterns from proven analytics products rather than inventing a bespoke model.
+
+Storage
+
+Store in existing SQLite for iteration speed.
+
+Accept non-scalability as a current tradeoff.
+
+Avoid locking the final data model because the long-term direction points toward actor/OTP-style evolution.
+
+Identity model
+
+Person profiles include anonymous.
+
+SDK can identify/merge users.
+
+Follow established analytics product identity patterns.
+
+Multi-tenancy
+
+Tie analytics to Loom organizations.
+
+Reuse existing multi-tenancy infrastructure.
+
+8) Spec shaping as an iterative “pottery wheel” process
+
+Specification building is iterative and interactive:
+
+probe model understanding
+
+apply engineering judgment
+
+reshape constraints
+
+steer toward reuse of existing systems (don’t reinvent what already exists)
+
+Once the spec is acceptable:
+
+run a few loops while present
+
+if direction is good, let it run further
+
+if direction is wrong, return to the spec and adjust
+
+9) Execution planning: linkage beats fancy formats
+
+Plan quality strongly affects loop success.
+
+Artifacts
+
+Update the spec/lookup table as the system evolves.
+
+Produce an implementation plan structured for agent execution.
+
+Linkage rules
+
+Bullet points with strong references.
+
+Cite the exact spec section and/or source code location to adjust.
+
+Point to explicit file sections/hunks when possible.
+
+Why hunks matter
+
+Read tools operate in hunks; plans that point to the right hunks reduce thrash and invention.
+
+10) Phase separation: a new array for implementation
+
+Avoid mixing planning and implementation.
+
+Planning session goal: generate/refine specs.
+
+Implementation session goal: ship code.
+
+Keep the spec session open for later refinement, but implement in a fresh context to minimise context rot.
+
+11) A practical implementation harness
+Prompt skeleton
+
+Study the pin (specs/README).
+
+Study the implementation plan.
+
+Choose the single most important next task.
+
+This is low control with high oversight:
+
+avoid micromanaging every step
+
+enforce constraints and success criteria
+
+Quality gates
+
+Follow existing patterns (e.g., i18n conventions for Rust/TypeScript).
+
+Write tests (property-based or unit tests as appropriate).
+
+Run test suite (example: cargo test).
+
+On pass: commit + push.
+
+Operate attended before unattended
+
+Start by watching the loop.
+
+Cancel quickly if behaviour looks wrong.
+
+Adjust spec/prompt/back-pressure.
+
+Re-run.
+
+State checkpoints
+
+Mark completion in the plan.
+
+Maintain external “done” state so loops can resume safely.
+
+Deployment model
+
+Commit + push triggers automated deployment.
+
+No CI is required in this setup.
+
+The system can introspect deployment state.
+
+12) Back-pressure and failure domains
+
+Autonomous loops create many failure domains. Engineering work focuses on building rails:
+
+Add constraints.
+
+Tighten plan linkage.
+
+Improve search guidance.
+
+Increase gating (tests, linting, formatting, security patterns).
+
+When outcomes are poor, remediation is another loop:
+
+refactor loop
+
+convention loop
+
+security loop
+
+i18n loop
+
+Back-pressure keeps the generative function on the rails.
+
+13) Scaling up: loops → chains → autonomous product systems
+
+Scaling comes from chaining many small objectives safely.
+
+Level 1 — manual fundamentals (screwdriver)
+
+generate specs via conversation
+
+edit and tighten constraints
+
+keep context minimal
+
+operate attended
+
+Level 2 — unattended looping (jackhammer)
+
+while true style runs
+
+single objective per iteration
+
+automated tests + commit/push
+
+checkpointed state
+
+Level 3 — Loom orchestrates many loops
+
+multiple loops running
+
+reactive chaining as needed
+
+actor/pub-sub direction
+
+Level 4 — beyond code: product decision loops
+
+Autonomous “weavers”:
+
+ship behind feature flags
+
+deploy without code review
+
+observe analytics
+
+decide whether changes fixed errors
+
+decide whether to optimise further
+
+14) Robots-first stack optimisation
+
+Beyond workflow, redesign parts of the stack for machines:
+
+Question assumptions: user space, TTY, JSON, etc.
+
+Optimise serialization/tokenization; JSON is suboptimal for tokenisation.
+
+Controlling the stack enables cheaper, more reliable reactive agents.
+
+Practical summary
+
+Specs are the anchor (“pin”); keep them living and lookup-oriented.
+
+Separate planning from implementation; keep each context window focused.
+
+Prefer linkage, file references, and hunks over fancy plan formats.
+
+Start attended, add back-pressure, then scale to unattended.
+
+Scale by chaining many small, single-objective loops into a reactive system.
+
+Engineering becomes the discipline of rails, checkpoints, and observability around autonomous generation.
+
+

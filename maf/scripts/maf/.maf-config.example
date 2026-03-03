@@ -1,0 +1,15 @@
+# MAF Franchisee Configuration
+# Copy this file to your project root as .maf-config and customize
+# MAF HQ scripts will automatically source this file
+
+# Franchisee-specific session name (prevents conflicts with other franchisees)
+export MAF_TMUX_SESSION="maf-cli"
+
+# Agent window name (rarely needs to change)
+export MAF_AGENT_WINDOW="agents"
+
+# Coordination cooldown in seconds (how long to wait before reassigning beads)
+export MAF_COORDINATION_COOLDOWN="300"
+
+# Assignment mode: "smart" (only to available agents) or "all" (broadcast)
+export MAF_ASSIGN_MODE="smart"

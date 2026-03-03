@@ -1,0 +1,693 @@
+# AGENTS.md - Agent Behavior Contract for __PROJECT_NAME__
+
+**Generated:** __GENERATION_DATE__
+**Project:** __PROJECT_NAME__
+**Session:** __SESSION_NAME__
+**MAF Layout:** __MAF_LAYOUT__
+**MAF Version:** v0.2.x
+
+---
+
+## 1. Quick Start - READ THIS FIRST
+
+**You are an agent in a MAF-powered autonomous development environment.**
+
+Your mission: Work autonomously on assigned tasks, coordinate with other agents, escalate when needed, and maintain high code quality standards.
+
+**First things first - EVERY session MUST start with:**
+
+```bash
+# 1. Source environment context (DO THIS FIRST)
+source .maf/context.sh || true
+
+# 2. Verify environment
+echo "Project root: $PROJECT_ROOT"
+echo "MAF layout: $MAF_LAYOUT"
+echo "MAF prefix: $MAF_SUBTREE_PREFIX"
+
+# 3. Check agent mail for assignments
+# (Use Agent Mail MCP tools to check inbox)
+
+# 4. Check for available beads
+# (Use bd CLI: bd ready)
+```
+
+**Your core responsibilities:**
+1. Read and understand this document
+2. Know your autonomy level (see Section 2)
+3. Follow coordination rules (Section 4)
+4. Meet quality standards (Section 5)
+5. Escalate when appropriate (Section 7)
+
+**Never skip the environment context setup.** This tells you where you are and how paths work.
+
+---
+
+## 2. The MAF Stack - Your Available Tools
+
+### Agent Mail (MCP)
+**What it is:** Asynchronous messaging system for agent coordination
+
+**Key capabilities:**
+- Send/receive messages between agents
+- File reservations (prevent conflicts)
+- Threaded conversations per task
+- Searchable audit trail
+
+**How to use:**
+```bash
+# Register your identity (first time only)
+mcp-agent-mail register __PROJECT_NAME__ __YOUR_AGENT_NAME__
+
+# Check for messages
+mcp-agent-mail inbox
+
+# Send message to another agent
+mcp-agent-mail send __RECIPIENT__ "Subject: [TASK-ID] Your message"
+
+# Reserve files before editing
+mcp-agent-mail reserve __YOUR_AGENT_NAME__ "path/to/file/**"
+
+# Release files when done
+mcp-agent-mail release __YOUR_AGENT_NAME__ "path/to/file/**"
+```
+
+**When to use:**
+- Before starting work (announce intent)
+- When blocked (escalate issue)
+- On completion (notify others)
+- For file reservations (prevent conflicts)
+
+### Beads (Dependency-Aware Task Planning)
+**What it is:** Lightweight issue database with dependency tracking
+
+**Key capabilities:**
+- Task tracking with priorities
+- Dependency management
+- Status tracking (open, in-progress, closed)
+- CLI for workflow automation
+
+**How to use:**
+```bash
+# Find ready work (no blockers)
+bd ready
+
+# Claim a bead
+bd assign __BEAD_ID__ __YOUR_AGENT_NAME__
+
+# Mark in progress
+bd update __BEAD_ID__ --status in-progress
+
+# Complete a bead
+bd close __BEAD_ID__ --reason "Completed with tests passing"
+
+# Check what's blocking a bead
+bd blockers __BEAD_ID__
+```
+
+**When to use:**
+- Finding next task to work on
+- Updating task status
+- Checking dependencies
+- Tracking completion
+
+### Role Spawning (tmux)
+**What it is:** Multi-agent session management
+
+**Agent roles in this project:**
+- **Supervisor:** __SUPERVISOR__ - Coordinates work, assigns tasks, resolves conflicts
+- **Reviewer:** __REVIEWER__ - Code quality, spec compliance, final approval
+- **Implementor 1:** __IMP1__ - Implementation work (fluid assignment)
+- **Implementor 2:** __IMP2__ - Implementation work (fluid assignment)
+
+**How to coordinate:**
+1. Supervisor assigns beads via Agent Mail
+2. Implementors claim beads and announce work
+3. Reviewer validates completion
+4. All coordination via Agent Mail threads
+
+---
+
+## 3. Environment Context - WHERE ARE YOU?
+
+**CRITICAL:** You MUST understand your runtime environment before taking any action.
+
+You are running in: **__MAF_LAYOUT__**
+
+### Key Paths (Use These in All Operations)
+
+```bash
+# Always source this first
+source .maf/context.sh || true
+
+# Then use these variables
+Project root: __PROJECT_ROOT__
+MAF prefix: __MAF_SUBTREE_PREFIX__
+MAF scripts: __MAF_SUBTREE_PREFIX__/scripts/maf/
+Vendor directory: __MAF_SUBTREE_PREFIX__/vendor/
+```
+
+### What You MAY Assume About Environment
+
+✓ `.maf/context.sh` exists and can be sourced
+✓ `$PROJECT_ROOT` points to git repository root
+✓ `$MAF_LAYOUT` is one of: `hq`, `franchisee`, or `legacy`
+✓ `$MAF_SUBTREE_PREFIX` correctly set for this environment
+✓ Script paths resolve correctly when using `$MAF_SUBTREE_PREFIX`
+
+### What You MUST NOT Assume About Environment
+
+✗ Scripts are at a fixed path relative to project root
+✗ MAF is always at a specific location
+✗ Current working directory is predictable
+✗ You are in HQ vs franchisee context (must detect via `.maf/context.sh`)
+
+### Environment Detection Examples
+
+```bash
+# ALWAYS source first
+source .maf/context.sh || true
+
+# Then use environment-aware paths
+cd "$PROJECT_ROOT"
+bash "$MAF_SUBTREE_PREFIX/scripts/maf/status/check-subtree-health.sh"
+
+# NOT this (will break in franchisee):
+cd /root/projects/myproject
+bash scripts/maf/status/check-subtree-health.sh  # WRONG PATH
+```
+
+### Layout Types
+
+**HQ Layout:**
+- MAF is the repository itself
+- `$MAF_SUBTREE_PREFIX` is empty string
+- Scripts at `scripts/maf/` from root
+
+**Franchisee Layout:**
+- MAF is a subtree at `maf/`
+- `$MAF_SUBTREE_PREFIX` is `maf`
+- Scripts at `maf/scripts/maf/` from root
+
+**Legacy Layout:**
+- Mixed/undocumented structure
+- Must detect carefully
+- May need manual path resolution
+
+---
+
+## 4. Your Workflow - Step-by-Step Daily Operations
+
+### Session Startup (Do This Every Time)
+
+1. **Source environment context**
+   ```bash
+   source .maf/context.sh || true
+   echo "Running in: $MAF_LAYOUT"
+   echo "Project root: $PROJECT_ROOT"
+   ```
+
+2. **Check Agent Mail inbox**
+   ```bash
+   mcp-agent-mail inbox
+   ```
+
+3. **Check for available beads**
+   ```bash
+   bd ready
+   ```
+
+4. **Claim work**
+   - If bead assigned: acknowledge via Agent Mail
+   - If no assignment: ask Supervisor for work
+
+### Working On a Task
+
+1. **Announce start (Agent Mail)**
+   ```bash
+   mcp-agent-mail send __SUPERVISOR__ "Starting: [BEAD-ID] Task title"
+   ```
+
+2. **Reserve files**
+   ```bash
+   mcp-agent-mail reserve __YOUR_AGENT_NAME__ "path/to/files/**"
+   ```
+
+3. **Update bead status**
+   ```bash
+   bd update __BEAD_ID__ --status in-progress
+   ```
+
+4. **Do the work**
+   - Read task description carefully
+   - Follow project conventions
+   - Run tests frequently
+   - Commit often with clear messages
+
+5. **Quality checks**
+   ```bash
+   # Run health check
+   bash __MAF_SUBTREE_PREFIX__/scripts/maf/status/check-subtree-health.sh
+
+   # Run project tests
+   npm test  # or project equivalent
+
+   # Check for lint errors
+   npm run lint  # or project equivalent
+   ```
+
+6. **Complete and release**
+   ```bash
+   # Mark bead complete
+   bd close __BEAD_ID__ --reason "Completed with tests passing"
+
+   # Release file reservations
+   mcp-agent-mail release __YOUR_AGENT_NAME__ "path/to/files/**"
+
+   # Notify completion
+   mcp-agent-mail send __SUPERVISOR__ "Completed: [BEAD-ID] Task title - Summary of changes"
+   ```
+
+### When Blocked
+
+1. **Document what you tried**
+   ```bash
+   mcp-agent-mail send __SUPERVISOR__ "Blocked: [BEAD-ID] Issue description
+
+   What I tried:
+   - Attempt 1: ... (output)
+   - Attempt 2: ... (output)
+
+   Suggested actions:
+   - Option 1: ...
+   - Option 2: ..."
+   ```
+
+2. **Mark bead as waiting**
+   ```bash
+   bd update __BEAD_ID__ --status waiting
+   ```
+
+3. **Pick up another bead** (if dependencies allow)
+
+---
+
+## 5. Code Quality Standards - Before Committing
+
+**CRITICAL:** Use "fresh eyes" review before any commit.
+
+### The Fresh Eyes Review
+
+Before committing, read your code as if someone else wrote it:
+
+1. **Step away mentally** - Clear your working memory
+2. **Read from top to bottom** - As if seeing it for the first time
+3. **Ask these questions:**
+   - What is this TRYING to do?
+   - What does it ACTUALLY do?
+   - Are there obvious bugs?
+   - Are edge cases handled?
+   - Will this break in production?
+
+### Quality Gate Checklist
+
+Before committing, you MUST:
+
+- [ ] All tests pass (`npm test` or equivalent)
+- [ ] No lint errors (`npm run lint` or equivalent)
+- [ ] Subtree health check passes
+  ```bash
+  bash __MAF_SUBTREE_PREFIX__/scripts/maf/status/check-subtree-health.sh
+  ```
+- [ ] Git checks pass
+  ```bash
+  git diff --check  # whitespace issues
+  ```
+- [ ] Fresh eyes review completed
+- [ ] Bead requirements fully met
+- [ ] Documentation updated (if needed)
+
+### What "Ready to Commit" Means
+
+Your code is ready when:
+1. **It works** - Tests pass, functionality verified
+2. **It's clean** - No lint errors, follows project style
+3. **It's complete** - All requirements addressed
+4. **It's safe** - No obvious bugs, edge cases handled
+5. **It's documented** - Code is self-explanatory or has comments
+
+### When to Ask for Review
+
+Request peer review via Agent Mail when:
+- You're unsure about code quality
+- The change is complex or subtle
+- You're working in unfamiliar code
+- Tests are hard to write
+- You've been working on it too long (fresh eyes needed)
+
+---
+
+## 6. Project-Specific Rules - Customized for __PROJECT_NAME__
+
+### Project Overview
+__PROJECT_DESCRIPTION_PLACEHOLDER__
+
+### Tech Stack
+__TECH_STACK_PLACEHOLDER__
+
+### Development Workflow
+__WORKFLOW_PLACEHOLDER__
+
+### Testing Requirements
+__TESTING_REQUIREMENTS_PLACEHOLDER__
+
+### Code Style
+__CODE_STYLE_PLACEHOLDER__
+
+### File Organization
+__FILE_ORGANIZATION_PLACEHOLDER__
+
+### Common Commands
+__COMMON_COMMANDS_PLACEHOLDER__
+
+---
+
+## 7. Escalation Contacts - Who to Contact When
+
+### Escalation Triggers
+
+**Escalate IMMEDIATELY when:**
+- Requirements are unclear or conflicting
+- You discover a security issue
+- You need access to protected resources
+- You've tried 3 times and still can't proceed
+- You're about to make a breaking change
+- Performance will be significantly impacted
+- Data migration is needed
+
+### Contact Hierarchy
+
+1. **First:** Check Agent Mail - solution may already be documented
+2. **Second:** Contact peer agent via Agent Mail
+3. **Third:** Escalate to Supervisor
+4. **Finally:** Human intervention (for critical issues only)
+
+### Escalation Format
+
+```yaml
+subject: "[LEVEL]: Brief one-line description"
+severity: info | warning | critical
+agent_id: "__YOUR_AGENT_NAME__"
+bead_id: "__BEAD_ID__"
+context:
+  what_i_was_doing: "Description of current work"
+  what_i_tried:
+    - "Attempt 1: Description (output)"
+    - "Attempt 2: Description (output)"
+    - "Attempt 3: Description (output)"
+  error_output: "Full error messages, logs"
+  environment:
+    project: "__PROJECT_NAME__"
+    branch: "git-branch-name"
+    maf_version: "v0.2.x"
+    maf_layout: "__MAF_LAYOUT__"
+suggested_actions:
+  - "Option 1: Description"
+  - "Option 2: Description"
+requesting: "approval | guidance | unblocking | information"
+urgency: "immediate | soon | when-convenient"
+```
+
+### Expected Response Times
+
+- **Critical:** 15 minutes
+- **Warning:** 1 hour
+- **Info:** Next business day
+
+---
+
+## 8. Forbidden Actions - NEVER Do These
+
+### NEVER Delete Files Without Permission
+
+**RULE NUMBER 1:** You are NEVER allowed to delete a file without express permission.
+
+Even files you created yourself. Even test files. You have a permanent ban on determining that files should be deleted.
+
+### NEVER Run Destructive Git Commands
+
+**Absolutely forbidden:**
+- `git reset --hard` (unless explicitly commanded)
+- `git clean -fd` (unless explicitly commanded)
+- `rm -rf` (unless explicitly commanded)
+- Any command that deletes or overwrites code/data
+
+**If you need to clean up:**
+1. Ask for permission first
+2. State exactly what will be affected
+3. Wait for explicit approval
+4. Document the approval
+
+### NEVER Skip Quality Gates
+
+- NEVER commit without tests passing
+- NEVER skip the fresh eyes review
+- NEVER ignore lint errors
+- NEVER bypass health checks
+
+### NEVER Make Assumptions About Environment
+
+- NEVER hardcode paths (use `$MAF_SUBTREE_PREFIX`)
+- NEVER assume current directory
+- NEVER skip sourcing `.maf/context.sh`
+- NEVER guess about HQ vs franchisee layout
+
+### NEVER Work Without Coordination
+
+- NEVER edit files without reserving them
+- NEVER start work without announcing it
+- NEVER complete work without notifying others
+- NEVER ignore Agent Mail messages
+
+### NEVER Break These Rules Without Explicit Instruction
+
+If a human explicitly commands you to do something that violates these rules, AND states they understand the consequences, you may proceed. Otherwise, escalate.
+
+---
+
+## 9. Success Indicators - How to Know You're Doing Well
+
+### Individual Metrics
+
+**You're succeeding when:**
+- Beads are completed within estimated time
+- Code reviews pass on first or second try
+- Tests pass consistently
+- No escalations for unclear reasons
+- Agent Mail is used properly
+
+**Warning signs:**
+- Same bead reopened multiple times
+- Frequent escalations for similar issues
+- Tests failing after commits
+- Other agents complaining about conflicts
+- Working on tasks beyond your autonomy level
+
+### Team Metrics
+
+**The team is succeeding when:**
+- Beads flow steadily through the pipeline
+- No blocking conflicts between agents
+- Agent Mail has useful conversation history
+- Escalations are handled quickly
+- Quality remains high
+
+### Quality Indicators
+
+**Code quality is good when:**
+- Test coverage is maintained or improved
+- Linter errors are caught and fixed
+- Fresh eyes reviews catch issues before commits
+- Bead requirements are fully met
+- Documentation is updated
+
+**Process quality is good when:**
+- Environment is detected correctly every time
+- Paths work in all layouts (HQ, franchisee, legacy)
+- Agent Mail threads are clear and searchable
+- Bead dependencies are respected
+- Escalations include proper context
+
+---
+
+## 10. Quick Reference - Common Commands
+
+### Environment Setup
+
+```bash
+# ALWAYS start with this
+source .maf/context.sh || true
+
+# Verify environment
+echo "Layout: $MAF_LAYOUT"
+echo "Prefix: $MAF_SUBTREE_PREFIX"
+echo "Root: $PROJECT_ROOT"
+```
+
+### Agent Mail
+
+```bash
+# Check inbox
+mcp-agent-mail inbox
+
+# Send message
+mcp-agent-mail send __AGENT__ "Subject: [TASK-ID] Message"
+
+# Reserve files
+mcp-agent-mail reserve __YOUR_AGENT_NAME__ "path/**"
+
+# Release files
+mcp-agent-mail release __YOUR_AGENT_NAME__ "path/**"
+```
+
+### Beads
+
+```bash
+# Find ready work
+bd ready
+
+# Claim bead
+bd assign __BEAD_ID__ __YOUR_AGENT_NAME__
+
+# Update status
+bd update __BEAD_ID__ --status in-progress
+
+# Complete bead
+bd close __BEAD_ID__ --reason "Completed"
+
+# Check blockers
+bd blockers __BEAD_ID__
+```
+
+### Quality Checks
+
+```bash
+# Subtree health
+bash __MAF_SUBTREE_PREFIX__/scripts/maf/status/check-subtree-health.sh
+
+# Run tests
+npm test  # or project equivalent
+
+# Lint check
+npm run lint  # or project equivalent
+
+# Git whitespace check
+git diff --check
+```
+
+### Git Workflow
+
+```bash
+# Commit with proper message
+git add files
+git commit -m "[__BEAD_ID__] Brief description
+
+- Detailed change 1
+- Detailed change 2
+
+Fixes: __BEAD_ID__"
+
+# Push to remote
+git pull --rebase
+git push
+```
+
+### Debugging
+
+```bash
+# Check environment
+source .maf/context.sh
+env | grep MAF
+
+# Check Agent Mail status
+mcp-agent-mail status
+
+# Check bead status
+bd status __BEAD_ID__
+
+# Check git status
+git status
+git log -1
+```
+
+### Emergency
+
+```bash
+# Escalate immediately
+mcp-agent-mail send __SUPERVISOR__ "CRITICAL: [BEAD-ID] Issue description
+
+What I tried:
+- ...
+
+Error output:
+- ..."
+
+# Mark bead as waiting
+bd update __BEAD_ID__ --status waiting
+
+# Release reservations
+mcp-agent-mail release __YOUR_AGENT_NAME__ --all
+```
+
+---
+
+## Appendix: Autonomy Levels
+
+### Level 1: Full Autopilot (No Human Required)
+
+Single-file edits under 50 lines, matching existing patterns, obvious bug fixes.
+
+**Examples:**
+- Adding docstrings
+- Renaming variables
+- Extracting functions (same file)
+- Fixing typos
+- Adding tests for existing code
+
+**Process:** Make change → Run tests → Commit
+
+### Level 2: Autopilot with Validation (Ask Only If Validation Fails)
+
+Multi-file changes (2-3 related files), API modifications, config changes.
+
+**Examples:**
+- Cross-file refactoring
+- Adding function parameters with defaults
+- Updating dependencies
+- Config file changes
+
+**Process:** Make changes → Run all tests → Check breaking changes → If passes: commit; If fails: escalate
+
+### Level 3: Human Approval Required
+
+Architecture changes, breaking changes, security changes, data migrations.
+
+**Examples:**
+- New patterns or frameworks
+- API changes without backward compatibility
+- Authentication/authorization changes
+- Database schema changes
+
+**Process:** Document proposal → Escalate for approval → Wait for approval → Implement
+
+---
+
+**This document is your contract. Read it, follow it, escalate when you're unsure.**
+
+**When in doubt:**
+1. Check this document
+2. Check Agent Mail for similar situations
+3. Ask a peer agent
+4. Escalate to Supervisor
+
+**You've got this. Now go build something great.** 🚀

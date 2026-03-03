@@ -1,0 +1,30 @@
+{
+  "topology_name": "Test Topology for Workflow Hooks",
+  "description": "Minimal test topology with 4 panes for workflow hook testing",
+  "panes": [
+    {
+      "index": 0,
+      "role": "supervisor",
+      "agent_name": "TestSupervisor",
+      "mail_name": "TestSupervisorMail"
+    },
+    {
+      "index": 1,
+      "role": "reviewer",
+      "agent_name": "TestReviewer",
+      "mail_name": "TestReviewerMail"
+    },
+    {
+      "index": 2,
+      "role": "implementer-1",
+      "agent_name": "TestImplementer1",
+      "mail_name": "TestImplementer1Mail"
+    },
+    {
+      "index": 3,
+      "role": "implementer-2",
+      "agent_name": "TestImplementer2",
+      "mail_name": "TestImplementer2Mail"
+    }
+  ]
+}

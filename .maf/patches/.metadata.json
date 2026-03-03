@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-01-09T00:00:00Z",
+  "vendors": {
+    "vendor-agent-mail": {
+      "name": "agent-mail",
+      "repo": "https://github.com/Dicklesworthstone/mcp_agent_mail",
+      "branch": "main",
+      "patches": []
+    },
+    "vendor-superpowers": {
+      "name": "superpowers",
+      "repo": "https://github.com/obra/superpowers",
+      "branch": "main",
+      "patches": []
+    }
+  }
+}

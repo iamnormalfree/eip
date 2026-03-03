@@ -1,0 +1,45 @@
+#!/bin/bash
+# ABOUTME: Agent identity loader - injects agent persona into Claude session
+# ABOUTME: Called by rebuild-maf-cli-agents.sh to start Claude with agent identity
+
+set -euo pipefail
+
+# Agent identity passed from rebuild script
+AGENT_NAME="${1:-}"
+AGENT_PROMPT_FILE="${2:-}"
+shift 2
+# Remaining arguments are the Claude command
+
+# Auto-detect PROJECT_ROOT using project-root-utils
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/project-root-utils.sh"
+
+# Colors for output
+CYAN='\033[1;36m'
+NC='\033[0m'
+
+if [[ -n "$AGENT_PROMPT_FILE" && -f "$AGENT_PROMPT_FILE" ]]; then
+    # Display agent identity header
+    echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
+    echo -e "${CYAN}  Agent: ${AGENT_NAME}${NC}"
+    echo -e "${CYAN}  Identity loaded from: $(basename "$AGENT_PROMPT_FILE")${NC}"
+    echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
+    echo ""
+    echo "Type '/identity' at any time to reload your agent prompt."
+    echo ""
+
+    # Export for Claude to access
+    export AGENT_NAME="$AGENT_NAME"
+    export AGENT_PROMPT_FILE="$AGENT_PROMPT_FILE"
+
+    # Store in a file Claude can read
+    cat > "$PROJECT_ROOT/.maf/agents/current-identity.txt" << EOF
+Agent Identity: ${AGENT_NAME}
+Prompt File: ${AGENT_PROMPT_FILE}
+
+$(cat "$AGENT_PROMPT_FILE")
+EOF
+fi
+
+# Start Claude with the agent's original command
+exec "$@"

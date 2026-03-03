@@ -1,0 +1,27 @@
+# MAF Managed Directory
+
+This directory contains files managed by MAF (Multi-Agent Framework).
+
+## File Ownership
+
+Files **without** `.maf-manifest.json` entries are **franchisee-owned** and will never be touched by MAF updates.
+
+Files **with** `.maf-manifest.json` entries are **MAF-managed**:
+- `maf_owned: true` + `franchisee_can_modify: false` = MAF controls, updates overwrite
+- `maf_owned: true` + `franchisee_can_modify: true` = MAF manages, but franchisee can customize (merge-safe)
+
+## Adding Your Own Files
+
+Simply add files to this directory. They will **not** be tracked by MAF unless you explicitly add them to `.maf-manifest.json`.
+
+## Safe Customization
+
+To customize MAF files safely:
+1. Copy the file to a new name (e.g., `response-awareness-custom.md`)
+2. Modify your copy
+3. Your custom file is franchisee-owned and will never be touched
+
+## See Also
+
+- `scripts/maf/merge-claude.sh` - Merge logic
+- `scripts/maf/health-check.sh` - Health validation

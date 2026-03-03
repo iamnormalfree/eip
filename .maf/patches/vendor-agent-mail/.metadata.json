@@ -1,0 +1,6 @@
+{
+  "vendor": "agent-mail",
+  "vendor_repo": "https://github.com/Dicklesworthstone/mcp_agent_mail",
+  "vendor_branch": "main",
+  "patches": []
+}
