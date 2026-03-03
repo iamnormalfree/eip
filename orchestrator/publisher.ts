@@ -10,7 +10,7 @@ type PublishInput = {
   draft: string;
   ip: string;
   audit: {
-    tags: Array<{ tag: string; severity: string }>;
+    tags: Array<{ tag: string; severity: 'error' | 'warning' | 'info' }>;
     overall_score?: number;
     content_analysis?: any;
     pattern_analysis?: any;

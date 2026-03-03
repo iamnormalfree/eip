@@ -34,6 +34,12 @@ import {
   updateErrorRate
 } from './monitoring';
 
+/**
+ * Queue Strict Mode Configuration
+ * When EIP_QUEUE_STRICT=true, queue failures will fail-fast instead of falling back to direct execution
+ */
+const isQueueStrict = (): boolean => process.env.EIP_QUEUE_STRICT === 'true';
+
 type Brief = {
   brief: string;
   persona?: string;
@@ -176,6 +182,17 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
         queue_error: queueResult.error
       });
 
+      // STRICT MODE: Fail fast, no fallback to direct execution
+      if (isQueueStrict()) {
+        endCorrelation(correlationId);
+        recordQueueOperation('submit', 'strict_failure');
+        return {
+          success: false,
+          error: `Queue submission failed (strict mode): ${queueResult.error}`,
+          queue_job_id: undefined
+        };
+      }
+
       // Fallback to direct execution if queue submission fails (unless in test mode)
       const isTestMode = process.env.EIP_TEST_MODE === "steel_thread";
       if (isTestMode) {
@@ -187,7 +204,7 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
           queue_job_id: undefined
         };
       }
-      
+
       getLogger().info("Queue submission failed, falling back to direct execution", {
         correlationId,
         event: "fallback_to_direct"
@@ -203,6 +220,17 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
       error_type: error instanceof Error ? error.constructor.name : 'Unknown'
     });
 
+    // STRICT MODE: Fail fast, no fallback to direct execution
+    if (isQueueStrict()) {
+      endCorrelation(correlationId);
+      recordQueueOperation('process', 'strict_failure');
+      return {
+        success: false,
+        error: `Queue processing failed (strict mode): ${error instanceof Error ? error.message : "Unknown error"}`,
+        queue_job_id: undefined
+      };
+    }
+
     // Fallback to direct execution on queue processing exceptions (unless in test mode)
     const isTestMode = process.env.EIP_TEST_MODE === "steel_thread";
     if (isTestMode) {
@@ -214,7 +242,7 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
         queue_job_id: undefined
       };
     }
-    
+
     getLogger().info("Queue processing failed, falling back to direct execution", {
       correlationId,
       event: "fallback_to_direct",
