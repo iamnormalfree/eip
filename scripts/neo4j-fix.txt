@@ -1,0 +1,3 @@
+// In the initializeNeo4jDriver function, replace the auth call
+const authMethod = neo4j.auth && neo4j.auth.basic ? neo4j.auth.basic : (user: string, pass: string) => ({ user, pass });
+const driver = neo4j.driver(neo4jUri, authMethod(neo4jUser, neo4jPassword));

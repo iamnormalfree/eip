@@ -409,7 +409,7 @@ EIP Steel Thread Test Report:
 Total Tests: ${totalTests}
 Passed: ${passedTests}
 Failed: ${failedTests}
-Success Rate: ${((passedTests / totalTests) * 100).toFixed(1)}%
+Success Rate: ${Math.round((passedTests / totalTests) * 100)}%
 Average Duration: ${avgDuration.toFixed(0)}ms
 
 Failed Tests:

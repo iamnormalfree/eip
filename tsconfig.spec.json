@@ -16,12 +16,14 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "types": ["jest", "@testing-library/jest-dom", "node"],
+    "types": ["jest", "@testing-library/jest-dom", "@types/jest-dom", "node"],
     "strict": false,
     "noImplicitAny": false,
     "strictNullChecks": false,
     "forceConsistentCasingInFileNames": true,
-    "moduleDetection": "force"
+    "moduleDetection": "force",
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["./node_modules/@types", "./types"]
   },
   "include": [
     "**/*.test.ts",
@@ -31,9 +33,6 @@
     "tests/**/*",
     "jest.setup.js",
     "tests/setup/**/*"
-  ],
-  "files": [
-    "types/jest.d.ts"
   ],
   "exclude": [
     "node_modules",

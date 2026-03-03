@@ -1,0 +1,28 @@
+// Legacy main function for direct script execution
+async function main() {
+  console.log('Mirror to Neo4j: starting implementation...');
+  
+  try {
+    const result = await mirrorSupabaseToNeo4j();
+    console.log('Mirror operation completed:', {
+      success: result.success,
+      nodesCreated: result.nodesCreated,
+      edgesCreated: result.edgesCreated,
+      duration: result.performance.duration + 'ms',
+      warnings: result.warnings?.length || 0
+    });
+    
+    if (!result.success) {
+      console.error('Operation failed:', result.error);
+      process.exit(1);
+    }
+  } catch (error) {
+    console.error('Mirror failed:', error);
+    process.exit(1);
+  }
+}
+
+// Only run main if this file is executed directly
+if (require.main === module) {
+  main();
+}

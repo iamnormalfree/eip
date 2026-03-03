@@ -1,0 +1,46 @@
+--- a/mirror-to-neo4j.ts
++++ b/mirror-to-neo4j.ts
+@@ -72,6 +72,7 @@ export async function mirrorSupabaseToNeo4j(
+   let batchCount = 0;
+   let nodesProcessed = 0;
+   let hasErrors = false;
++  let errorMessages: string[] = [];
+   const warnings: string[] = [];
+   
+   // Track if we created the drivers to manage cleanup properly
+@@ -85,10 +86,12 @@ export async function mirrorSupabaseToNeo4j(
+       } catch (error) {
+         const errorMessage = error instanceof Error ? error.message : String(error);
+         if (!isTestEnvironment()) {
++          errorMessages.push(errorMessage);
+           throw new Error('Neo4j client not provided and environment variables missing');
+         } else {
+           // In test environment, continue without Neo4j to test error handling
+           hasErrors = true;
++          errorMessages.push(errorMessage);
+           warnings.push('Neo4j connection failed: ' + errorMessage);
+         }
+       }
+@@ -101,10 +104,12 @@ export async function mirrorSupabaseToNeo4j(
+       } catch (error) {
+         const errorMessage = error instanceof Error ? error.message : String(error);
+         if (!isTestEnvironment()) {
++          errorMessages.push(errorMessage);
+           throw new Error('Supabase client not provided and environment variables missing');
+         } else {
+           // In test environment, continue without Supabase to test error handling
+           hasErrors = true;
++          errorMessages.push(errorMessage);
+           warnings.push('Supabase connection failed: ' + errorMessage);
+         }
+       }
+@@ -287,7 +292,8 @@ export async function mirrorSupabaseToNeo4j(
+       },
+       nextCursor: maxTimestamp.toISOString(),
+       ...(warnings.length > 0 && { warnings }),
+-      ...(errorMessages.length > 0 && { error: errorMessages.join('; ') })
++      ...(errorMessages.length > 0 && { error: errorMessages.join('; ') }),
++      ...(hasErrors && !errorMessages.length && { error: 'Unknown error occurred' })
+     };
+     
+   } catch (error) {

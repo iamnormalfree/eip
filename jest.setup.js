@@ -3,6 +3,9 @@
  * Provides proper storage mocking and environment configuration
  */
 
+// Import Jest DOM matchers
+require('@testing-library/jest-dom');
+
 // Storage mock factory
 const createStorageMock = () => {
   const store = new Map();

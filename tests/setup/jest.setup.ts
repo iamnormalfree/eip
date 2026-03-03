@@ -4,10 +4,7 @@
 // Import Jest globals for setup files
 import '@jest/globals';
 
-// Import global Jest DOM type overrides
-import '../../types/jest.d.ts';
-
-// Extend Jest matchers with testing-library matchers
+// Extend Jest matchers with testing-library matchers - CRITICAL LINE
 import '@testing-library/jest-dom';
 
 // Import MockFactory setup for centralized mock management

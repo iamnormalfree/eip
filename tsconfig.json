@@ -18,7 +18,6 @@
     "incremental": true,
     "noImplicitReturns": false,
     "noImplicitThis": false,
-    "suppressImplicitAnyIndexErrors": true,
     "plugins": [
       {
         "name": "next"

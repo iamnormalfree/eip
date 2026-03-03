@@ -68,11 +68,11 @@
     ]
   },
   "env": {
-    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
-    "ANTHROPIC_AUTH_TOKEN": "15267ec2640844bb82f29e0b1be881aa.TPV6V17gFDjquEfC",
+    "ANTHROPIC_BASE_URL": "https://api.minimax.io/anthropic",
     "API_TIMEOUT_MS": "3000000",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.5-air",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.6",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-4.6"
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "MiniMax-M2.5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "MiniMax-M2.5",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "MiniMax-M2.5",
+    "ANTHROPIC_API_KEY": "sk-cp-nz4UfbVZL66ObsH50zgd9-_TuE_zFoqwiSH4LMagD3uMkXsP3xvV5AwLENh6OHobUh4jWSlCMUcz2jInDIcyD2bpTtz2wlfpfBIK40U17ON-OBIF9CZLXYc"
   }
 }

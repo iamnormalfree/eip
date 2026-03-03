@@ -13,13 +13,29 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabaseAdmin();
     const body = await request.json();
 
-    const { artifactId, action, feedback } = body;
+    const { artifactId, action, feedback, rubricScores } = body;
 
     if (!artifactId || !action || !['approve', 'reject'].includes(action)) {
       return NextResponse.json(
         { error: 'Missing required fields: artifactId and action (approve/reject)' },
         { status: 400 }
       );
+    }
+
+    // Validate rubric scores if provided
+    if (rubricScores) {
+      const { tone, novelty, strategic_alignment, compliance_risk } = rubricScores;
+      if (
+        typeof tone !== 'number' || tone < 1 || tone > 5 ||
+        typeof novelty !== 'number' || novelty < 1 || novelty > 5 ||
+        typeof strategic_alignment !== 'number' || strategic_alignment < 1 || strategic_alignment > 5 ||
+        !['low', 'medium', 'high'].includes(compliance_risk)
+      ) {
+        return NextResponse.json(
+          { error: 'Invalid rubric scores: tone, novelty, and strategic_alignment must be 1-5, compliance_risk must be low/medium/high' },
+          { status: 400 }
+        );
+      }
     }
 
     // Update artifact status
@@ -52,6 +68,7 @@ export async function POST(request: NextRequest) {
           action,
           feedback,
           reviewer_timestamp: new Date().toISOString(),
+          rubric_scores: rubricScores || null,
           artifact_metadata: {
             frontmatter: artifact.frontmatter,
             ledger: artifact.ledger
@@ -78,7 +95,8 @@ export async function POST(request: NextRequest) {
       success: true,
       artifactId,
       action,
-      status: newStatus
+      status: newStatus,
+      rubricScoresStored: !!rubricScores
     });
 
   } catch (error) {

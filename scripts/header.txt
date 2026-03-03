@@ -1,0 +1,36 @@
+// ABOUTME: Neo4j mirror implementation - TDD approach
+// ABOUTME: Implements mirrorSupabaseToNeo4j with node creation, edge relationships, and incremental updates
+
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import neo4j, { Driver, Session, Record, Integer } from 'neo4j-driver';
+import * as dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
+
+export interface MirrorOptions {
+  since?: string;
+  graphSparse?: boolean;
+}
+
+export interface MirrorResult {
+  success: boolean;
+  nodesCreated: number;
+  edgesCreated: number;
+  flags: {
+    graphSparse: boolean;
+    incrementalMode: boolean;
+    hasErrors: boolean;
+  };
+  performance: {
+    duration: number;
+    batchCount: number;
+    nodesProcessed: number;
+  };
+  nextCursor: string;
+  error?: string;
+  warnings?: string[];
+}
+
+// Batch size for processing
+const BATCH_SIZE = 100;
