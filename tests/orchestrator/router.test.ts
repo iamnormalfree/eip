@@ -126,6 +126,29 @@ describe('IP Routing System - Real Implementation Tests', () => {
         });
       }
     });
+
+    it('should prioritize IM v2 framework for explicit internal-methodology intent', async () => {
+      const result = await routeToIP({
+        query: 'internal methodology for sprint planning and team operating system',
+        persona: 'professional',
+        funnel: 'mofu'
+      });
+
+      expect(result.selected_ip).toBe('imv2_framework@1.0.0');
+      expect(result.reasoning.primary_indicators).toContain('imv2_intent_match');
+      expect(result.confidence).toBeGreaterThanOrEqual(0.9);
+    });
+
+    it('should prioritize IM v2 loop debug for explicit debugging intent', async () => {
+      const result = await routeToIP({
+        query: 'loop debug root cause and troubleshooting steps',
+        persona: 'practitioner',
+        funnel: 'bottom'
+      });
+
+      expect(result.selected_ip).toBe('imv2_loop_debug@1.0.0');
+      expect(result.reasoning.primary_indicators).toContain('imv2_intent_match');
+    });
   });
 
   describe('Legacy routeIP Function Tests', () => {

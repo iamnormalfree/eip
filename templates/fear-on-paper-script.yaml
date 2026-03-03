@@ -1,0 +1,36 @@
+id: fear-on-paper-script
+version: 1.0.0
+name: Fear on Paper Script
+description: Video script template for Fear on Paper content
+type: script
+
+structure:
+  intro:
+    hook: "What if everything you believed about [TOPIC] was wrong?"
+    setup: "Most people assume [COMMON_BELIEF], but the reality is completely different."
+    thesis: "Today I'm going to show you why [COUNTER_INTUITIVE_TRUTH]"
+
+  body:
+    - section: The Fear Setup
+      content: "Here's what Scary Thing X means for you..."
+      emotional_lever: fear
+    - section: Evidence Build
+      content: "Here's the data that proves it..."
+      emotional_lever: urgency
+    - section: The Alternative
+      content: "But there's a way to protect yourself..."
+      emotional_lever: hope
+    - section: Call to Action
+      content: "Here's what you need to do next..."
+      emotional_lever: agency
+
+  outro:
+    summary: "The bottom line: [KEY_TAKEAWAY]"
+    cta: "If you want to learn more about protecting yourself, click the link below."
+
+variables:
+  - TOPIC
+  - COMMON_BELIEF
+  - COUNTER_INTUITIVE_TRUTH
+  - SCARY_THING_X
+  - KEY_TAKEAWAY

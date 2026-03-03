@@ -1,0 +1,24 @@
+id: imv2_loop_debug
+version: 1.0.0
+purpose: "Debugging methodology - systematic approach to identifying and resolving technical issues"
+operators:
+  - name: ISSUE_REPRODUCE
+    spec: "Establish clear steps to reproduce the issue consistently"
+  - name: ROOT_CAUSE_ANALYSIS
+    spec: "Use systematic elimination to identify the true root cause"
+  - name: SOLUTION_VALIDATE
+    spec: "Verify solution fixes the issue without introducing regressions"
+  - name: PREVENTION_STRATEGY
+    spec: "Document lessons learned and prevention measures"
+invariants:
+  - "Must include reproducible test case"
+  - "Must include root cause analysis"
+  - "Must include validation steps"
+sections:
+  - Problem Statement
+  - Reproduction Steps
+  - Root Cause Analysis
+  - Solution
+  - Validation
+  - Prevention
+  - Lessons Learned

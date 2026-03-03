@@ -21,6 +21,53 @@ interface IPMapping {
   use_cases: string[];
 }
 
+function selectIMv2ByIntent(brief: string, persona: string): string | null {
+  const normalizedBrief = brief.toLowerCase();
+  const normalizedPersona = persona.toLowerCase();
+
+  const founderSignals = [
+    'founder translation',
+    'translate founder',
+    'strategy translation',
+    'vision communication',
+    'team alignment'
+  ];
+  const debugSignals = [
+    'loop debug',
+    'debug',
+    'troubleshoot',
+    'root cause',
+    'issue resolution',
+    'reproduce'
+  ];
+  const frameworkSignals = [
+    'internal methodology',
+    'internal method',
+    'operating system',
+    'team process',
+    'fear on paper',
+    'imv2'
+  ];
+
+  if (
+    founderSignals.some((signal) => normalizedBrief.includes(signal)) ||
+    (normalizedBrief.includes('founder') &&
+      ['leader', 'manager', 'founder'].includes(normalizedPersona))
+  ) {
+    return 'imv2_founder_translation@1.0.0';
+  }
+
+  if (debugSignals.some((signal) => normalizedBrief.includes(signal))) {
+    return 'imv2_loop_debug@1.0.0';
+  }
+
+  if (frameworkSignals.some((signal) => normalizedBrief.includes(signal))) {
+    return 'imv2_framework@1.0.0';
+  }
+
+  return null;
+}
+
 // Router versioning and metadata
 export const ROUTER_VERSION = '1.0.0';
 export const ROUTER_LAST_UPDATED = '2025-11-15';
@@ -76,6 +123,37 @@ const IP_REGISTRY: Record<string, IPMapping> = {
     invariants: ['has_concept', 'has_examples', 'has_clarification'],
     complexity_score: 0.4,
     use_cases: ['concept_explanation', 'learning_content', 'knowledge_transfer']
+  },
+  // IM v2 IPs (Internal Methodologies)
+  'imv2_framework@1.0.0': {
+    id: 'imv2_framework@1.0.0',
+    name: 'IM v2 Framework',
+    funnels: ['mofu', 'mid'],
+    personas: ['learner', 'professional'],
+    keywords: ['imv2', 'internal', 'method', 'methodology'],
+    invariants: ['has_overview', 'has_objectives', 'has_implementation'],
+    complexity_score: 0.7,
+    use_cases: ['internal_methodology', 'team_process', 'operational_guide']
+  },
+  'imv2_loop_debug@1.0.0': {
+    id: 'imv2_loop_debug@1.0.0',
+    name: 'IM v2 Loop Debug',
+    funnels: ['bofu', 'bottom'],
+    personas: ['practitioner', 'implementer'],
+    keywords: ['imv2', 'debug', 'troubleshoot', 'fix', 'issue'],
+    invariants: ['has_reproduction', 'has_root_cause', 'has_validation'],
+    complexity_score: 0.6,
+    use_cases: ['debugging_guide', 'troubleshooting', 'issue_resolution']
+  },
+  'imv2_founder_translation@1.0.0': {
+    id: 'imv2_founder_translation@1.0.0',
+    name: 'IM v2 Founder Translation',
+    funnels: ['mofu', 'mid', 'consideration'],
+    personas: ['leader', 'manager'],
+    keywords: ['imv2', 'founder', 'vision', 'strategy', 'translation'],
+    invariants: ['has_vision', 'has_objectives', 'has_metrics'],
+    complexity_score: 0.8,
+    use_cases: ['strategy_translation', 'vision_communication', 'team_alignment']
   }
 };
 
@@ -115,8 +193,17 @@ export async function routeToIP(input: RouterInput): Promise<{
   };
   const alternatives: string[] = [];
 
+  const imv2Selection = selectIMv2ByIntent(brief, persona);
+  if (imv2Selection) {
+    selectedIP = imv2Selection;
+    confidence = 0.92;
+    reasoning.primary_indicators.push('imv2_intent_match');
+    reasoning.scenario_fit = 0.95;
+    console.log('Router: Selected IMv2 IP by explicit intent:', imv2Selection);
+  }
+
   // Primary routing by funnel
-  if (funnel) {
+  if (!imv2Selection && funnel) {
     for (const [ipId, mapping] of Object.entries(IP_REGISTRY)) {
       if (mapping.funnels.includes(funnel)) {
         // Check persona compatibility if specified
@@ -142,7 +229,7 @@ export async function routeToIP(input: RouterInput): Promise<{
   }
 
   // Secondary routing by persona if no funnel match
-  if (confidence < 0.8 && persona) {
+  if (!imv2Selection && confidence < 0.8 && persona) {
     for (const [ipId, mapping] of Object.entries(IP_REGISTRY)) {
       if (mapping.personas.includes(persona)) {
         selectedIP = ipId;
@@ -156,7 +243,7 @@ export async function routeToIP(input: RouterInput): Promise<{
   }
 
   // Tertiary routing by brief content keywords
-  if (confidence < 0.8 && brief) {
+  if (!imv2Selection && confidence < 0.8 && brief) {
     for (const [ipId, mapping] of Object.entries(IP_REGISTRY)) {
       for (const keyword of mapping.keywords) {
         if (brief.includes(keyword)) {
@@ -256,9 +343,15 @@ export function routeIP(input: RouterInput): string {
   // Use the new routeToIP but return just the IP string for compatibility
   const funnel = (input.funnel || '').toLowerCase().trim();
   const persona = (input.persona || '').toLowerCase().trim();
-  const brief = (input.brief || '').toLowerCase();
+  const brief = (input.brief || input.query || '').toLowerCase();
   
   console.log('Router: Determining IP for', { funnel, persona, brief_length: brief.length });
+
+  const imv2Selection = selectIMv2ByIntent(brief, persona);
+  if (imv2Selection) {
+    console.log('Router: Selected IMv2 IP by explicit intent:', imv2Selection);
+    return imv2Selection;
+  }
 
   // Primary routing by funnel
   if (funnel) {

@@ -1,6 +1,10 @@
 // ABOUTME: Template renderer for EIP system using simple template processing
 // ABOUTME: Supports basic template rendering, validation, compilation, and content formatting
 
+import fs from 'node:fs';
+import path from 'node:path';
+import { parse } from 'yaml';
+
 export interface TemplateData {
   [key: string]: any;
 }
@@ -15,6 +19,13 @@ export interface CompiledTemplate {
 }
 
 export class TemplateRenderer {
+  private readonly fearOnPaperTemplates = new Set([
+    'fear-on-paper-script.yaml',
+    'fear-on-paper-shorts.yaml',
+    'fear-on-paper-email.yaml',
+    'fear-on-paper-cta-safe.yaml',
+  ]);
+
   /**
    * Render template with data
    */
@@ -281,6 +292,68 @@ export class TemplateRenderer {
     ];
 
     return complexPatterns.some(pattern => pattern.test(template));
+  }
+
+  /**
+   * Deterministically resolve Fear-on-Paper template by explicit request or content intent.
+   */
+  resolveFearOnPaperTemplate(input: {
+    requestedTemplate?: string;
+    ip?: string;
+    brief?: string;
+  }): string | null {
+    const requestedTemplate = (input.requestedTemplate || '').trim().toLowerCase();
+    const ip = (input.ip || '').toLowerCase();
+    const brief = (input.brief || '').toLowerCase();
+
+    if (requestedTemplate) {
+      const normalized = requestedTemplate.endsWith('.yaml')
+        ? requestedTemplate
+        : `${requestedTemplate}.yaml`;
+      if (this.fearOnPaperTemplates.has(normalized)) {
+        return normalized;
+      }
+    }
+
+    const hasShortsIntent = /shorts|tiktok|reels?|short[- ]form/.test(brief);
+    const hasEmailIntent = /newsletter|email|subject line/.test(brief);
+    const hasCtaIntent = /call to action|cta/.test(brief);
+    const isImv2Content = ip.startsWith('imv2_');
+
+    if (hasShortsIntent) return 'fear-on-paper-shorts.yaml';
+    if (hasEmailIntent) return 'fear-on-paper-email.yaml';
+    if (hasCtaIntent) return 'fear-on-paper-cta-safe.yaml';
+    if (isImv2Content || brief.includes('fear on paper')) return 'fear-on-paper-script.yaml';
+    return null;
+  }
+
+  /**
+   * Load Fear-on-Paper template YAML from repository templates directory.
+   */
+  loadFearOnPaperTemplate(templateFileName: string): {
+    success: boolean;
+    template?: TemplateData;
+    error?: string;
+  } {
+    if (!this.fearOnPaperTemplates.has(templateFileName)) {
+      return { success: false, error: `Unsupported Fear-on-Paper template: ${templateFileName}` };
+    }
+
+    try {
+      const templatePath = path.join(process.cwd(), 'templates', templateFileName);
+      if (!fs.existsSync(templatePath)) {
+        return { success: false, error: `Template file not found: ${templatePath}` };
+      }
+
+      const raw = fs.readFileSync(templatePath, 'utf8');
+      const template = parse(raw) as TemplateData;
+      return { success: true, template };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown template loading error'
+      };
+    }
   }
 }
 

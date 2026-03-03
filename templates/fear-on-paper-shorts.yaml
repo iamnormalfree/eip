@@ -1,0 +1,28 @@
+id: fear-on-paper-shorts
+version: 1.0.0
+name: Fear on Paper Shorts
+description: Short-form video template for Fear on Paper content (YouTube Shorts, TikTok)
+type: shorts
+
+structure:
+  hook:
+    text: "POV: You just learned [SCARY_FACT] about [TOPIC]"
+    duration: "0-3 seconds"
+
+  setup:
+    text: "Everyone thinks [COMMON_BELIEF], but actually..."
+    duration: "3-10 seconds"
+
+  reveal:
+    text: "[COUNTER_INTUITIVE_TRUTH]"
+    duration: "10-25 seconds"
+
+  cta:
+    text: "Follow for more [TOPIC] secrets"
+    duration: "25-30 seconds"
+
+variables:
+  - TOPIC
+  - SCARY_FACT
+  - COMMON_BELIEF
+  - COUNTER_INTUITIVE_TRUTH

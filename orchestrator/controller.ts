@@ -8,6 +8,7 @@ import { parallelRetrieve } from './retrieval';
 import { microAudit } from './auditor';
 import { repairDraft } from './repairer';
 import { publishArtifact } from './publisher';
+import { evaluateHitlGates } from './hitl-gates';
 import { isLegacyCompat } from '../lib_supabase/utils/compat';
 import { submitContentGenerationJob } from '../lib_supabase/queue/eip-queue';
 import {
@@ -555,13 +556,32 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
       }
     });
 
+    const hitlDecision = evaluateHitlGates({
+      tags: finalAudit.tags,
+      overall_score: finalAudit.overall_score,
+      compliance_analysis: finalAudit.compliance_analysis,
+      invariants_failed: artifact.ledger?.ip_invariants?.failed?.length || 0
+    });
+
+    const reviewStatus = hitlDecision.needs_human_review ? 'pending_review' : 'auto_approved';
+    artifact.ledger = {
+      ...artifact.ledger,
+      provenance: {
+        ...artifact.ledger?.provenance,
+        humanReviewRequired: hitlDecision.needs_human_review,
+        review_status: hitlDecision.needs_human_review ? 'pending' : 'auto_approved'
+      },
+      hitl: hitlDecision
+    };
+
     const publishDuration = Date.now() - publishStartTime;
     logStageComplete(correlationId, 'review', {
       stageDuration: publishDuration,
       tokensUsed: 0, // Publishing doesn't consume additional budget
       budgetRemaining: 0,
       artifactCreated: true,
-      artifactType: artifact.jsonld['@type'] || 'Article'
+      artifactType: artifact.jsonld['@type'] || 'Article',
+      needsHumanReview: hitlDecision.needs_human_review
     });
 
     // Create artifact record (if database available)
@@ -626,12 +646,15 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
     if (db) {
       try {
         await db.updateJob(jobId, {
-          stage: 'completed',
+          stage: hitlDecision.needs_human_review ? 'pending_review' : 'completed',
           outputs: {
             artifact_id: savedArtifact?.id,
             ip,
             tags: finalAudit.tags,
-            jsonld_type: artifact.jsonld['@type'] || 'Article'
+            jsonld_type: artifact.jsonld['@type'] || 'Article',
+            review_status: reviewStatus,
+            needs_human_review: hitlDecision.needs_human_review,
+            review_reasons: hitlDecision.review_reasons
           },
           tokens: tracker.tokens_used,
           duration_ms: totalDuration,
@@ -670,6 +693,9 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
 
     endCorrelation(correlationId);
 
+    // Record successful pipeline completion for monitoring.
+    recordPipelineCompletion(tier, 'direct_execution', 'success', totalDuration, tracker.tokens_used);
+
     return {
       success: true,
       artifact: {
@@ -686,9 +712,6 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
         }
       }
     };
-
-    // Record successful pipeline completion for monitoring
-    recordPipelineCompletion(tier, 'direct_execution', 'success', totalDuration, tracker.tokens_used);
 
   } catch (error) {
     const errorObj = error instanceof Error ? error : new Error('Unknown error');

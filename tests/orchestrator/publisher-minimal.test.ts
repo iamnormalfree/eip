@@ -1,20 +1,19 @@
 // ABOUTME: Minimal Publisher test demonstrating proper interface alignment
 // ABOUTME: Validates publishArtifact function with correct PublishInput/PublishResult types
 
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach } from '@jest/globals';
 
-// Import the actual types from the production module
 import type { PublishResult } from '../../orchestrator/publisher';
 
-describe('Publisher Interface Alignment', () => {
-  // Mock the actual publisher module with correct exports
-  jest.mock('../../orchestrator/publisher', () => ({
-    publishArtifact: jest.fn(),
-    MDXRenderer: jest.fn().mockImplementation(() => ({
-      render: jest.fn()
-    }))
-  }));
+// Mock the actual publisher module with correct exports
+jest.mock('../../orchestrator/publisher', () => ({
+  publishArtifact: jest.fn(),
+  MDXRenderer: jest.fn().mockImplementation(() => ({
+    render: jest.fn()
+  }))
+}));
 
+describe('Publisher Interface Alignment', () => {
   const mockTestContent = {
     id: 'test-content-123',
     title: 'Test Framework',

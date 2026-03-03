@@ -1,10 +1,14 @@
 // ABOUTME: Test suite for EIP compliance database migration and functionality
 // ABOUTME: Validates Redis → Supabase migration, worker compatibility, and data integrity
 
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { ComplianceDatabaseExtension } from '../../orchestrator/database-compliance-v2';
 import { getSupabaseAdmin } from '../../lib_supabase/db/supabase-client';
 import Redis from 'ioredis';
+
+jest.mock('uuid', () => ({
+  v4: () => '00000000-0000-4000-8000-000000000000'
+}));
 
 // Mock data for testing
 const mockComplianceReport = {

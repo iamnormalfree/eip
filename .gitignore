@@ -87,3 +87,11 @@ docs/RAILWAY_ENVIRONMENT_CONFIGURATION.md
 .maf/credentials/*.env
 !maf/credentials/README.md
 !maf/credentials/example-*.env
+
+# Backup and temp files (QA artifacts)
+*.backup
+*.tmp
+*.bak
+*.orig
+*.queue-backup
+*-backup

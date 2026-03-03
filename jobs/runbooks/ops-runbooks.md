@@ -307,3 +307,9 @@ Expand IP library if a style keeps winning (e.g., Playbook).
 
 Retire underperforming grids; double down on top clusters.
 Exit: framework gets sharper every quarter.
+
+---
+
+## Active Runbooks
+
+- [IM v2 & Fear on Paper Generation](../../docs/runbooks/active/im-fear-on-paper-generation.md)

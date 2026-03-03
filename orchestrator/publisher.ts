@@ -4,6 +4,7 @@
 
 import { templateRenderer, TemplateData } from './template-renderer';
 import { getIPInvariants } from './router';
+import { evaluateHitlGates } from './hitl-gates';
 
 type PublishInput = {
   draft: string;
@@ -13,6 +14,10 @@ type PublishInput = {
     overall_score?: number;
     content_analysis?: any;
     pattern_analysis?: any;
+    compliance_analysis?: {
+      compliance_score?: number;
+      financial_claims_detected?: number | boolean;
+    };
   };
   retrieval: {
     flags: any;
@@ -26,6 +31,7 @@ type PublishInput = {
     tier?: string;
     correlation_id?: string;
     processing_mode?: string;
+    output_template?: string;
   };
 };
 
@@ -500,6 +506,21 @@ export async function publishArtifact(input: PublishInput): Promise<PublishResul
   const renderer = new MDXRenderer();
 
   const frontmatter = renderer.generateFrontmatter(input, metrics);
+
+  // Resolve optional Fear-on-Paper output template for IMv2 / FoP content.
+  const resolvedFearOnPaperTemplate = (templateRenderer as any).resolveFearOnPaperTemplate?.({
+    requestedTemplate: input.metadata?.output_template,
+    ip: input.ip,
+    brief: input.metadata?.brief || input.draft
+  }) || null;
+
+  const loadedFearOnPaperTemplate = resolvedFearOnPaperTemplate
+    ? (templateRenderer as any).loadFearOnPaperTemplate?.(resolvedFearOnPaperTemplate)
+    : null;
+
+  if (resolvedFearOnPaperTemplate) {
+    frontmatter.output_template = resolvedFearOnPaperTemplate;
+  }
   const mdx = renderer.renderMDX(input, frontmatter);
 
   // Use TemplateRenderer for JSON-LD generation instead of hardcoded JSONLDGenerator
@@ -594,11 +615,14 @@ export async function publishArtifact(input: PublishInput): Promise<PublishResul
     }
   ];
 
-  // Determine if human review is required
-  const hasCriticalTags = input.audit.tags.some(tag => tag.severity === 'error');
-  const hasLowScore = (input.audit.overall_score || 0) < 70;
-  const hasFailedInvariants = ipInvariants.failed.length > 0;
-  const humanReviewRequired = hasCriticalTags || hasLowScore || hasFailedInvariants;
+  // Deterministic HITL decision from shared gate logic.
+  const hitlDecision = evaluateHitlGates({
+    tags: input.audit.tags,
+    overall_score: input.audit.overall_score,
+    compliance_analysis: input.audit.compliance_analysis,
+    invariants_failed: ipInvariants.failed.length,
+  });
+  const humanReviewRequired = hitlDecision.needs_human_review;
 
   // Comprehensive compliance ledger
   const ledger = {
@@ -632,9 +656,12 @@ export async function publishArtifact(input: PublishInput): Promise<PublishResul
       version: '1.0.0',
       quality_assured: true,
       template_used: `${contentType}.jsonld.j2`,
+      output_template_used: resolvedFearOnPaperTemplate,
+      output_template_loaded: Boolean(loadedFearOnPaperTemplate?.success),
       compliance_checked: true,
-      sources_validated: complianceSources.length > 0
-    }
+      sources_validated: complianceSources.length > 0,
+    },
+    hitl: hitlDecision,
   };
 
   // Quality gates validation

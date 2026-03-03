@@ -9,7 +9,9 @@ import { publishArtifact, type PublishResult } from '../../orchestrator/publishe
 jest.mock('../../orchestrator/template-renderer', () => ({
   templateRenderer: {
     renderArticle: jest.fn(),
-    renderFAQ: jest.fn()
+    renderFAQ: jest.fn(),
+    resolveFearOnPaperTemplate: jest.fn(),
+    loadFearOnPaperTemplate: jest.fn()
   }
 }));
 
@@ -69,6 +71,8 @@ describe('Publisher Integration Tests - Plan 06', () => {
 
     // Mock IP invariants
     (getIPInvariants as jest.Mock).mockReturnValue(['has_overview', 'has_mechanism', 'has_examples']);
+    (templateRenderer.resolveFearOnPaperTemplate as jest.Mock).mockReturnValue(null);
+    (templateRenderer.loadFearOnPaperTemplate as jest.Mock).mockReturnValue({ success: false });
   });
 
   describe('Complete Publisher Assembly', () => {
@@ -215,6 +219,27 @@ describe('Publisher Integration Tests - Plan 06', () => {
       expect(templateRenderer.renderFAQ).toHaveBeenCalled();
       expect(templateRenderer.renderArticle).toHaveBeenCalled();
       expect(result.jsonld['@type']).toContain('Article');
+    });
+
+    it('should record resolved Fear on Paper template when available', async () => {
+      (templateRenderer.resolveFearOnPaperTemplate as jest.Mock).mockReturnValueOnce('fear-on-paper-script.yaml');
+      (templateRenderer.loadFearOnPaperTemplate as jest.Mock).mockReturnValueOnce({
+        success: true,
+        template: { id: 'fear-on-paper-script' }
+      });
+
+      const result = await publishArtifact({
+        draft: '# Internal Method\n\nMechanism content.',
+        ip: 'imv2_framework@1.0.0',
+        audit: { tags: [], overall_score: 90 },
+        retrieval: { flags: {}, candidates: [] },
+        metadata: { brief: 'internal methodology', output_template: 'fear-on-paper-script' }
+      });
+
+      expect(templateRenderer.resolveFearOnPaperTemplate).toHaveBeenCalled();
+      expect(result.frontmatter.output_template).toBe('fear-on-paper-script.yaml');
+      expect(result.ledger.provenance_extended.output_template_used).toBe('fear-on-paper-script.yaml');
+      expect(result.ledger.provenance_extended.output_template_loaded).toBe(true);
     });
   });
 

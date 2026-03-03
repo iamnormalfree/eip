@@ -25,7 +25,7 @@ jest.mock('next/image', () => ({
 jest.mock('@supabase/auth-helpers-react', () => ({
   useUser: () => ({ user: null, loading: false }),
   Auth: ({ children }: any) => <div>{children}</div>
-}));
+}), { virtual: true });
 
 // Mock environment variables for UI testing
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:54321';

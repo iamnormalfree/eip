@@ -1,0 +1,21 @@
+id: imv2_framework
+version: 1.0.0
+purpose: "Internal methodology framework - explain internal team methodologies, processes, and operational structures"
+operators:
+  - name: METHODOLOGY_EXPLAIN
+    spec: "Explain internal methodology as structured approach with clear steps and rationale"
+  - name: CONTEXT_ADAPT
+    spec: "Adapt explanation based on audience familiarity with internal context"
+  - name: IMPLEMENTATION_GUIDE
+    spec: "Provide actionable implementation guidance for teams adopting the methodology"
+invariants:
+  - "Must include methodology overview with clear objectives"
+  - "Must include step-by-step implementation guide"
+  - "Must include success metrics or expected outcomes"
+sections:
+  - Overview
+  - Objectives
+  - Implementation Steps
+  - Best Practices
+  - Success Metrics
+  - FAQ

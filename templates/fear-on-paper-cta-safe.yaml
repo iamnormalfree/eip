@@ -1,0 +1,35 @@
+id: fear-on-paper-cta-safe
+version: 1.0.0
+name: Fear on Paper CTA (Safe)
+description: Safe call-to-action template that follows compliance guidelines
+type: cta
+
+structure:
+  headline:
+    text: "What to do next"
+    alignment: center
+
+  options:
+    - id: learn_more
+      button_text: "Learn more about [TOPIC]"
+      description: "Get our comprehensive guide to understanding [TOPIC]"
+      type: informational
+
+    - id: free_consultation
+      button_text: "Book a free consultation"
+      description: "Speak with an expert about your specific situation"
+      type: conversion
+
+    - id: download_checklist
+      button_text: "Download our free checklist"
+      description: "Get our step-by-step checklist for [TOPIC]"
+      type: lead_magnet
+
+  compliance_notice:
+    text: "This content is for educational purposes only and does not constitute financial advice."
+    placement: below_cta
+
+variables:
+  - TOPIC
+  - BUTTON_TEXT
+  - CTA_TYPE

@@ -1,0 +1,22 @@
+id: imv2_founder_translation
+version: 1.0.0
+purpose: "Founder communication translation - convert founder vision into actionable team direction"
+operators:
+  - name: VISION_EXTRACT
+    spec: "Extract core vision and key strategic priorities from founder communication"
+  - name: TRANSLATION_PRINCIPLE
+    spec: "Translate high-level vision into concrete team objectives"
+  - name: ALIGNMENT_FRAMEWORK
+    spec: "Create alignment framework for team execution"
+  - name: SUCCESS_DEFINITION
+    spec: "Define clear success criteria that align with founder goals"
+invariants:
+  - "Must include clear strategic priorities"
+  - "Must include actionable team objectives"
+  - "Must include success metrics"
+sections:
+  - Vision Summary
+  - Strategic Priorities
+  - Team Objectives
+  - Success Metrics
+  - Next Steps

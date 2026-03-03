@@ -1,0 +1,42 @@
+id: fear-on-paper-email
+version: 1.0.0
+name: Fear on Paper Email
+description: Email template for Fear on Paper content
+type: email
+
+structure:
+  subject_line:
+    options:
+      - "What [TOPIC] companies don't want you to know"
+      - "The [SCARY_ADJECTIVE] truth about [TOPIC]"
+      - "Warning: This article about [TOPIC] might scare you"
+
+  preheader:
+    text: "Most people get this completely wrong..."
+
+  header:
+    headline: "[FEAR_INDUCING_HEADLINE]"
+    subheadline: "Here's why this matters to you"
+
+  body:
+    - paragraph: "I was skeptical too when I first learned about this..."
+    - paragraph: "Here's what the experts aren't telling you..."
+    - paragraph: "[EVIDENCE_OR_STATISTIC]"
+    - paragraph: "The good news? You can protect yourself by [ACTION]"
+
+  cta_button:
+    text: "[BUTTON_TEXT]"
+    url: "[LANDING_PAGE_URL]"
+
+  footer:
+    disclaimer: "Not financial advice. Do your own research."
+    unsubscribe: "Unsubscribe from these emails"
+
+variables:
+  - TOPIC
+  - SCARY_ADJECTIVE
+  - FEAR_INDUCING_HEADLINE
+  - EVIDENCE_OR_STATISTIC
+  - ACTION
+  - BUTTON_TEXT
+  - LANDING_PAGE_URL

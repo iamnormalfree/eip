@@ -337,6 +337,33 @@ Sections: {{ document.sections.count }}
     });
   });
 
+  describe('Fear on Paper Template Resolution', () => {
+    it('should resolve explicit Fear on Paper template requests deterministically', () => {
+      const templateName = templateRenderer.resolveFearOnPaperTemplate({
+        requestedTemplate: 'fear-on-paper-email'
+      });
+
+      expect(templateName).toBe('fear-on-paper-email.yaml');
+    });
+
+    it('should resolve IM v2 briefs to script template by default', () => {
+      const templateName = templateRenderer.resolveFearOnPaperTemplate({
+        ip: 'imv2_framework@1.0.0',
+        brief: 'internal methodology for weekly operating system'
+      });
+
+      expect(templateName).toBe('fear-on-paper-script.yaml');
+    });
+
+    it('should load Fear on Paper template YAML from templates directory', () => {
+      const loaded = templateRenderer.loadFearOnPaperTemplate('fear-on-paper-script.yaml');
+
+      expect(loaded.success).toBe(true);
+      expect(loaded.template).toBeDefined();
+      expect(loaded.template?.id).toBe('fear-on-paper-script');
+    });
+  });
+
   describe('Error Handling', () => {
     it('should handle circular references in data', () => {
       const circularData: any = { name: 'Test' };
