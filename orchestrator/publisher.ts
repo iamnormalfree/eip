@@ -10,7 +10,7 @@ import { templateRenderer, TemplateData } from './template-renderer';
  * - output_template starting with 'fear-on-paper-'
  * - IP pattern starting with 'imv2_'
  */
-function isFoPContext(metadata: PublishInput['metadata'], ip: string): boolean {
+export function isFoPContext(metadata: PublishInput['metadata'], ip: string): boolean {
   return Boolean(
     (metadata?.output_template?.startsWith('fear-on-paper-')) ||
     ip.startsWith('imv2_')

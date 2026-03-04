@@ -1,7 +1,7 @@
 // ABOUTME: Tests for publish-time source_capture gate for Fear-on-Paper outputs
 // ABOUTME: Validates that source_capture is required for FoP context at publish boundary
 
-import { publishArtifact } from '../../orchestrator/publisher';
+import { publishArtifact, isFoPContext } from '../../orchestrator/publisher';
 
 describe('publisher source_capture gate', () => {
   const baseInput = {
@@ -22,14 +22,6 @@ describe('publisher source_capture gate', () => {
 
   describe('FoP context detection', () => {
     it('should detect FoP context via output_template prefix', () => {
-      // Helper function to detect FoP context
-      const isFoPContext = (metadata: any, ip: string): boolean => {
-        return Boolean(
-          (metadata?.output_template?.startsWith('fear-on-paper-')) ||
-          ip.startsWith('imv2_')
-        );
-      };
-
       // Test: output_template starts with fear-on-paper-
       expect(isFoPContext({ output_template: 'fear-on-paper-basic' }, 'framework')).toBe(true);
       expect(isFoPContext({ output_template: 'fear-on-paper-detailed' }, 'framework')).toBe(true);
@@ -38,13 +30,6 @@ describe('publisher source_capture gate', () => {
     });
 
     it('should detect FoP context via IP prefix', () => {
-      const isFoPContext = (metadata: any, ip: string): boolean => {
-        return Boolean(
-          (metadata?.output_template?.startsWith('fear-on-paper-')) ||
-          ip.startsWith('imv2_')
-        );
-      };
-
       // Test: ip starts with imv2_
       expect(isFoPContext({}, 'imv2_framework')).toBe(true);
       expect(isFoPContext({}, 'imv2_process')).toBe(true);
