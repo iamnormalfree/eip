@@ -1,7 +1,7 @@
 // ABOUTME: Test Preflight Check Script Exports and Basic Functionality
 // ABOUTME: Validates environment preflight check module structure
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from '@jest/globals';
 
 // Import the module to test exports
 import {

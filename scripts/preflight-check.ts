@@ -96,7 +96,7 @@ export async function checkRedisConnection(): Promise<PreflightResult> {
   try {
     // Dynamic import with constructor interop: default ?? Redis ?? module
     const ioredisModule = await import('ioredis');
-    const Redis = ioredisModule.default ?? ioredisModule.Redis ?? ioredisModule;
+    const Redis = (ioredisModule.default ?? ioredisModule.Redis ?? ioredisModule) as new (url: string, options?: any) => any;
 
     if (!Redis) {
       return {
