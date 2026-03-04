@@ -40,7 +40,19 @@ import {
  * Queue Strict Mode Configuration
  * When EIP_QUEUE_STRICT=true, queue failures will fail-fast instead of falling back to direct execution
  */
-const isQueueStrict = (): boolean => process.env.EIP_QUEUE_STRICT === 'true';
+const isQueueStrict = (): boolean => {
+  // If explicitly set, respect the explicit value
+  if (process.env.EIP_QUEUE_STRICT !== undefined) {
+    return process.env.EIP_QUEUE_STRICT === 'true';
+  }
+  // Default to strict mode in production and staging environments
+  const nodeEnv = process.env.NODE_ENV;
+  if (nodeEnv === 'production' || nodeEnv === 'staging') {
+    return true;
+  }
+  // Default to non-strict in development and other environments
+  return false;
+};
 
 type Brief = {
   brief: string;
