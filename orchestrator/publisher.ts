@@ -3,6 +3,15 @@
 // ABOUTME: Integrates with TemplateRenderer for proper JSON-LD schema rendering
 
 import { templateRenderer, TemplateData } from './template-renderer';
+
+/**
+ * Detects if the publish context is for Fear-on-Paper (FoP) output.
+ * FoP context is determined by output template contract only.
+ * This avoids accidentally gating non-FoP IMv2 content paths.
+ */
+export function isFoPContext(metadata: PublishInput['metadata'], _ip: string): boolean {
+  return Boolean(metadata?.output_template?.startsWith('fear-on-paper-'));
+}
 import { getIPInvariants } from './router';
 import { evaluateHitlGates } from './hitl-gates';
 
@@ -32,6 +41,7 @@ type PublishInput = {
     correlation_id?: string;
     processing_mode?: string;
     output_template?: string;
+    source_capture?: string;
   };
 };
 
@@ -500,6 +510,14 @@ function extractFAQDataFromDraft(draft: string): Array<{ question: string; answe
 }
 
 export async function publishArtifact(input: PublishInput): Promise<PublishResult> {
+  // Validate source_capture requirement for Fear-on-Paper outputs
+  if (isFoPContext(input.metadata, input.ip)) {
+    const sourceCapture = input.metadata?.source_capture;
+    if (!sourceCapture || sourceCapture.trim() === '') {
+      throw new Error('Publish blocked: source_capture is required for Fear-on-Paper outputs');
+    }
+  }
+
   console.log('Publisher: Rendering artifact for IP:', input.ip);
 
   const metrics = calculateMetrics(input.draft, input.audit);

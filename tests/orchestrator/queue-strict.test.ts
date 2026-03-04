@@ -143,10 +143,11 @@ describe('Queue Strict Mode Tests', () => {
       expect(result.artifact).toBeDefined();
     });
 
-    it('should fall back to direct execution when EIP_QUEUE_STRICT is not set', async () => {
-      // Ensure EIP_QUEUE_STRICT is not set (undefined) and test mode is off
+    it('should fall back to direct execution in development when EIP_QUEUE_STRICT is not set', async () => {
+      // Ensure EIP_QUEUE_STRICT is not set (undefined), test mode is off, and NODE_ENV is development
       delete process.env.EIP_QUEUE_STRICT;
       delete process.env.EIP_TEST_MODE;
+      process.env.NODE_ENV = 'development';
 
       // Mock failed queue submission
       mockSubmitContentGenerationJob.mockResolvedValue({
@@ -165,9 +166,71 @@ describe('Queue Strict Mode Tests', () => {
 
       const result = await runOnce(brief);
 
-      // Should succeed via fallback to direct execution (default behavior)
+      // Should succeed via fallback to direct execution in development (default behavior)
       expect(result.success).toBe(true);
       expect(result.artifact).toBeDefined();
+    });
+
+    it('should fail fast without fallback in production when EIP_QUEUE_STRICT is not set', async () => {
+      // NODE_ENV=production, EIP_QUEUE_STRICT not set -> strict mode defaults to true
+      delete process.env.EIP_QUEUE_STRICT;
+      delete process.env.EIP_TEST_MODE;
+      process.env.NODE_ENV = 'production';
+
+      // Mock failed queue submission
+      mockSubmitContentGenerationJob.mockResolvedValue({
+        jobId: undefined,
+        success: false,
+        error: 'Queue service unavailable'
+      });
+
+      const brief = {
+        brief: 'Explain the strategic framework for business expansion',
+        persona: 'professional',
+        funnel: 'mofu',
+        tier: 'MEDIUM' as const,
+        queue_mode: true
+      };
+
+      const result = await runOnce(brief);
+
+      // Should fail without fallback in production (strict mode defaults to true)
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('strict mode');
+      expect(result.error).toContain('Queue submission failed');
+      expect(result.queue_job_id).toBeUndefined();
+      expect(result.artifact).toBeUndefined();
+    });
+
+    it('should fail fast without fallback in staging when EIP_QUEUE_STRICT is not set', async () => {
+      // NODE_ENV=staging, EIP_QUEUE_STRICT not set -> strict mode defaults to true
+      delete process.env.EIP_QUEUE_STRICT;
+      delete process.env.EIP_TEST_MODE;
+      process.env.NODE_ENV = 'staging';
+
+      // Mock failed queue submission
+      mockSubmitContentGenerationJob.mockResolvedValue({
+        jobId: undefined,
+        success: false,
+        error: 'Queue service unavailable'
+      });
+
+      const brief = {
+        brief: 'Explain the strategic framework for business expansion',
+        persona: 'professional',
+        funnel: 'mofu',
+        tier: 'MEDIUM' as const,
+        queue_mode: true
+      };
+
+      const result = await runOnce(brief);
+
+      // Should fail without fallback in staging (strict mode defaults to true)
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('strict mode');
+      expect(result.error).toContain('Queue submission failed');
+      expect(result.queue_job_id).toBeUndefined();
+      expect(result.artifact).toBeUndefined();
     });
 
     it('should succeed with queue submission in strict mode when queue works', async () => {

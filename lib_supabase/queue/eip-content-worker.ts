@@ -230,10 +230,10 @@ async function processEIPContentGenerationJob(job: Job<EIPContentGenerationJob>)
     const finalAudit = await microAudit({ draft: repaired, ip });
     
     // Stage 7: Publishing (within budget limits)
-    const artifact = await publishArtifact({ 
-      draft: repaired, 
-      ip, 
-      audit: finalAudit, 
+    const artifact = await publishArtifact({
+      draft: repaired,
+      ip,
+      audit: finalAudit,
       retrieval,
       metadata: {
         brief: data.brief,
@@ -241,7 +241,9 @@ async function processEIPContentGenerationJob(job: Job<EIPContentGenerationJob>)
         funnel: data.funnel,
         tier: data.tier,
         correlation_id: data.correlation_id,
-        queue_job_id: data.job_id
+        queue_job_id: data.job_id,
+        output_template: data.metadata?.output_template,
+        source_capture: data.metadata?.source_capture
       }
     });
 
