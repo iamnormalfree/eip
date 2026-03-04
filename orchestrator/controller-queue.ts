@@ -18,6 +18,10 @@ type Brief = {
   tier?: Tier;
   correlation_id?: string;
   queue_mode?: boolean; // New: force queue processing
+  output_template?: string;
+  imv2_card?: {
+    source_capture?: string;
+  };
 };
 
 /**
@@ -248,10 +252,10 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
     const finalAudit = await microAudit({ draft: repaired, ip });
     
     // Stage 7: Publishing
-    const artifact = await publishArtifact({ 
-      draft: repaired, 
-      ip, 
-      audit: finalAudit, 
+    const artifact = await publishArtifact({
+      draft: repaired,
+      ip,
+      audit: finalAudit,
       retrieval,
       metadata: {
         brief: input.brief,
@@ -259,7 +263,9 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
         funnel: input.funnel,
         tier: tier,
         correlation_id: input.correlation_id,
-        processing_mode: 'direct_execution'
+        processing_mode: 'direct_execution',
+        output_template: input.output_template,
+        source_capture: input.imv2_card?.source_capture
       }
     });
 

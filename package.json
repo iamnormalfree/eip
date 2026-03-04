@@ -23,7 +23,7 @@
     "retrieval:test": "npx tsx scripts/test-retrieval.ts",
     "test:auditor": "jest --config jest.eip.config.js tests/orchestrator/auditor.test.ts tests/orchestrator/auditor-simple.test.ts tests/orchestrator/plan05-compliance.test.ts tests/orchestrator/plan05-integration.test.ts tests/orchestrator/repairer-plan05.test.ts tests/orchestrator/repairer-updated.test.ts",
     "test:db": "jest --config jest.eip.config.js --testNamePattern=\"database\"",
-    "test:orchestrator": "jest --config jest.eip.config.js tests/orchestrator/controller.test.ts tests/orchestrator/controller-real.test.ts tests/orchestrator/controller-queue-integration.test.ts tests/orchestrator/queue-strict.test.ts tests/orchestrator/whelm-contract.test.ts tests/orchestrator/template-im-conformance.test.ts tests/orchestrator/orchestrator-smoke.test.ts tests/orchestrator/router.test.ts tests/orchestrator/pipeline-phase3-e2e.test.ts",
+    "test:orchestrator": "jest --config jest.eip.config.js tests/orchestrator/controller.test.ts tests/orchestrator/controller-real.test.ts tests/orchestrator/controller-queue-integration.test.ts tests/orchestrator/queue-strict.test.ts tests/orchestrator/whelm-contract.test.ts tests/orchestrator/template-im-conformance.test.ts tests/orchestrator/orchestrator-smoke.test.ts tests/orchestrator/router.test.ts tests/orchestrator/pipeline-phase3-e2e.test.ts tests/orchestrator/publisher-source-capture-gate.test.ts",
     "test:ui": "jest --config jest.eip.config.js --testNamePattern=\"review\"",
     "test:integration": "npm run test:retrieval && npm run test:auditor && npm run test:orchestrator",
     "test:integration:env": "jest --config jest.integration-env.config.js --runInBand",

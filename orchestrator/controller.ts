@@ -183,7 +183,8 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
         queue_mode: true,
         timestamp: new Date().toISOString(),
         correlation_id: correlationId,
-        output_template: input.output_template
+        output_template: input.output_template,
+        source_capture: input.imv2_card?.source_capture
       }
     });
 
@@ -629,7 +630,8 @@ async function runDirectly(input: Brief): Promise<{ success: boolean; artifact?:
         tier: tier,
         correlation_id: correlationId,
         processing_mode: 'direct_execution',
-        output_template: input.output_template
+        output_template: input.output_template,
+        source_capture: input.imv2_card?.source_capture
       }
     });
 
