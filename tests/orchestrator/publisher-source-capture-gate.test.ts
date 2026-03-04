@@ -29,10 +29,9 @@ describe('publisher source_capture gate', () => {
       expect(isFoPContext({}, 'framework')).toBe(false);
     });
 
-    it('should detect FoP context via IP prefix', () => {
-      // Test: ip starts with imv2_
-      expect(isFoPContext({}, 'imv2_framework')).toBe(true);
-      expect(isFoPContext({}, 'imv2_process')).toBe(true);
+    it('should not detect FoP context from IP prefix alone', () => {
+      expect(isFoPContext({}, 'imv2_framework')).toBe(false);
+      expect(isFoPContext({}, 'imv2_process')).toBe(false);
       expect(isFoPContext({}, 'framework')).toBe(false);
     });
   });
@@ -97,24 +96,41 @@ describe('publisher source_capture gate', () => {
       expect(result).toHaveProperty('jsonld');
     });
 
-    it('IP starts with imv2_ + missing source_capture -> throws error', async () => {
+    it('IP starts with imv2_ + missing source_capture + non-FoP template -> resolves', async () => {
       const input = {
         ...baseInput,
         ip: 'imv2_framework',
         metadata: {
-          brief: 'test brief'
+          brief: 'test brief',
+          output_template: 'standard-article'
+        }
+      };
+
+      const result = await publishArtifact(input);
+      expect(result).toHaveProperty('mdx');
+      expect(result).toHaveProperty('jsonld');
+    });
+
+    it('IP starts with imv2_ + FoP template + missing source_capture -> throws error', async () => {
+      const input = {
+        ...baseInput,
+        ip: 'imv2_framework',
+        metadata: {
+          brief: 'test brief',
+          output_template: 'fear-on-paper-basic'
         }
       };
 
       await expect(publishArtifact(input)).rejects.toThrow('source_capture');
     });
 
-    it('IP starts with imv2_ + valid source_capture -> resolves', async () => {
+    it('IP starts with imv2_ + FoP template + valid source_capture -> resolves', async () => {
       const input = {
         ...baseInput,
         ip: 'imv2_framework',
         metadata: {
           brief: 'test brief',
+          output_template: 'fear-on-paper-basic',
           source_capture: 'https://mas.gov.sg/regulation'
         }
       };

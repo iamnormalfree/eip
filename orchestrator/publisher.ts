@@ -6,15 +6,11 @@ import { templateRenderer, TemplateData } from './template-renderer';
 
 /**
  * Detects if the publish context is for Fear-on-Paper (FoP) output.
- * FoP context is determined by:
- * - output_template starting with 'fear-on-paper-'
- * - IP pattern starting with 'imv2_'
+ * FoP context is determined by output template contract only.
+ * This avoids accidentally gating non-FoP IMv2 content paths.
  */
-export function isFoPContext(metadata: PublishInput['metadata'], ip: string): boolean {
-  return Boolean(
-    (metadata?.output_template?.startsWith('fear-on-paper-')) ||
-    ip.startsWith('imv2_')
-  );
+export function isFoPContext(metadata: PublishInput['metadata'], _ip: string): boolean {
+  return Boolean(metadata?.output_template?.startsWith('fear-on-paper-'));
 }
 import { getIPInvariants } from './router';
 import { evaluateHitlGates } from './hitl-gates';
