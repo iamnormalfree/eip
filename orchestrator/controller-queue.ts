@@ -78,7 +78,10 @@ async function runViaQueue(input: Brief): Promise<{ success: boolean; artifact?:
       metadata: {
         submission_source: 'orchestrator_controller',
         queue_mode: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        correlation_id: input.correlation_id,
+        output_template: input.output_template,
+        source_capture: input.imv2_card?.source_capture
       }
     });
 
